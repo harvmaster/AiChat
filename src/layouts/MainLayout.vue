@@ -1,7 +1,7 @@
 <template>
   <q-layout view="lHh Lpr lFf" class="page-background">
     <q-header class="bg-transparent row justify-center">
-      <div class="col-auto text-h5 text-weight-bold">AI Chat</div>
+      <div class="col-auto text-h3 text-weight-bold q-pa-md">AI Chat</div>
     </q-header>
 
     <q-page-container>
