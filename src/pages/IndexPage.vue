@@ -57,7 +57,7 @@ pre {
 </style>
 
 <script setup lang="ts">
-import { computed, onMounted, ref, nextTick } from 'vue';
+import { computed, ref, nextTick } from 'vue';
 import { marked } from 'marked';
 import Prism from 'prismjs';
 
@@ -67,16 +67,6 @@ const inputElement = ref<HTMLTextAreaElement | null>(null);
 const messages = ref([
   { id: 1, text: 'Hello, how can I help you?', isBot: true },
 ]);
-
-/*
-this is a test
-This a second line
-```ts
-const thisIsCode = () => {
-  return 'code'
-}
-```
-*/
 
 const sendMessage = async (event?: KeyboardEvent) => {
   // Dont do anything if its an empty message
@@ -170,26 +160,5 @@ const log = (value: any) => {
 
 const inputRows = computed(() => {
   return Math.min(10, input.value.split('\n').length);
-});
-
-onMounted(async () => {
-  const text = '```ts\nconst a = 1;\n```';
-
-  const markup = await marked.parse(text);
-  console.log(markup);
-
-  const noLines = markup.replaceAll(/\n/g, '∂');
-  console.log(noLines);
-
-  const codeBlocks = noLines.match(/<code[^>]*>.*?<\/code>/g);
-  console.log(codeBlocks);
-
-  const lines = codeBlocks?.join('').split('∂').join('\n');
-  console.log(lines);
-
-  Prism.highlightAll();
-
-  console.log(Prism);
-  console.log(Prism.languages);
 });
 </script>
