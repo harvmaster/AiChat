@@ -17,7 +17,7 @@
       </div>
 
       <!-- Chat input -->
-      <div class="col-12 row bg-secondary q-pa-md rounded-borders">
+      <div class="col-12 row bg-accent q-pa-md rounded-borders">
         <div class="col text-h6 self-center q-pl-md">
           <textarea
             type="textarea"
@@ -32,7 +32,7 @@
           </textarea>
         </div>
         <div class="col-auto self-center">
-          <q-btn flat round dense icon="send" @click="() => sendMessage()" />
+          <q-btn flat round dense icon="send" color="primary" @click="() => sendMessage()" />
         </div>
       </div>
     </div>
@@ -47,7 +47,7 @@ pre {
 }
 
 .card-background {
-  background-color: #D7F9FF;
+  background-color: #EFF1F3;
 }
 
 .chat-message {
@@ -137,7 +137,6 @@ const sendMessage = async (event?: KeyboardEvent) => {
 
 const handleTab = (event: KeyboardEvent) => {
   const codeWrappers = input.value.split('```');
-  console.log(event)
   if (codeWrappers.length % 2 == 0) {
     event.preventDefault();
     const target = event.target as HTMLTextAreaElement;

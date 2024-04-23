@@ -12,7 +12,7 @@
 
 <style lang="scss" scoped>
 .page-background {
-  background-color: #AFCBFF;
+  background-color: #D17B88;
 }
 </style>
 
