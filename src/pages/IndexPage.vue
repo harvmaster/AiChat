@@ -4,9 +4,12 @@
       <!-- Chat history -->
       <div class="col-12 row q-pb-md">
         <div class="col-12" v-for="message of messages" :key="message.id">
-          <q-card
+          <!-- <q-card
             :class="message.isBot ? 'bg-grey-3' : 'bg-primary text-white'"
-            class="full-width"
+            class="full-width card-background"
+          > -->
+          <q-card
+            class="full-width card-background text-black chat-message"
           >
             <q-card-section>
               <q-item-label>
@@ -28,7 +31,7 @@
             v-model="input"
             :rows="inputRows"
             @keyup="log"
-            @keypress.enter="sendMessage"
+            @keypress.enter.exact="sendMessage"
             @keydown.tab="handleTab"
           >
           </textarea>
@@ -46,6 +49,15 @@ pre {
   background-color: #9a7b7b;
   padding: 1rem;
   border-radius: 1rem;
+}
+
+.card-background {
+  background-color: #D7F9FF;
+}
+
+.chat-message {
+  font-size: 1.2rem;
+  font-weight: 700;
 }
 </style>
 
@@ -104,7 +116,7 @@ const sendMessage = async (event?: KeyboardEvent) => {
 
         const highlightedCode = Prism.highlight(
           formattedCode,
-          Prism.languages.javascript,
+          Prism.languages.typescript,
           language
         );
         markup = markup.replace(
