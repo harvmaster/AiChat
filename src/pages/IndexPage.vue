@@ -4,10 +4,6 @@
       <!-- Chat history -->
       <div class="col-12 row q-pb-md">
         <div class="col-12 q-py-sm" v-for="message of messages" :key="message.id">
-          <!-- <q-card
-            :class="message.isBot ? 'bg-grey-3' : 'bg-primary text-white'"
-            class="full-width card-background"
-          > -->
           <q-card
             class="full-width card-background text-black chat-message"
           >
@@ -83,37 +79,18 @@ const thisIsCode = () => {
 */
 
 const sendMessage = async (event?: KeyboardEvent) => {
-  
-  // Get the current text up to the cursor
-  // const cursorPosition = inputElement.value?.selectionStart || input.value.length;
-  // const textBeforeCursor = input.value.substring(0, cursorPosition);
-  // const hasCode = textBeforeCursor.match(/```.{2,4}\n/g) || [];
-
-
+  // Dont do anything if its an empty message
+  if (!input.value.trim()) return;
   
   // Is in code block
-
-
   const codeWrapperStarts = input.value.match(/^(?:\n|^)```.{1,4}/mgi) || [];
   const wholeCode = input.value.match(/(^(?:\n|^)```.{1,4}\n)([^]*?)(\n```)/gmi) || [];
-  const codeWarpperEnds = input.value.match(/\n```\n/g) || []
-
-  console.log(codeWrapperStarts.length, wholeCode.length)
-  // if ((codeWrapperStarts.length + codeWarpperEnds.length) % 2 != 0) {
-  //   return;
-  // }
 
   if (codeWrapperStarts.length != wholeCode.length) {
-    console.log('Code block');
     return;
   }
 
-  const lines = input.value.split('\n');
-  if (lines.every((line) => line.length === 0)) {
-    console.log('Empty message');
-    return;
-  }
-
+  // Cancel the event, were submitting it
   if (event) {
     event.preventDefault();
   }
@@ -121,27 +98,20 @@ const sendMessage = async (event?: KeyboardEvent) => {
   if (input.value.length > 1) {
     let markup = await marked.parse(input.value)
     markup = markup.replaceAll('\n', '<br>')
-    // console.log(markup);
 
     const noLines = markup.replaceAll(/<br>/g, '∂');
-    // console.log(noLines);
-
     const codeBlocks = noLines.match(/<code[^>]*>.*?<\/code>/g)?.map(block => block.split('∂').join('\n'));
-    // console.log(codeBlocks);
 
     if (codeBlocks) {
       codeBlocks.forEach((codeBlock) => {
         const domParser = new DOMParser();
 
         const language = codeBlock.match(/<code class="language-(.*?)">/)?.[1] || 'javascript';
-
         const code = codeBlock
           .replace(/<code[^>]*>/, '')
           .replace(/<\/code>/, '');
-        // console.log(code)
 
         const parsed = domParser.parseFromString(code, 'text/html');
-        // console.log(parsed.body.textContent);
         const formattedCode = parsed.body.textContent || '';
 
         const highlightedCode = Prism.highlight(
@@ -155,12 +125,8 @@ const sendMessage = async (event?: KeyboardEvent) => {
           codeBlock.replaceAll(/\n/g, '<br>'),
           `<code class="language-${language}">${highlightedCode}</code>`
         );
-        // console.log(markup)
       });
     }
-
-    // const lines = codeBlocks?.join('').split('∂').join('\n');
-    // console.log(lines);
 
     messages.value.push({
       id: messages.value.length + 1,
@@ -186,8 +152,7 @@ const handleTab = (event: KeyboardEvent) => {
     event.preventDefault();
     const target = event.target as HTMLTextAreaElement;
     const cursorPosition = target?.selectionStart
-    // const cursorPosition = event.target?.selectionStart! || 2
-    // const cursorPosition = 2
+
     input.value =
       input.value.substring(0, cursorPosition) +
       '  ' +
