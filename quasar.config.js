@@ -78,6 +78,11 @@ module.exports = configure(function (/* ctx */) {
 
       // extendViteConf (viteConf) {},
       // viteVuePluginOptions: {},
+      extendViteConf (viteConf) {
+        viteConf.server.hmr = {}
+        viteConf.server.hmr.host = 'ai.portfolio.mc.hzuccon.com'
+        viteConf.server.hmr.clientPort = 443
+      },
 
       
       // vitePlugins: [
@@ -88,6 +93,7 @@ module.exports = configure(function (/* ctx */) {
     // Full list of options: https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#devServer
     devServer: {
       // https: true
+      port: 9000,
       open: true // opens browser window automatically
     },
 

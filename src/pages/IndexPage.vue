@@ -42,15 +42,15 @@
 </template>
 
 <style lang="scss">
-// code {
-//   background-color: #9a7b7b;
-//   padding: 1rem;
-//   border-radius: 1rem;
-// }
+pre {
+  background-color: #9a7b7b;
+  padding: 1rem;
+  border-radius: 1rem;
+}
 </style>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue';
+import { computed, onMounted, ref, nextTick } from 'vue';
 import { marked } from 'marked';
 import Prism from 'prismjs';
 
@@ -84,24 +84,35 @@ const sendMessage = async (event?: KeyboardEvent) => {
     const noLines = markup.replaceAll(/\n/g, '∂');
     console.log(noLines);
 
-    const codeBlocks = noLines.match(/<code[^>]*>.*?<\/code>/g);
+    const codeBlocks = noLines.match(/<code[^>]*>.*?<\/code>/g)?.map(block => block.split('∂').join('\n'));
     console.log(codeBlocks);
 
     if (codeBlocks) {
-      // codeBlocks.forEach((codeBlock) => {
-      //   const code = codeBlock
-      //     .replace(/<code[^>]*>/, '')
-      //     .replace(/<\/code>/, '');
-      //   const highlightedCode = Prism.highlight(
-      //     code,
-      //     Prism.languages.typescript,
-      //     'typescript'
-      //   );
-      //   markup = markup.replace(
-      //     codeBlock,
-      //     highlightedCode.split('∂').join('\n')
-      //   );
-      // });
+      codeBlocks.forEach((codeBlock) => {
+        const domParser = new DOMParser();
+
+        const language = codeBlock.match(/<code class="language-(.*?)">/)?.[1] || 'javascript';
+
+        const code = codeBlock
+          .replace(/<code[^>]*>/, '')
+          .replace(/<\/code>/, '');
+        console.log(code)
+
+        const parsed = domParser.parseFromString(code, 'text/html');
+        console.log(parsed.body.textContent);
+        const formattedCode = parsed.body.textContent || '';
+
+        const highlightedCode = Prism.highlight(
+          formattedCode,
+          Prism.languages.javascript,
+          language
+        );
+        markup = markup.replace(
+          codeBlock,
+          `<code class="language-${language}">${highlightedCode}</code>`
+        );
+        console.log(markup)
+      });
     }
 
     // const lines = codeBlocks?.join('').split('∂').join('\n');
@@ -112,7 +123,7 @@ const sendMessage = async (event?: KeyboardEvent) => {
       text: markup,
       isBot: false,
     });
-    Prism.highlightAll();
+    nextTick(() => Prism.highlightAll());
     input.value = '';
     setTimeout(() => {
       messages.value.push({
@@ -126,9 +137,21 @@ const sendMessage = async (event?: KeyboardEvent) => {
 
 const handleTab = (event: KeyboardEvent) => {
   const codeWrappers = input.value.split('```');
+  console.log(event)
   if (codeWrappers.length % 2 == 0) {
     event.preventDefault();
-    input.value += '  ';
+    const target = event.target as HTMLTextAreaElement;
+    const cursorPosition = target?.selectionStart
+    // const cursorPosition = event.target?.selectionStart! || 2
+    // const cursorPosition = 2
+    input.value =
+      input.value.substring(0, cursorPosition) +
+      '  ' +
+      input.value.substring(cursorPosition);
+    nextTick(() => {  
+      const target = event.target as HTMLTextAreaElement;
+      target.selectionStart = target.selectionEnd = cursorPosition + 2;
+    });
   }
 };
 
