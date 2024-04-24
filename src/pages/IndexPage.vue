@@ -77,8 +77,6 @@ const messages = ref([
 const sendMessage = async (event?: KeyboardEvent) => {
   // Dont do anything if its an empty message
   if (!input.value.trim()) return;
-
-  getHighlightedChunks(input.value);
   
   // Is in code block
   const codeWrapperStarts = input.value.match(/^(?:\n|^)```.{1,4}/mgi) || [];
@@ -88,65 +86,16 @@ const sendMessage = async (event?: KeyboardEvent) => {
     return;
   }
 
-  // Cancel the event, were submitting it
   if (event) {
     event.preventDefault();
   }
 
-  // console.log(input.value.replaceAll('\n', '<br>'))
-
   if (input.value.length > 1) {
-    let markup = await marked.parse(input.value)
-    markup = markup.replaceAll('\n', '<br>')
-    // console.log(markup)
-
-    const noLines = markup.replaceAll(/<br>/g, '∂');
-    const codeBlocks = noLines.match(/<code[^>]*>.*?<\/code>/g)?.map(block => block.split('∂').join('\n'));
-
-    if (codeBlocks) {
-      codeBlocks.forEach((codeBlock) => {
-        const domParser = new DOMParser();
-
-        const language = codeBlock.match(/<code class="language-(.*?)">/)?.[1] || 'javascript';
-        const code = codeBlock
-          .replace(/<code[^>]*>/, '')
-          .replace(/<\/code>/, '');
-
-        const parsed = domParser.parseFromString(code, 'text/html');
-        const formattedCode = parsed.body.textContent || '';
-
-        console.log(formattedCode)
-
-        const highlightedCode = Prism.highlight(
-          formattedCode,
-          Prism.languages[language],
-          language
-        );
-
-
-        markup = markup.replace(
-          codeBlock.replaceAll(/\n/g, '<br>'),
-          `<code class="language-${language}">${highlightedCode}</code>`
-        );
-      });
-      // markup = markup.replaceAll('<br><pre>', '<pre>');
-      markup = markup.replaceAll('</pre><br>', '</pre>');
-    }
-
-    if (markup.endsWith('<br>')) {
-      markup = markup.slice(0, -4);
-    }
-
     const mark = await getHighlightedChunks(input.value);
     
     messages.value.push({
       id: messages.value.length + 1,
       text: mark.markup,
-      isBot: false,
-    });
-    messages.value.push({
-      id: messages.value.length + 1,
-      text: markup,
       isBot: false,
     });
     input.value = '';
