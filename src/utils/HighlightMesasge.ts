@@ -1,21 +1,24 @@
-import { marked } from "marked";
+import { marked } from 'marked';
 import Prism from 'prismjs'
-
-// take in a string
 
 type Message = string
 
-type HighlightedMessageResponse = {
-  highlightedMessage: String
-  codeBlocks: Array<String>
-  origialMessage: String
+export type Chunk = {
+  input: string;
+  output: HighlightedChunk;
+  type: 'code' | 'text';
 }
 
-type HighlightedChunks = {
-  original: String
-  output: String
-  code: String
-}[]
+export type HighlightedChunk = {
+  markup: string;
+  highlighted?: string;
+}
+
+export type HighlightedMessage = {
+  input: string;
+  markup: string;
+  chunks: Chunk[];
+}
 
 // remove lines and replace with a special character
 const removeLines = (text: string) => {
@@ -24,7 +27,7 @@ const removeLines = (text: string) => {
 
 const getCodeBlocks = (text: string) => {
   const noLines = removeLines(text)
-  return text.match(/<code[^>]*>.*?<\/code>/g)?.map(joinLines)
+  return noLines.match(/<code[^>]*>.*?<\/code>/g)?.map(joinLines)
 }
 
 const joinLines = (text: string) => {
@@ -32,7 +35,6 @@ const joinLines = (text: string) => {
 }
 
 const highlightCodeBlock = (codeBlock: string) => {
-  
   // Get the language from the class
   let language = codeBlock.match(/<code class="language-(.*?)">/)?.[1] || 'javascript';
   if (Prism.languages[language] === undefined) language = 'javascript';
@@ -49,18 +51,106 @@ const highlightCodeBlock = (codeBlock: string) => {
   // highlight the code
   const highlightedCode = Prism.highlight(parsedCode, Prism.languages[language], language);
   
-  return `<code class="language-${language}">${highlightedCode}</code>`
+  return `<pre><code class="language-${language}">${highlightedCode}</code></pre>\n`
 }
 
-const getHighlightedChunks = async (message: Message): HighlightedChunks => {
-  const markup = await marked.parse(message)
-  const codeBlocks = getCodeBlocks(markup)
+const splitOnce = (text: string, separator: string) => {
+  const [first, ...rest] = text.split(separator)
+  return [first, rest.length > 0 ? rest.join(separator) : '']
+}
 
-  if (codeBlocks) {
+const parseCodeChunk = async (chunk: string): Promise<HighlightedChunk> => {
+  const markedCode = await marked.parse(chunk)
+  const codeBlocks = getCodeBlocks(markedCode) || []
+  return {
+    markup: markedCode,
+    highlighted: highlightCodeBlock(codeBlocks.join(''))
+  }
+}
 
+const parseTextChunk = async (chunk: string): Promise<HighlightedChunk> => {
+  const markup = await marked.parse(chunk)
+  return {
+    markup: markup.replaceAll('\n', '<br>')
+  }
+}
+
+const separateInputChunks = async (text: string): Promise<Chunk[]> => {
+  const wrappedCodeBlocks = text.match(/(^(?:\n|^)```.*?\n)([^]*?)(\n```)/gmi) || [];
+
+  let input = text
+  const chunks: Chunk[] = []
+
+  for (const codeBlock of wrappedCodeBlocks) {
+    const [original, rest] = splitOnce(input, codeBlock)
+    if (original) chunks.push({ input: original, output: await parseTextChunk(original), type: 'text' })
+    chunks.push({ input: codeBlock, output: await parseCodeChunk(codeBlock), type: 'code' })
+    input = rest
   }
 
+  if (input.length > 0) chunks.push({ input, output: await parseTextChunk(input), type: 'text' })
 
+  return chunks
+}
+
+const getHighlightedChunks = async (message: Message): Promise<HighlightedMessage> => {
+  const chunks = await separateInputChunks(message)
+
+  let output = chunks.map((chunk, i) => {
+    if (chunk.type === 'code') {
+      if (i === chunks.length - 1) return chunk.output.highlighted || ''
+      return (chunk.output.highlighted || '') + '<br>'
+    } else {
+      return chunk.output.markup
+    }
+  }).join('')
+
+  if (output.endsWith('<br>')) output = output.slice(0, -4)
+
+  return {
+    input: message,
+    markup: output,
+    chunks: chunks
+  }
 }
 
 export default getHighlightedChunks
+
+/*
+```ts
+const getData = () => {
+  return '' as string
+}
+```
+*/
+
+/*
+This is a test
+[link](https://example.com)
+
+```ts
+const getHighlightedChunks = async (message: Message): Promise<HighlightedMessageChunks> => {
+  const chunks = await separateInputChunks(message)
+
+  const output = chunks.map((chunk) => {
+    if (chunk.type === 'code') {
+      return chunk.output.highlighted || ''
+    } else {
+      return chunk.output.markup
+    }
+  }).join('')
+
+  return {
+    input: message,
+    markup: output,
+    chunks: chunks
+  }
+}
+```
+
+This is a second test
+```ts
+
+export default getHighlightedChunks
+```
+*/

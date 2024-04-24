@@ -8,3 +8,34 @@
   border: none;
   outline: none;
 }
+
+pre {
+  border: none;
+  background-color: #1f1f1f;
+  filter: brightness(1.2);
+  font-size: 1rem;
+  font-weight: 500;
+  padding: 1rem;
+  border-radius: 1rem;
+  margin: 0;
+  overflow-x: auto;
+  white-space: nowrap;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.opacity-25 {
+  opacity: 0.25;
+}
+
+.opacity-50 {
+  opacity: 0.5;
+}
+
+.opacity-75 {
+  opacity: 0.75;
+}
+
+.flat-line-height {
+  line-height: 1;
+}
