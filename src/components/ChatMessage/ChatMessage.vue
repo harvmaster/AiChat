@@ -3,12 +3,14 @@
     class="full-width card-background text-white q-py-sm"
   >
     <div class="chat-message q-pa-md row">
-      <div class="col-auto q-pb-md row">
-        <div class="col-12 row q-col-gutter-x-sm">
-          <div class="col-auto self-center flat-line-height text-h6 text-weight-bold opacity-75">{{ props.author }}</div>
-          <div class="col-auto self-end flat-line-height text-caption opacity-50">{{ timeAgo }}</div>
+      <div class="col-12 q-pb-md row">
+        <div class="col row q-col-gutter-x-sm">
+          <div class="col-12 self-center flat-line-height text-h6 text-weight-bold opacity-75">{{ props.author }}</div>
+          <div class="col-12 self-end flat-line-height text-caption opacity-50">{{ timeAgo }}</div>
         </div>
-        <q-separator class="col-12" horizontal color="white"/>
+        <div class="col-auto">
+          <q-btn flat round dense icon="delete" color="red-5" @click="deleteMessage" />
+        </div>
       </div>
       <div class="col-12" v-for="(chunk, index) of message.chunks" :key="chunk.input" >
         <chat-message-chunk :type="chunk.type" :output="chunk.output" :input="chunk.input" :index="index" :parentLength="message.chunks.length"/>
@@ -24,12 +26,15 @@
   border: 2px solid #242424;
   border-radius: 1rem;
 }
+.relative {
+  position: relative;
+}
 </style>
 
 <script setup lang="ts">
-import { HighlightedMessage } from 'src/utils/HighlightMesasge'
+import { computed, onMounted, ref, defineEmits } from 'vue';
 import ChatMessageChunk from './ChatMessageChunk.vue';
-import { computed, onMounted, ref } from 'vue';
+import { HighlightedMessage } from 'src/utils/HighlightMesasge'
 
 export type ChatMessageProps = {
   id: string;
@@ -39,6 +44,9 @@ export type ChatMessageProps = {
 }
 
 const props = defineProps<ChatMessageProps>()
+const emits = defineEmits<{
+  (e: 'delete', id: string): void
+}>()
 
 const now = ref(new Date())
 const timeSinceTimer = () => {
@@ -69,4 +77,8 @@ const timeAgo = computed(() => {
 onMounted(() => {
   timeSinceTimer()
 })
+
+const deleteMessage = () => {
+  emits('delete', props.id)
+}
 </script>

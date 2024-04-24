@@ -76,7 +76,7 @@ const parseTextChunk = async (chunk: string): Promise<HighlightedChunk> => {
 }
 
 const separateInputChunks = async (text: string): Promise<Chunk[]> => {
-  const wrappedCodeBlocks = text.match(/(^(?:\n|^)```.{1,4}\n)([^]*?)(\n```)/gmi) || [];
+  const wrappedCodeBlocks = text.match(/(^(?:\n|^)```.*?\n)([^]*?)(\n```)/gmi) || [];
 
   let input = text
   const chunks: Chunk[] = []

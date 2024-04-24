@@ -16,6 +16,7 @@
     "@quasar/extras": "^1.16.4",
     "axios": "^1.2.1",
     "marked": "^12.0.2",
+    "openai": "^4.38.3",
     "pinia": "^2.0.11",
     "prismjs": "^1.29.0",
     "quasar": "^2.6.0",

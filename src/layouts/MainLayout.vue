@@ -2,7 +2,7 @@
   <q-layout view="lHh Lpr lFf" class="page-background">
     <q-header class="row justify-center bg-transparent">
       <div class="col-12 text-center header-background text-h3 text-weight-bold q-pa-md">AI Chat</div>
-      <div class="col-12 col-md-auto input-border q-pa-sm row">
+      <div class="col-12 col-md-auto input-border q-pa-sm row bg-primary">
         <q-input v-model="token" input-class="col-auto text-white my-input text-h6" borderless placeholder="OpenAI Token" filled text-color="white" :type="showToken ? 'password' : 'text'" />
         <div class="col-auto self-center q-px-md">
           <q-btn flat round dense icon="visibility" color="white" @click="toggleToken" />
@@ -29,15 +29,27 @@
   border: 2px solid $secondary;
   border-radius: 1rem;
 }
+
+.my-input {
+  background-color: $primary;
+}
 </style>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
+import { useTokenStore } from 'src/stores/tokenStore';
 
+const tokenStore = useTokenStore()
 const token = ref('')
 const showToken = ref(false)
 
 const toggleToken = () => {
   showToken.value = !showToken.value
 }
+
+const updateToken = () => {
+  tokenStore.setToken(token.value)
+}
+
+watch(token, updateToken, { immediate: true })
 </script>
