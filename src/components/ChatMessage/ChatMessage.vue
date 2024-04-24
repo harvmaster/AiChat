@@ -29,7 +29,7 @@
 <script setup lang="ts">
 import { HighlightedMessage } from 'src/utils/HighlightMesasge'
 import ChatMessageChunk from './ChatMessageChunk.vue';
-import { computed } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 
 export type ChatMessageProps = {
   id: string;
@@ -40,10 +40,16 @@ export type ChatMessageProps = {
 
 const props = defineProps<ChatMessageProps>()
 
+const now = ref(new Date())
+const timeSinceTimer = () => {
+  setInterval(() => {
+    now.value = new Date()
+  }, 15000)
+}
+
 const timeAgo = computed(() => {
   const date = new Date(props.timestamp)
-  const now = new Date()
-  const diff = now.getTime() - date.getTime()
+  const diff = now.value.getTime() - date.getTime()
   const seconds = Math.floor(diff / 1000)
   const minutes = Math.floor(seconds / 60)
   const hours = Math.floor(minutes / 60)
@@ -58,5 +64,9 @@ const timeAgo = computed(() => {
   if (minutes > 0) return `${minutes} minutes ago`
   if (seconds > 10) return `${seconds} seconds ago`
   return 'Just now'
+})
+
+onMounted(() => {
+  timeSinceTimer()
 })
 </script>
