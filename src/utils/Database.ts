@@ -65,7 +65,7 @@ class Database {
 
         if (cursor) {
           const record = cursor.value;
-          const isMatch = Object.entries(query as { [s: string]: unknown }).every(([key, value]) => record[key] === value);
+          const isMatch = Object.entries(query as { [s: string]: unknown }).every(([key, value]) => record[key] == value);
 
           if (isMatch) {
             results.push(record);
@@ -91,7 +91,7 @@ class Database {
 
         if (cursor) {
           const record = cursor.value;
-          const isMatch = Object.entries(query).every(([key, value]) => record[key] === value);
+          const isMatch = Object.entries(query).every(([key, value]) => record[key] == value);
 
           if (isMatch) {
             resolve(record)
@@ -131,7 +131,7 @@ class Database {
 
         if (cursor) {
           const record = cursor.value;
-          const isMatch = Object.entries(query).every(([key, value]) => record[key] === value);
+          const isMatch = Object.entries(query).every(([key, value]) => record[key] == value);
 
           if (isMatch) {
             cursor.update({ ...record, ...update });
@@ -157,7 +157,7 @@ class Database {
 
         if (cursor) {
           const record = cursor.value;
-          const isMatch = Object.entries(query).every(([key, value]) => record[key] === value);
+          const isMatch = Object.entries(query).every(([key, value]) => record[key] == value);
 
           if (isMatch) {
             cursor.update({ ...record, ...update });
@@ -185,7 +185,7 @@ class Database {
 
         if (cursor) {
           const record = cursor.value;
-          const isMatch = Object.entries(query).every(([key, value]) => record[key] === value);
+          const isMatch = Object.entries(query).every(([key, value]) => record[key] == value);
 
           if (isMatch) {
             cursor.delete();
@@ -212,7 +212,7 @@ class Database {
 
         if (cursor) {
           const record = cursor.value;
-          const isMatch = Object.entries(query).every(([key, value]) => record[key] === value);
+          const isMatch = Object.entries(query).every(([key, value]) => record[key] == value);
 
           if (isMatch) {
             cursor.delete();

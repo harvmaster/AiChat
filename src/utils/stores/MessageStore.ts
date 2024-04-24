@@ -2,6 +2,7 @@ import BaseStore from "./baseStore";
 
 export type Message = {
   id: string;
+  author: string;
   conversationId: string;
   content: string;
   timestamp: number;

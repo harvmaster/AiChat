@@ -20,3 +20,29 @@ export type ObjectStoreSchema = {
     options: IDBIndexParameters;
   }>;
 }
+
+export type DatabaseConversation = {
+  id: string;
+  summary: string;
+}
+
+export type DatabaseMessage = {
+  id: string;
+  author: string;
+  conversationId: string;
+  content: string;
+  timestamp: string;
+}
+
+export type Conversation = {
+  id: string;
+  summary: string;
+  messages: Message[];
+}
+
+export type Message = {
+  id: string;
+  author: string;
+  content: string;
+  timestamp: number;
+}

@@ -40,7 +40,7 @@ export type ChatMessageProps = {
   id: string;
   author: string;
   message: HighlightedMessage
-  timestamp: string;
+  timestamp: number;
 }
 
 const props = defineProps<ChatMessageProps>()

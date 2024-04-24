@@ -52,18 +52,25 @@ p {
 </style>
 
 <script setup lang="ts">
-import { computed, ref, nextTick } from 'vue';
+import { computed, ref, nextTick, watch, onMounted, onActivated } from 'vue';
 import OpenAI from 'openai';
+import { useRouter } from 'vue-router';
 
 import { useTokenStore } from 'src/stores/tokenStore';
+import { useConversationStore } from 'src/stores/conversations';
 import ChatMessage, { ChatMessageProps } from 'src/components/ChatMessage/ChatMessage.vue';
 
 import getHighlightedChunks from 'src/utils/HighlightMesasge';
 
+const router = useRouter()
+
 const tokenStore = useTokenStore();
+const conversationStore = useConversationStore();
 
 const input = ref('');
 const inputElement = ref<HTMLTextAreaElement | null>(null);
+
+const currentConversationId = computed(() => router.currentRoute.value.params.id as string);
 
 const messages = ref<ChatMessageProps[]>([
   { id: '1', author: 'GPT', message: {
@@ -72,7 +79,7 @@ const messages = ref<ChatMessageProps[]>([
     chunks: [
       { input: 'Hello World', output: { markup: '<p>Hello World</p>'}, type: 'text'  }
     ]
-  }, timestamp: new Date().toISOString()},
+  }, timestamp: Date.now()},
 ]);
 
 const sendMessage = async (event?: KeyboardEvent) => {
@@ -92,16 +99,30 @@ const sendMessage = async (event?: KeyboardEvent) => {
   }
 
   if (input.value.length > 1) {
+    // Is in a current conversation
+    let conversationId = router.currentRoute.value.params.id as string;
+    if (!conversationId) {
+      conversationId = generateUUID()
+      conversationStore.addConversation({
+        id: conversationId,
+        summary: input.value,
+        messages: [],
+      })
+      router.push('/' + conversationId)
+    }
+
     const openai = new OpenAI({ apiKey: tokenStore.token, dangerouslyAllowBrowser: true });
 
     const mark = await getHighlightedChunks(input.value);
-    
-    messages.value.push({
-      id: '' + (messages.value.length + 1),
+
+    const message = {
+      id: generateUUID(),
       author: 'User',
       message: mark,
-      timestamp: new Date().toISOString(),
-    });
+      timestamp: Date.now(),
+    }
+    
+    messages.value.push(message);
 
     const formattedMessage = messages.value.map(message => {
       return {
@@ -110,11 +131,18 @@ const sendMessage = async (event?: KeyboardEvent) => {
       } as OpenAI.ChatCompletionMessage;
     })
 
+    await conversationStore.addMessage(conversationId, {
+      id: message.id,
+      author: 'User',
+      content: input.value,
+      timestamp: message.timestamp,
+    })
+
     input.value = '';
 
-    const responseId = messages.value.length + 1;
+    const responseId = generateUUID();
     const stream = await openai.chat.completions.create({
-      model: 'gpt-4',
+      model: 'gpt-3.5-turbo',
       messages: formattedMessage,
       stream: true,
     });
@@ -133,7 +161,7 @@ const sendMessage = async (event?: KeyboardEvent) => {
           id: '' + responseId,
           message: markup,
           author: 'GPT',
-          timestamp: new Date().toISOString(),
+          timestamp: Date.now(),
         })
       } else {
         message.message = markup;
@@ -141,11 +169,23 @@ const sendMessage = async (event?: KeyboardEvent) => {
       
       scrollToBottom()
     }
+
+    const response = messages.value.find(message => message.id === '' + responseId);
+    if (!response) {
+      return;
+    }
+    conversationStore.addMessage(conversationId, {
+      id: response.id,
+      author: 'GPT',
+      content: response?.message.input,
+      timestamp: response.timestamp,
+    })
   }
 };
 
-const deleteMessage = (id: string) => {
-  messages.value = messages.value.filter(message => message.id !== id);
+const deleteMessage = async (id: string) => {
+  await conversationStore.deleteMessage(currentConversationId.value, id);
+  getMessages()
 };
 
 const handleTab = (event: KeyboardEvent) => {
@@ -184,4 +224,54 @@ const scrollToBottom = () => {
   }
   scroll()
 }
+
+const generateUUID = () => {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    var r = (Math.random() * 16) | 0,
+      v = c == 'x' ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
+}
+
+const getMessages = async () => {
+  const conversationId = router.currentRoute.value.params.id as string;
+  if (!conversationId) {
+    messages.value = [
+      { id: '1', author: 'GPT', message: await getHighlightedChunks('Tell me what you\'d like to do'), timestamp: Date.now()},
+    ]
+    return
+  }
+  
+  const conversation = conversationStore.conversations.find(conversation => conversation.id == conversationId);
+  if (!conversation) {
+    messages.value = [
+      { id: '1', author: 'GPT', message: await getHighlightedChunks('Tell me what you\'d like to do'), timestamp: Date.now()},
+    ]
+    return
+  }
+  
+  const formattedMessagesPromises = conversation.messages.map(async message => {
+    const mark = await getHighlightedChunks(message.content);
+    return {
+      id: message.id,
+      author: message.author,
+      timestamp: message.timestamp,
+      message: mark,
+    }
+  })
+  const formattedMessage = await Promise.all(formattedMessagesPromises);
+
+  messages.value = formattedMessage || [];
+}
+
+watch(currentConversationId, () => {
+  getMessages()
+  scrollToBottom()
+})
+
+onMounted(async () => {
+  await conversationStore.readFromDb()
+  getMessages()
+  scrollToBottom()
+})
 </script>

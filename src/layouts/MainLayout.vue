@@ -25,14 +25,17 @@
             Conversations
           </div>
         </q-item>
-        <!-- <q-item clickable v-ripple>
+        <q-item class="full-width" v-for="conversation of sortedConversation" :key="conversation.id" :conversation="conversation" clickable v-ripple :to="`/${conversation.id}`" active-class="bg-accent">
           <q-item-section>
-            <q-item-label>Settings</q-item-label>
+            <q-item-label class="text-h6">{{ conversation.summary }}</q-item-label>
           </q-item-section>
-        </q-item> -->
-        <q-item class="full-width" v-for="conversation of conversations" :key="conversation.id" :conversation="conversation" clickable v-ripple>
-          <q-item-section>
-            <q-item-label>{{ conversation.summary }}</q-item-label>
+        </q-item>
+        <q-item clickable @click="createNewConversation">
+          <q-item-section avatar>
+            <q-icon name="add" class="text-white" size="2em" />
+          </q-item-section>
+          <q-item-section class="text-h6">
+            New Conversation
           </q-item-section>
         </q-item>
       </q-list>
@@ -73,11 +76,13 @@
 </style>
 
 <script setup lang="ts">
-import { onMounted, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useTokenStore } from 'src/stores/tokenStore';
 
-import getDatabase from 'src/utils/IndexedDB';
-import { Conversation } from 'src/utils/stores/ConversationStore';
+import { useConversationStore } from 'src/stores/conversations';
+import { useRouter } from 'vue-router';
+
+const router = useRouter()
 
 const tokenStore = useTokenStore()
 const token = ref('')
@@ -98,13 +103,17 @@ const toggleDrawer = () => {
   drawer.value = !drawer.value
 }
 
-const conversations = ref<Conversation[]>([])
+const conversationStore = useConversationStore()
+
+const createNewConversation = () => {
+  router.push('/')
+}
+
+const sortedConversation = computed(() => {
+  return [...conversationStore.conversations].sort((a, b) => b.messages.sort((c, d) => c.timestamp - d.timestamp)[0]?.timestamp - a.messages.sort((c, d) => c.timestamp - d.timestamp)[0]?.timestamp)
+})
 
 onMounted(async () => {
-  const db = await getDatabase()
-  console.log(db.stores)
-
-  const chats = await db.stores?.conversations.find({  }) || []
-  conversations.value = chats
+  conversationStore.readFromDb()
 })
 </script>
