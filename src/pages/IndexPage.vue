@@ -141,7 +141,7 @@ const sendMessage = async (event?: KeyboardEvent) => {
     
     messages.value.push({
       id: messages.value.length + 1,
-      text: mark,
+      text: mark.markup,
       isBot: false,
     });
     messages.value.push({
