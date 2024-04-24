@@ -1,22 +1,9 @@
-import { marked } from "marked";
-import { parse } from "path";
+import { marked } from 'marked';
 import Prism from 'prismjs'
 
 // take in a string
 
 type Message = string
-
-type HighlightedMessageResponse = {
-  highlightedMessage: string
-  codeBlocks: Array<string>
-  origialMessage: string
-}
-
-type HighlightedChunks = {
-  original: string
-  output: string
-  code: string
-}[]
 
 // remove lines and replace with a special character
 const removeLines = (text: string) => {
@@ -61,37 +48,73 @@ const splitOnce = (text: string, separator: string) => {
 
 type Chunk = {
   input: string;
-  output: string;
+  output: HighlightedChunk;
   type: 'code' | 'text';
 }
 
-const separateInputChunks = (text: string): Chunk[] => {
-  const wrappedCodeBlocks = text.match(/(^(?:\n|^)```.{1,4}\n)([^]*?)(\n```)/gmi) || [];
-  const chunks = wrappedCodeBlocks.reduce((acc, block) => {
-    const [original, rest] = splitOnce(acc.input, block)
-    acc.output.push({
-      input: original,
-      output: parseChunk(original),
-      type: 'text'
-    })
-    acc.output.push({
-      input: original,
-      output: parseCodeChunk(block),
-      type: 'code'
-    })
-    return {
-      output: acc.output,
-      input: rest
-    }
-  }, {
-    output: [] as Chunk[],
-    input: text
-  })
+type HighlightedChunk = {
+  markup: string;
+  highlighted?: string;
+}
 
-  const output = chunks.output
-  if (chunks.input.length > 0) output.push({ input: chunks.input, output: parseChunk(chunks.input), type: 'text' })
+const parseCodeChunk = async (chunk: string): Promise<HighlightedChunk> => {
+  const markedCode = await marked.parse(chunk)
+  const codeBlocks = getCodeBlocks(markedCode) || []
+  return {
+    markup: markedCode,
+    highlighted: highlightCodeBlock(codeBlocks.join(''))
+  }
+}
+
+const parseTextChunk = async (chunk: string): Promise<HighlightedChunk> => {
+  const markup = await marked.parse(chunk)
+  return {
+    markup
+  }
+}
+
+const separateInputChunks = async (text: string): Promise<Chunk[]> => {
+  const wrappedCodeBlocks = text.match(/(^(?:\n|^)```.{1,4}\n)([^]*?)(\n```)/gmi) || [];
+
+  let input = text
+  const chunks: Chunk[] = []
+
+  for (const codeBlock of wrappedCodeBlocks) {
+    const [original, rest] = splitOnce(input, codeBlock)
+    chunks.push({ input: original, output: await parseTextChunk(original), type: 'text' })
+    chunks.push({ input: codeBlock, output: await parseCodeChunk(codeBlock), type: 'code' })
+    input = rest
+  }
+
+  if (input.length > 0) chunks.push({ input, output: await parseTextChunk(input), type: 'text' })
+
+  return chunks
+
+  // const chunks = wrappedCodeBlocks.reduce(async (acc, block) => {
+  //   const [original, rest] = splitOnce(acc.input, block)
+  //   acc.output.push({
+  //     input: original,
+  //     output: parseChunk(original),
+  //     type: 'text'
+  //   })
+  //   acc.output.push({
+  //     input: original,
+  //     output: await parseCodeChunk(block),
+  //     type: 'code'
+  //   })
+  //   return {
+  //     output: acc.output,
+  //     input: rest
+  //   }
+  // }, {
+  //   output: [] as Chunk[],
+  //   input: text
+  // })
+
+  // const output = chunks.output
+  // if (chunks.input.length > 0) output.push({ input: chunks.input, output: parseChunk(chunks.input), type: 'text' })
   
-    return output
+  //   return output
 }
 
 const getHighlightedChunks = async (message: Message) => {
@@ -135,7 +158,7 @@ const getHighlightedChunks = async (message: Message) => {
   // const chunks = [ ...otherBlocks.output, otherBlocks.input ]
   // console.log(chunks)
 
-  const chunks = separateInputChunks(message)
+  const chunks = await separateInputChunks(message)
   console.log(chunks)
 
   // const hi
