@@ -63,8 +63,6 @@ p {
 
 <script setup lang="ts">
 import { computed, ref, nextTick } from 'vue';
-import { marked } from 'marked';
-import Prism from 'prismjs';
 import getHighlightedChunks from 'src/utils/HighlightMesasge';
 
 const input = ref('');
@@ -77,7 +75,7 @@ const messages = ref([
 const sendMessage = async (event?: KeyboardEvent) => {
   // Dont do anything if its an empty message
   if (!input.value.trim()) return;
-  
+
   // Is in code block
   const codeWrapperStarts = input.value.match(/^(?:\n|^)```.{1,4}/mgi) || [];
   const wholeCode = input.value.match(/(^(?:\n|^)```.{1,4}\n)([^]*?)(\n```)/gmi) || [];

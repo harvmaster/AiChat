@@ -35,8 +35,6 @@ const joinLines = (text: string) => {
 }
 
 const highlightCodeBlock = (codeBlock: string) => {
-  console.log(Prism.languages)
-  
   // Get the language from the class
   let language = codeBlock.match(/<code class="language-(.*?)">/)?.[1] || 'javascript';
   if (Prism.languages[language] === undefined) language = 'javascript';
@@ -128,6 +126,8 @@ const getData = () => {
 
 /*
 This is a test
+[link](https://example.com)
+
 ```ts
 const getHighlightedChunks = async (message: Message): Promise<HighlightedMessageChunks> => {
   const chunks = await separateInputChunks(message)
