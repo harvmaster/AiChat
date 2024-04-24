@@ -174,9 +174,11 @@ const sendMessage = async (event?: KeyboardEvent) => {
       let decoded
       if (chunk instanceof Uint8Array) {
         const decodedChunk = new TextDecoder().decode(chunk)
-        const body = JSON.parse(decodedChunk) as { message: { content: string } }
-        const content = body?.message?.content
-        decoded = content
+        console.log(decodedChunk)
+        const decodedParts = decodedChunk.match(/{(.*)}/g)
+        const bodyParts = decodedParts?.map(part => JSON.parse(part) as { message: { content: string } }) || []
+        const body = bodyParts.map(part => part.message.content).join('')
+        decoded = body
       }
       if (!(chunk instanceof Uint8Array) && chunk.choices[0]?.delta?.content && !decoded) {
         decoded = chunk.choices[0]?.delta?.content;
@@ -281,7 +283,8 @@ const scrollToBottom = () => {
   const scroll = () => {
     const element = document.getElementById('chat-input')
     if (element) {
-      element.scrollIntoView({ behavior: 'smooth' })
+      console.log('scrolling')
+      element.scrollIntoView()
     }
   }
   scroll()
@@ -341,13 +344,10 @@ const getAIAgent = () => {
   }
 
   const agent = async (messages: OpenAI.ChatCompletionMessage[], stream: boolean) => {
-    const url = 'http://localhost:11434/api/chat';
+    const url = 'https://ai.ollama.mc.hzuccon.com/api/chat';
     const res = await fetch(url, {
       method: 'POST',
-      // headers: {
-      //   'Content-Type': 'application/json',
-      // },
-      body: JSON.stringify({ model: 'llama2', messages }),
+      body: JSON.stringify({ model: 'phi3', messages }),
     })
     return res.body
   }

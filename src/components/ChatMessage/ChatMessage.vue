@@ -9,7 +9,7 @@
           <div class="col-12 self-end flat-line-height text-caption opacity-50">{{ timeAgo }}</div>
         </div>
         <div class="col-auto">
-          <q-btn flat round dense icon="delete" color="red-5" @click="deleteMessage" />
+          <q-btn flat round dense icon="delete" color="red-4 opacity-50" @click="deleteMessage" />
         </div>
       </div>
       <div class="col-12" v-for="(chunk, index) of message.chunks" :key="chunk.input" >

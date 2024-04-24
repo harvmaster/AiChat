@@ -18,6 +18,10 @@ pre {
   padding: 1rem;
   border-radius: 1rem;
   margin: 0;
+  overflow-x: auto;
+  white-space: nowrap;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
 .opacity-25 {

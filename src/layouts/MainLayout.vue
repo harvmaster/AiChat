@@ -4,7 +4,11 @@
       <div class="col-auto visible-on-small self-center">
         <q-btn flat round dense icon="menu" color="white" @click="toggleDrawer" />
       </div>
-      <div class="col col-md-12 text-center header-background text-h3 text-weight-bold q-pa-md">AI Chat</div>
+      <div class="col col-md-12 header-background text-h3 text-weight-bold q-pa-md row justify-center">
+        <div class="rainbow-text col-auto">
+          AI Chat
+        </div>
+      </div>
       <div class="col-12 col-md-auto input-border q-pa-sm row bg-primary">
         <q-input v-model="token" input-class="col-auto text-white my-input text-h6" borderless placeholder="OpenAI Token" filled text-color="white" :type="showToken ? 'password' : 'text'" />
         <div class="col-auto self-center q-px-md">
@@ -17,28 +21,32 @@
       show-if-above
       v-model="drawer"
       side="left"
-      class="bg-secondary"
+      class="bg-secondary text-white q-pa-sm"
     >
-      <q-list class="text-white">
-        <q-item>
-          <div class="text-h6">
-            Conversations
-          </div>
-        </q-item>
-        <q-item class="full-width" v-for="conversation of sortedConversation" :key="conversation.id" :conversation="conversation" clickable v-ripple :to="`/${conversation.id}`" active-class="bg-accent">
-          <q-item-section>
-            <q-item-label class="text-h6">{{ conversation.summary }}</q-item-label>
-          </q-item-section>
-        </q-item>
-        <q-item clickable @click="createNewConversation">
-          <q-item-section avatar>
-            <q-icon name="add" class="text-white" size="2em" />
-          </q-item-section>
-          <q-item-section class="text-h6">
-            New Conversation
-          </q-item-section>
-        </q-item>
-      </q-list>
+      <div class="drawer-item row" clickable @click="createNewConversation">
+        <div class="col-auto text-weight-bolder q-pl-md q-pr-lg rainbow-text">
+          AI
+        </div>
+        <div class="drawer-item-text col self-center">
+          <div class="text-weight-bold">New Chat</div>
+        </div>
+        <div class="drawer-item-icon col-auto q-px-md">
+          <q-icon name="library_add" />
+        </div>
+      </div>
+      <q-separator class="bg-white"/>
+      <div class="drawer-item row q-col-gutter-x-sm" v-for="conversation of sortedConversation" :key="conversation.id" :conversation="conversation" @click="() => routeToConversation(conversation.id)">
+        <!-- <div class="drawer-item-icon col-auto">
+          <q-icon name="note" />
+        </div> -->
+        <div class="drawer-item-text col self-center">
+          <div class="text-weight-bold">{{ conversation.summary }}</div>
+        </div>
+
+        <div class="drawer-item-interactions col-auto row">
+          <q-btn class="self-center" flat round dense icon="delete" color="red-4" @click.stop.prevent="conversationStore.deleteConversation(conversation.id)" />
+        </div>
+      </div>
     </q-drawer>
 
     <q-page-container>
@@ -72,6 +80,48 @@
   .visible-on-small {
     display: inline-block;
   }
+}
+.drawer-item {
+  border-radius: 0.5rem;
+  margin: 0.5rem;
+  padding: 0.5rem;
+  cursor: pointer;
+  font-size: 1.1rem;
+  overflow: hidden;
+  position: relative;
+}
+.drawer-item-interactions {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%;
+  transform: translate(0, 0%);
+  background-image: linear-gradient(90deg, $accent, $secondary, $secondary);
+
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.25s, visibility 0s;
+}
+
+.drawer-item:hover {
+  background-color: $accent;
+
+  .drawer-item-interactions {
+    visibility: visible;
+    opacity: 1;
+  }
+}
+
+.drawer-item-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rainbow-text {
+  background-image: linear-gradient(to left, rgb(79, 79, 255), rgb(255, 97, 97));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 </style>
 
@@ -112,6 +162,9 @@ const createNewConversation = () => {
 const sortedConversation = computed(() => {
   return [...conversationStore.conversations].sort((a, b) => b.messages.sort((c, d) => c.timestamp - d.timestamp)[0]?.timestamp - a.messages.sort((c, d) => c.timestamp - d.timestamp)[0]?.timestamp)
 })
+const routeToConversation = (id: string) => {
+  router.push(`/${id}`)
+}
 
 onMounted(async () => {
   conversationStore.readFromDb()
