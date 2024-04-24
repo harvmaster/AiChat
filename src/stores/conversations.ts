@@ -124,6 +124,16 @@ export const useConversationStore = defineStore('conversation', {
 
       this.conversations.splice(conversationIndex, 1)
       this.readFromDb()
+    },
+    async updateConversation (conversationId: string, newSummary: string) {
+      const db = await getDatabase()
+      const conversationIndex = this.conversations.findIndex(conversation => conversation.id == conversationId)
+      if (conversationIndex === -1) return
+
+      await db.stores?.conversations.findAndUpdate({ id: conversationId }, { summary: newSummary })
+
+      this.conversations[conversationIndex].summary = newSummary
+      this.readFromDb()
     }
   },
 });

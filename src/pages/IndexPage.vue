@@ -25,6 +25,11 @@
           <q-btn flat round dense icon="send" color="accent" @click="() => sendMessage()" />
         </div>
       </div>
+      <div class="col-12 row q-pt-md justify-center">
+        <select v-model="aiAgentSelector" class="text-white bg-primary my-select">
+          <option v-for="option in aiAgentOptions" :key="option" :value="option">{{ option }}</option>
+        </select>
+      </div>
     </div>
   </q-page>
 </template>
@@ -49,6 +54,15 @@ p {
   border: 2px solid $secondary;
   border-radius: 1rem;
 }
+
+.my-select {
+  background-color: $primary;
+  border: 2px solid $secondary;
+  border-radius: 1rem;
+  color: white;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+}
 </style>
 
 <script setup lang="ts">
@@ -61,6 +75,8 @@ import { useConversationStore } from 'src/stores/conversations';
 import ChatMessage, { ChatMessageProps } from 'src/components/ChatMessage/ChatMessage.vue';
 
 import getHighlightedChunks from 'src/utils/HighlightMesasge';
+import { response } from 'express';
+import { ChatCompletionChunk } from 'openai/resources/chat/completions';
 
 const router = useRouter()
 
@@ -68,12 +84,17 @@ const tokenStore = useTokenStore();
 const conversationStore = useConversationStore();
 
 const input = ref('');
-const inputElement = ref<HTMLTextAreaElement | null>(null);
+const aiAgentSelector = ref('ollama (:11434)');
+const aiAgentOptions = ref([
+  'openai-gpt-3.5-turbo',
+  'openai-gpt-4-turbo',
+  'ollama (:11434)'
+])
 
 const currentConversationId = computed(() => router.currentRoute.value.params.id as string);
 
 const messages = ref<ChatMessageProps[]>([
-  { id: '1', author: 'GPT', message: {
+  { id: '1', author: 'AI', message: {
     input: 'Hello World',
     markup: '<p>Hello World</p>',
     chunks: [
@@ -126,7 +147,7 @@ const sendMessage = async (event?: KeyboardEvent) => {
 
     const formattedMessage = messages.value.map(message => {
       return {
-        role: message.author === 'GPT' ? 'assistant' : 'user',
+        role: message.author === 'AI' ? 'assistant' : 'user',
         content: message.message.input,
       } as OpenAI.ChatCompletionMessage;
     })
@@ -141,26 +162,38 @@ const sendMessage = async (event?: KeyboardEvent) => {
     input.value = '';
 
     const responseId = generateUUID();
-    const stream = await openai.chat.completions.create({
-      model: 'gpt-3.5-turbo',
-      messages: formattedMessage,
-      stream: true,
-    });
-    for await (const chunk of stream) {
+    const agent = getAIAgent();
+    const stream = await agent(formattedMessage, true)
+    if (!stream) {
+      return;
+    }
+
+    const asyncStream = stream as AsyncIterable<ChatCompletionChunk | Uint8Array>;
+    for await (const chunk of asyncStream) {
       // console.log(chunk.choices[0]?.delta?.content)
-      if (!chunk.choices[0]?.delta?.content) {
+      let decoded
+      if (chunk instanceof Uint8Array) {
+        const decodedChunk = new TextDecoder().decode(chunk)
+        const body = JSON.parse(decodedChunk) as { message: { content: string } }
+        const content = body?.message?.content
+        decoded = content
+      }
+      if (!(chunk instanceof Uint8Array) && chunk.choices[0]?.delta?.content && !decoded) {
+        decoded = chunk.choices[0]?.delta?.content;
+      }
+      if (!(chunk instanceof Uint8Array) && !chunk.choices[0]?.delta?.content) {
         continue;
       }
       // get existing message
       const message = messages.value.find(message => message.id === '' + responseId);
       const currentText = message?.message.input || '';
-      const markup = await getHighlightedChunks(currentText + chunk.choices[0]?.delta?.content || '');
+      const markup = await getHighlightedChunks(currentText + decoded || '');
 
       if (!message) {
         messages.value.push({
           id: '' + responseId,
           message: markup,
-          author: 'GPT',
+          author: 'AI',
           timestamp: Date.now(),
         })
       } else {
@@ -174,18 +207,47 @@ const sendMessage = async (event?: KeyboardEvent) => {
     if (!response) {
       return;
     }
-    conversationStore.addMessage(conversationId, {
+    await conversationStore.addMessage(conversationId, {
       id: response.id,
-      author: 'GPT',
+      author: 'AI',
       content: response?.message.input,
       timestamp: response.timestamp,
     })
+
+    if (messages.value.length < 4) {
+      const formattedMessage = messages.value.map(message => {
+        return {
+          role: message.author === 'AI' ? 'assistant' : 'user',
+          content: message.message.input,
+        } as OpenAI.ChatCompletionMessage;
+      })
+
+      const summary = await openai.chat.completions.create({
+        model: 'gpt-3.5-turbo',
+        messages: [{
+          role: 'system',
+          content: `Summarise this conversation in no more than 6 words`,
+        },
+          {
+            role: 'user',
+            content: `Summarise: ${formattedMessage.map(message => message.content).join(' ')}`,
+          }
+        ],
+      });
+      if (!summary.choices[0]?.message?.content) {
+        return;
+      }
+      conversationStore.updateConversation(conversationId, summary.choices[0]?.message?.content)
+    }
   }
 };
 
 const deleteMessage = async (id: string) => {
   await conversationStore.deleteMessage(currentConversationId.value, id);
-  getMessages()
+  await getMessages()
+  if (messages.value.length == 0) {
+    router.push('/')
+  }
 };
 
 const handleTab = (event: KeyboardEvent) => {
@@ -237,7 +299,7 @@ const getMessages = async () => {
   const conversationId = router.currentRoute.value.params.id as string;
   if (!conversationId) {
     messages.value = [
-      { id: '1', author: 'GPT', message: await getHighlightedChunks('Tell me what you\'d like to do'), timestamp: Date.now()},
+      { id: '1', author: 'AI', message: await getHighlightedChunks('Tell me what you\'d like to do'), timestamp: Date.now()},
     ]
     return
   }
@@ -245,7 +307,7 @@ const getMessages = async () => {
   const conversation = conversationStore.conversations.find(conversation => conversation.id == conversationId);
   if (!conversation) {
     messages.value = [
-      { id: '1', author: 'GPT', message: await getHighlightedChunks('Tell me what you\'d like to do'), timestamp: Date.now()},
+      { id: '1', author: 'AI', message: await getHighlightedChunks('Tell me what you\'d like to do'), timestamp: Date.now()},
     ]
     return
   }
@@ -262,6 +324,34 @@ const getMessages = async () => {
   const formattedMessage = await Promise.all(formattedMessagesPromises);
 
   messages.value = formattedMessage || [];
+}
+
+const getAIAgent = () => {
+  const selected = aiAgentSelector.value;
+  if (selected == 'openai-gpt-3.5-turbo') {
+    const openai = new OpenAI({ apiKey: tokenStore.token, dangerouslyAllowBrowser: true });
+    const agent = (messages: OpenAI.ChatCompletionMessage[], stream: boolean) => openai.chat.completions.create({ model: 'gpt-3.5-turbo', messages, stream });
+    return agent
+  }
+
+  if (selected == 'openai-gpt-4-turbo') {
+    const openai = new OpenAI({ apiKey: tokenStore.token, dangerouslyAllowBrowser: true });
+    const agent = (messages: OpenAI.ChatCompletionMessage[], stream: boolean) => openai.chat.completions.create({ model: 'gpt-4-turbo', messages, stream });
+    return agent
+  }
+
+  const agent = async (messages: OpenAI.ChatCompletionMessage[], stream: boolean) => {
+    const url = 'http://localhost:11434/api/chat';
+    const res = await fetch(url, {
+      method: 'POST',
+      // headers: {
+      //   'Content-Type': 'application/json',
+      // },
+      body: JSON.stringify({ model: 'llama2', messages }),
+    })
+    return res.body
+  }
+  return agent
 }
 
 watch(currentConversationId, () => {
