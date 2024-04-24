@@ -3,9 +3,11 @@
     <div class="col-12 col-md-8 row">
       <!-- Chat history -->
       <div class="col-12 row q-pb-md">
-        <div class="col-12 q-py-sm" v-for="message of messages" :key="message.id">
+        <chat-message v-for="chatMessage of messages" :key="chatMessage.id" :id="chatMessage.id" :author="chatMessage.author" :message="chatMessage.message" :timestamp="chatMessage.timestamp" />
+
+        <!-- <div class="col-12 q-py-sm" v-for="message of messages" :key="message.id">
           <div
-            class="full-width card-background text-white chat-message"
+            class="full-width card-background text-white chat-message q-pa-md"
           >
             <q-card-section>
               <q-item-label>
@@ -13,7 +15,7 @@
               </q-item-label>
             </q-card-section>
           </div>
-        </div>
+        </div> -->
       </div>
 
       <!-- Chat input -->
@@ -63,13 +65,22 @@ p {
 
 <script setup lang="ts">
 import { computed, ref, nextTick } from 'vue';
+
+import ChatMessage, { ChatMessageProps } from 'src/components/ChatMessage/ChatMessage.vue';
+
 import getHighlightedChunks from 'src/utils/HighlightMesasge';
 
 const input = ref('');
 const inputElement = ref<HTMLTextAreaElement | null>(null);
 
-const messages = ref([
-  { id: 1, text: 'Hello, how can I help you?', isBot: true },
+const messages = ref<ChatMessageProps[]>([
+  { id: '1', author: 'Bot', message: {
+    input: 'Hello World',
+    markup: '<p>Hello World</p>',
+    chunks: [
+      { input: 'Hello World', output: { markup: '<p>Hello World</p>'}, type: 'text'  }
+    ]
+  }, timestamp: new Date().toISOString()},
 ]);
 
 const sendMessage = async (event?: KeyboardEvent) => {
@@ -92,18 +103,19 @@ const sendMessage = async (event?: KeyboardEvent) => {
     const mark = await getHighlightedChunks(input.value);
     
     messages.value.push({
-      id: messages.value.length + 1,
-      text: mark.markup,
-      isBot: false,
+      id: '' + (messages.value.length + 1),
+      author: 'User',
+      message: mark,
+      timestamp: new Date().toISOString(),
     });
     input.value = '';
-    setTimeout(() => {
-      messages.value.push({
-        id: messages.value.length + 1,
-        text: 'I am a bot, I do not understand you.',
-        isBot: true,
-      });
-    }, 1000);
+    // setTimeout(() => {
+    //   messages.value.push({
+    //     id: messages.value.length + 1,
+    //     text: 'I am a bot, I do not understand you.',
+    //     isBot: true,
+    //   });
+    // }, 1000);
   }
 };
 
@@ -130,6 +142,6 @@ const log = (value: any) => {
 };
 
 const inputRows = computed(() => {
-  return Math.min(10, input.value.split('\n').length);
+  return Math.min(15, input.value.split('\n').length);
 });
 </script>

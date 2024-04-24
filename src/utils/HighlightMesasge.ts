@@ -3,18 +3,18 @@ import Prism from 'prismjs'
 
 type Message = string
 
-type Chunk = {
+export type Chunk = {
   input: string;
   output: HighlightedChunk;
   type: 'code' | 'text';
 }
 
-type HighlightedChunk = {
+export type HighlightedChunk = {
   markup: string;
   highlighted?: string;
 }
 
-type HighlightedMessageChunks = {
+export type HighlightedMessage = {
   input: string;
   markup: string;
   chunks: Chunk[];
@@ -83,7 +83,7 @@ const separateInputChunks = async (text: string): Promise<Chunk[]> => {
 
   for (const codeBlock of wrappedCodeBlocks) {
     const [original, rest] = splitOnce(input, codeBlock)
-    chunks.push({ input: original, output: await parseTextChunk(original), type: 'text' })
+    if (original) chunks.push({ input: original, output: await parseTextChunk(original), type: 'text' })
     chunks.push({ input: codeBlock, output: await parseCodeChunk(codeBlock), type: 'code' })
     input = rest
   }
@@ -93,7 +93,7 @@ const separateInputChunks = async (text: string): Promise<Chunk[]> => {
   return chunks
 }
 
-const getHighlightedChunks = async (message: Message): Promise<HighlightedMessageChunks> => {
+const getHighlightedChunks = async (message: Message): Promise<HighlightedMessage> => {
   const chunks = await separateInputChunks(message)
 
   let output = chunks.map((chunk, i) => {
