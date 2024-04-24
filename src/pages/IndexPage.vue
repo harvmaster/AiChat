@@ -19,7 +19,7 @@
       </div>
 
       <!-- Chat input -->
-      <div class="col-12 row bg-accent q-pa-md rounded-borders input-border">
+      <div class="col-12 row bg-primary q-pa-md rounded-borders input-border">
         <div class="col text-h6 self-center q-pl-md row">
           <textarea
             type="textarea"
@@ -34,7 +34,7 @@
           </textarea>
         </div>
         <div class="col-auto self-center">
-          <q-btn flat round dense icon="send" color="primary" @click="() => sendMessage()" />
+          <q-btn flat round dense icon="send" color="accent" @click="() => sendMessage()" />
         </div>
       </div>
     </div>
@@ -47,18 +47,18 @@ p {
 }
 
 .card-background {
-  background-color: #141414;
+  background-color: $primary;
 }
 
 .input-border {
-  border: 2px solid #242424;
+  border: 2px solid $secondary;
   border-radius: 1rem;
 }
 
 .chat-message {
   font-size: 1.2rem;
   font-weight: 700;
-  border: 2px solid #242424;
+  border: 2px solid $secondary;
   border-radius: 1rem;
 }
 </style>
