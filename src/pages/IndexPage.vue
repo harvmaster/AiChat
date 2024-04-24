@@ -1,6 +1,6 @@
 <template>
   <q-page class="row items-center justify-evenly q-pa-md">
-    <div class="col-12 col-md-8 row">
+    <div class="col-12 col-md-8 col-lg-6 row">
       <!-- Chat history -->
       <div class="col-12 row q-pb-md">
         <chat-message v-for="chatMessage of messages" :key="chatMessage.id" :id="chatMessage.id" :author="chatMessage.author" :message="chatMessage.message" :timestamp="chatMessage.timestamp" @delete="deleteMessage"/>
@@ -176,7 +176,6 @@ const inputRows = computed(() => {
 
 
 const scrollToBottom = () => {
-  // let timer
   const scroll = () => {
     const element = document.getElementById('chat-input')
     if (element) {
@@ -184,6 +183,5 @@ const scrollToBottom = () => {
     }
   }
   scroll()
-  
 }
 </script>
