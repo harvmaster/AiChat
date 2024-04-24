@@ -22,7 +22,7 @@
 <style lang="scss" scoped>
 .chat-message {
   font-size: 1.2rem;
-  font-weight: 700;
+  font-weight: 500;
   border: 2px solid #242424;
   border-radius: 1rem;
 }

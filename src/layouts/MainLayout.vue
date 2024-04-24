@@ -1,6 +1,6 @@
 <template>
   <q-layout view="lHh Lpr lFf" class="page-background">
-    <q-header class="row justify-center bg-transparent">
+    <q-header class="row justify-center bg-transparent q-px-md">
       <div class="col-12 text-center header-background text-h3 text-weight-bold q-pa-md">AI Chat</div>
       <div class="col-12 col-md-auto input-border q-pa-sm row bg-primary">
         <q-input v-model="token" input-class="col-auto text-white my-input text-h6" borderless placeholder="OpenAI Token" filled text-color="white" :type="showToken ? 'password' : 'text'" />
