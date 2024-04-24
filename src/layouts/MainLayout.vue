@@ -1,7 +1,7 @@
 <template>
   <q-layout view="lHh Lpr lFf" class="page-background">
-    <q-header class="bg-transparent row justify-center">
-      <div class="col-auto text-h3 text-weight-bold q-pa-md">AI Chat</div>
+    <q-header class="row justify-center bg-transparent">
+      <div class="col text-center header-background text-h3 text-weight-bold q-pa-md">AI Chat</div>
     </q-header>
 
     <q-page-container>
@@ -12,7 +12,12 @@
 
 <style lang="scss" scoped>
 .page-background {
-  background-color: #D17B88;
+  background-color: #141414;
+  // background-color: #ffffff;
+}
+
+.header-background {
+  background-image: linear-gradient(0deg, hsla(0%, 0%, 8%, 0%), hsla(0%, 0%, 8%, 100%), hsla(0%, 0%, 8%, 100%));
 }
 </style>
 

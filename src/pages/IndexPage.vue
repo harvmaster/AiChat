@@ -4,24 +4,24 @@
       <!-- Chat history -->
       <div class="col-12 row q-pb-md">
         <div class="col-12 q-py-sm" v-for="message of messages" :key="message.id">
-          <q-card
-            class="full-width card-background text-black chat-message"
+          <div
+            class="full-width card-background text-white chat-message"
           >
             <q-card-section>
               <q-item-label>
                 <div v-html="message.text" />
               </q-item-label>
             </q-card-section>
-          </q-card>
+          </div>
         </div>
       </div>
 
       <!-- Chat input -->
-      <div class="col-12 row bg-accent q-pa-md rounded-borders">
-        <div class="col text-h6 self-center q-pl-md">
+      <div class="col-12 row bg-accent q-pa-md rounded-borders input-border">
+        <div class="col text-h6 self-center q-pl-md row">
           <textarea
             type="textarea"
-            class="my-input full-width text-white"
+            class="my-input full-width text-white self-center"
             placeholder="Send a message"
             v-model="input"
             :rows="inputRows"
@@ -40,19 +40,24 @@
 </template>
 
 <style lang="scss">
-pre {
-  background-color: #9a7b7b;
-  padding: 1rem;
-  border-radius: 1rem;
+p {
+  margin: 0;
 }
 
 .card-background {
-  background-color: #EFF1F3;
+  background-color: #141414;
+}
+
+.input-border {
+  border: 2px solid #242424;
+  border-radius: 1rem;
 }
 
 .chat-message {
   font-size: 1.2rem;
   font-weight: 700;
+  border: 2px solid #242424;
+  border-radius: 1rem;
 }
 </style>
 
@@ -60,6 +65,7 @@ pre {
 import { computed, ref, nextTick } from 'vue';
 import { marked } from 'marked';
 import Prism from 'prismjs';
+import getHighlightedChunks from 'src/utils/HighlightMesasge';
 
 const input = ref('');
 const inputElement = ref<HTMLTextAreaElement | null>(null);
@@ -71,6 +77,8 @@ const messages = ref([
 const sendMessage = async (event?: KeyboardEvent) => {
   // Dont do anything if its an empty message
   if (!input.value.trim()) return;
+
+  getHighlightedChunks(input.value);
   
   // Is in code block
   const codeWrapperStarts = input.value.match(/^(?:\n|^)```.{1,4}/mgi) || [];
@@ -85,9 +93,12 @@ const sendMessage = async (event?: KeyboardEvent) => {
     event.preventDefault();
   }
 
+  // console.log(input.value.replaceAll('\n', '<br>'))
+
   if (input.value.length > 1) {
     let markup = await marked.parse(input.value)
     markup = markup.replaceAll('\n', '<br>')
+    // console.log(markup)
 
     const noLines = markup.replaceAll(/<br>/g, '∂');
     const codeBlocks = noLines.match(/<code[^>]*>.*?<\/code>/g)?.map(block => block.split('∂').join('\n'));
@@ -104,9 +115,11 @@ const sendMessage = async (event?: KeyboardEvent) => {
         const parsed = domParser.parseFromString(code, 'text/html');
         const formattedCode = parsed.body.textContent || '';
 
+        console.log(formattedCode)
+
         const highlightedCode = Prism.highlight(
           formattedCode,
-          Prism.languages.typescript,
+          Prism.languages[language],
           language
         );
 
@@ -116,14 +129,26 @@ const sendMessage = async (event?: KeyboardEvent) => {
           `<code class="language-${language}">${highlightedCode}</code>`
         );
       });
+      // markup = markup.replaceAll('<br><pre>', '<pre>');
+      markup = markup.replaceAll('</pre><br>', '</pre>');
     }
 
+    if (markup.endsWith('<br>')) {
+      markup = markup.slice(0, -4);
+    }
+
+    const mark = await getHighlightedChunks(input.value);
+    
+    messages.value.push({
+      id: messages.value.length + 1,
+      text: mark,
+      isBot: false,
+    });
     messages.value.push({
       id: messages.value.length + 1,
       text: markup,
       isBot: false,
     });
-    nextTick(() => Prism.highlightAll());
     input.value = '';
     setTimeout(() => {
       messages.value.push({

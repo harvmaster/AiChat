@@ -6,15 +6,15 @@ import Prism from 'prismjs'
 type Message = string
 
 type HighlightedMessageResponse = {
-  highlightedMessage: String
-  codeBlocks: Array<String>
-  origialMessage: String
+  highlightedMessage: string
+  codeBlocks: Array<string>
+  origialMessage: string
 }
 
 type HighlightedChunks = {
-  original: String
-  output: String
-  code: String
+  original: string
+  output: string
+  code: string
 }[]
 
 // remove lines and replace with a special character
@@ -24,7 +24,7 @@ const removeLines = (text: string) => {
 
 const getCodeBlocks = (text: string) => {
   const noLines = removeLines(text)
-  return text.match(/<code[^>]*>.*?<\/code>/g)?.map(joinLines)
+  return noLines.match(/<code[^>]*>.*?<\/code>/g)?.map(joinLines)
 }
 
 const joinLines = (text: string) => {
@@ -32,10 +32,12 @@ const joinLines = (text: string) => {
 }
 
 const highlightCodeBlock = (codeBlock: string) => {
+  console.log(Prism.languages)
   
   // Get the language from the class
   let language = codeBlock.match(/<code class="language-(.*?)">/)?.[1] || 'javascript';
   if (Prism.languages[language] === undefined) language = 'javascript';
+  console.log(language)
   
   // Remove the <code> tags from it
   const code = codeBlock
@@ -47,20 +49,49 @@ const highlightCodeBlock = (codeBlock: string) => {
   const parsedCode = domParser.parseFromString(code, 'text/html').body.textContent || '';
   
   // highlight the code
+  console.log(parsedCode)
+  // const highlightedCode = Prism.highlight(parsedCode, Prism.languages.typescript, language);
   const highlightedCode = Prism.highlight(parsedCode, Prism.languages[language], language);
   
-  return `<code class="language-${language}">${highlightedCode}</code>`
+  return `<pre><code class="language-${language}">${highlightedCode}</code></pre>`
 }
 
-const getHighlightedChunks = async (message: Message): HighlightedChunks => {
-  const markup = await marked.parse(message)
-  const codeBlocks = getCodeBlocks(markup)
+const getHighlightedChunks = async (message: Message) => {
 
-  if (codeBlocks) {
+  // Pull out code blocks
+  const wrappedCodeBlocks = message.match(/(^(?:\n|^)```.{1,4}\n)([^]*?)(\n```)/gmi) || [];
 
-  }
+  // Format code blocks
+  const markedCodeBlocksPromises = wrappedCodeBlocks.map(async (block) => {
+    const markedCode = await marked.parse(block)
+    const codeBlocks = getCodeBlocks(markedCode) || []
+    console.log(codeBlocks)
+    return {
+      original: block,
+      markedup: markedCode,
+      output: highlightCodeBlock(codeBlocks.join(''))
+    }
+  });
+  const markedCodeBlocks = await Promise.all(markedCodeBlocksPromises)
 
+  // Format the rest of the markdown
+  let markup = await marked.parse(message)
 
+  // Replace markdown code blocks with highlighted code
+  markedCodeBlocks.forEach((block) => {
+    markup = markup.replace(block.markedup, block.output)
+  })
+
+  console.log(markup)
+  return markup
 }
 
 export default getHighlightedChunks
+
+/*
+```ts
+const getData = () => {
+  return '' as string
+}
+```
+*/
