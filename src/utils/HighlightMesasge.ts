@@ -1,4 +1,5 @@
 import { marked } from "marked";
+import { parse } from "path";
 import Prism from 'prismjs'
 
 // take in a string
@@ -37,7 +38,6 @@ const highlightCodeBlock = (codeBlock: string) => {
   // Get the language from the class
   let language = codeBlock.match(/<code class="language-(.*?)">/)?.[1] || 'javascript';
   if (Prism.languages[language] === undefined) language = 'javascript';
-  console.log(language)
   
   // Remove the <code> tags from it
   const code = codeBlock
@@ -49,11 +49,49 @@ const highlightCodeBlock = (codeBlock: string) => {
   const parsedCode = domParser.parseFromString(code, 'text/html').body.textContent || '';
   
   // highlight the code
-  console.log(parsedCode)
-  // const highlightedCode = Prism.highlight(parsedCode, Prism.languages.typescript, language);
   const highlightedCode = Prism.highlight(parsedCode, Prism.languages[language], language);
   
-  return `<pre><code class="language-${language}">${highlightedCode}</code></pre>`
+  return `<pre><code class="language-${language}">${highlightedCode}</code></pre>\n`
+}
+
+const splitOnce = (text: string, separator: string) => {
+  const [first, ...rest] = text.split(separator)
+  return [first, rest.length > 0 ? rest.join(separator) : '']
+}
+
+type Chunk = {
+  input: string;
+  output: string;
+  type: 'code' | 'text';
+}
+
+const separateInputChunks = (text: string): Chunk[] => {
+  const wrappedCodeBlocks = text.match(/(^(?:\n|^)```.{1,4}\n)([^]*?)(\n```)/gmi) || [];
+  const chunks = wrappedCodeBlocks.reduce((acc, block) => {
+    const [original, rest] = splitOnce(acc.input, block)
+    acc.output.push({
+      input: original,
+      output: parseChunk(original),
+      type: 'text'
+    })
+    acc.output.push({
+      input: original,
+      output: parseCodeChunk(block),
+      type: 'code'
+    })
+    return {
+      output: acc.output,
+      input: rest
+    }
+  }, {
+    output: [] as Chunk[],
+    input: text
+  })
+
+  const output = chunks.output
+  if (chunks.input.length > 0) output.push({ input: chunks.input, output: parseChunk(chunks.input), type: 'text' })
+  
+    return output
 }
 
 const getHighlightedChunks = async (message: Message) => {
@@ -65,7 +103,6 @@ const getHighlightedChunks = async (message: Message) => {
   const markedCodeBlocksPromises = wrappedCodeBlocks.map(async (block) => {
     const markedCode = await marked.parse(block)
     const codeBlocks = getCodeBlocks(markedCode) || []
-    console.log(codeBlocks)
     return {
       original: block,
       markedup: markedCode,
@@ -73,6 +110,35 @@ const getHighlightedChunks = async (message: Message) => {
     }
   });
   const markedCodeBlocks = await Promise.all(markedCodeBlocksPromises)
+
+  // const otherBlocks = wrappedCodeBlocks.reduce((acc, block) => {
+  //   return acc.map(chunk => {
+  //     const chunks = splitOnce(chunk, block)
+  //     return chunks
+  //   }).flat()
+  // }, [message])
+  // console.log(otherBlocks)
+
+  // const otherBlocks = wrappedCodeBlocks.reduce((acc, block) => {
+  //   const [output, rest] = splitOnce(acc.input, block)
+  //   acc.output.push(output)
+  //   acc.output.push(block)
+  //   return {
+  //     output: acc.output,
+  //     input: rest
+  //   }
+  // }, {
+  //   output: [] as string[],
+  //   input: message
+  // })
+
+  // const chunks = [ ...otherBlocks.output, otherBlocks.input ]
+  // console.log(chunks)
+
+  const chunks = separateInputChunks(message)
+  console.log(chunks)
+
+  // const hi
 
   // Format the rest of the markdown
   let markup = await marked.parse(message)
