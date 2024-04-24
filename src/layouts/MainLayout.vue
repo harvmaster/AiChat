@@ -19,18 +19,11 @@
 <style lang="scss" scoped>
 .page-background {
   background-color: #141414;
-  // background-color: #ffffff;
 }
 
 .header-background {
   background-image: linear-gradient(0deg, hsla(0%, 0%, 8%, 0%), hsla(0%, 0%, 8%, 100%), hsla(0%, 0%, 8%, 100%));
 }
-
-// .token-input {
-//   border: 2px solid $secondary;
-//   border-radius: 1rem;
-//   width: 30em;
-// }
 
 .input-border {
   border: 2px solid $secondary;
