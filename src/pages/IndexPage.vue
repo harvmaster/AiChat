@@ -1,34 +1,40 @@
 <template>
-  <q-page class="row items-center justify-evenly q-pa-md">
-    <div class="col-12 col-md-8 col-lg-6 row">
+  <q-page class="row items-stretch q-pa-md justify-center">
+    <div class="col-12 col-md-8 col-lg-6 column">
       <!-- Chat history -->
-      <div class="col-12 row q-pb-md">
-        <chat-message v-for="chatMessage of messages" :key="chatMessage.id" :id="chatMessage.id" :author="chatMessage.author" :message="chatMessage.message" :timestamp="chatMessage.timestamp" @delete="deleteMessage"/>
+      <!-- <q-scroll-area class="chat-history q-pb-md"> -->
+      <div class="col relative full-width">
+        <div class="row q-pb-md scrollable q-pr-sm">
+          <chat-message v-for="chatMessage of messages" :key="chatMessage.id" :id="chatMessage.id" :author="chatMessage.author" :message="chatMessage.message" :timestamp="chatMessage.timestamp" @delete="deleteMessage"/>
+        </div>
       </div>
+      <!-- </q-scroll-area> -->
 
       <!-- Chat input -->
-      <div class="col-12 row bg-primary q-pa-md rounded-borders input-border">
-        <div class="col text-h6 self-center q-pl-md row">
-          <textarea
-            id="chat-input"
-            type="textarea"
-            class="my-input full-width text-white self-center"
-            placeholder="Send a message"
-            v-model="input"
-            :rows="inputRows"
-            @keypress.enter.exact="sendMessage"
-            @keydown.tab="handleTab"
-          >
-          </textarea>
+      <div class="col-auto row q-pa-md row justify-center">
+        <div class="col-12 bg-primary q-pa-md rounded-borders input-border row">
+          <div class="col text-h6 self-center q-pl-md row">
+            <textarea
+              id="chat-input"
+              type="textarea"
+              class="my-input full-width text-white self-center"
+              placeholder="Send a message"
+              v-model="input"
+              :rows="inputRows"
+              @keypress.enter.exact="sendMessage"
+              @keydown.tab="handleTab"
+              >
+            </textarea>
+          </div>
+            <div class="col-auto self-center">
+              <q-btn flat round dense icon="send" color="accent" @click="() => sendMessage()" />
+            </div>
         </div>
-        <div class="col-auto self-center">
-          <q-btn flat round dense icon="send" color="accent" @click="() => sendMessage()" />
+        <div class="col-auto row q-pt-md justify-center">
+          <select v-model="aiAgentSelector" class="text-white bg-primary my-select">
+            <option v-for="option in aiAgentOptions" :key="option" :value="option">{{ option }}</option>
+          </select>
         </div>
-      </div>
-      <div class="col-12 row q-pt-md justify-center">
-        <select v-model="aiAgentSelector" class="text-white bg-primary my-select">
-          <option v-for="option in aiAgentOptions" :key="option" :value="option">{{ option }}</option>
-        </select>
       </div>
     </div>
   </q-page>
@@ -48,11 +54,10 @@ p {
   border-radius: 1rem;
 }
 
-.chat-message {
-  font-size: 1.2rem;
-  font-weight: 500;
-  border: 2px solid $secondary;
-  border-radius: 1rem;
+.chat-history {
+  max-height: 75vh;
+  height: 75vh;
+  width: 100%;
 }
 
 .my-select {
@@ -62,6 +67,44 @@ p {
   color: white;
   padding: 0.5rem 1rem;
   cursor: pointer;
+}
+.max-100vh {
+  max-height: 100%;
+  overflow: hidden;
+}
+.relative {
+  position: relative;
+}
+.scrollable {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+
+  // Attractive scroll bar
+  &::-webkit-scrollbar {
+    width: 10px;
+    border-radius: 10px;
+
+    &-track {
+      background: $secondary;
+      border-radius: 10px;
+    }
+
+    &-thumb {
+      background: $accent;
+      border-radius: 10px;
+    }
+
+    &-thumb:hover {
+      background: $accent;
+    }
+  }
+
 }
 </style>
 
@@ -75,7 +118,6 @@ import { useConversationStore } from 'src/stores/conversations';
 import ChatMessage, { ChatMessageProps } from 'src/components/ChatMessage/ChatMessage.vue';
 
 import getHighlightedChunks from 'src/utils/HighlightMesasge';
-import { response } from 'express';
 import { ChatCompletionChunk } from 'openai/resources/chat/completions';
 
 const router = useRouter()
