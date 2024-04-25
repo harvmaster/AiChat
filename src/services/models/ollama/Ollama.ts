@@ -18,24 +18,42 @@ class Ollama implements Agent {
       body: JSON.stringify({ model: this.model, messages: request.messages })
     })
 
+    if (!response.ok) throw new Error('Failed to send chat')
+    if (!response.body) throw new Error('Failed to read response body')
+
     let result = ''
     const decoder = new TextDecoder()
-
-    for await (const encodedChunk of response.body) {
-      const text = decoder.decode(encodedChunk, { stream: true })
-      const textChunks = text.match(/{(.*)}\n/g)
-      const chunks = textChunks?.map(chunk => JSON.parse(chunk)) || []
-      console.log(chunks)
-
+    const reader = response.body.getReader();
+    
+    while (true) {
+      const { done, value } = await reader.read();
+  
+      if (done) break;
+  
+      const text = decoder.decode(value, { stream: true });
+      const textChunks = text.match(/{(.*)}\n/g);
+      const chunks = textChunks?.map(chunk => JSON.parse(chunk)) || [];
+  
       for (const chunk of chunks) {
         if (chunk.message?.content) {
           if (callback) await callback({ message: { finished: chunk.done, content: chunk.message.content } });
           else result += chunk.message.content;
         }
       }
-
-
     }
+
+    // for await (const encodedChunk of response.body) {
+    //   const text = decoder.decode(encodedChunk, { stream: true })
+    //   const textChunks = text.match(/{(.*)}\n/g)
+    //   const chunks = textChunks?.map(chunk => JSON.parse(chunk)) || []
+
+    //   for (const chunk of chunks) {
+    //     if (chunk.message?.content) {
+    //       if (callback) await callback({ message: { finished: chunk.done, content: chunk.message.content } });
+    //       else result += chunk.message.content;
+    //     }
+    //   }
+    // }
 
     return {
       message: {

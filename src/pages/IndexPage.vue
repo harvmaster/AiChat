@@ -124,6 +124,8 @@ import { ChatCompletionChunk } from 'openai/resources/chat/completions';
 import { Notify } from 'quasar';
 
 import Ollama from 'src/services/models/ollama/Ollama'
+import GPT3_5Turbo from 'src/services/models/openai/gpt3.5-turbo';
+import stream from 'stream';
 
 const router = useRouter()
 
@@ -216,8 +218,8 @@ const sendMessage = async (event?: KeyboardEvent) => {
       //   return;
       // }
 
-      const ollama = new Ollama()
-      const res = await ollama.sendChat({ messages: formattedMessage }, async (m) => {
+      const gpt3 = new GPT3_5Turbo(tokenStore.token)
+      const res = await gpt3.sendChat({ messages: formattedMessage }, async (m) => {
         const message = messages.value.find(message => message.id === '' + responseId);
         const currentText = message?.message.input || '';
         const markup = await getHighlightedChunks(currentText + m.message.content || '');
@@ -233,6 +235,24 @@ const sendMessage = async (event?: KeyboardEvent) => {
           message.message = markup;
         }
       })
+
+      // const ollama = new Ollama()
+      // const res = await ollama.sendChat({ messages: formattedMessage }, async (m) => {
+      //   const message = messages.value.find(message => message.id === '' + responseId);
+      //   const currentText = message?.message.input || '';
+      //   const markup = await getHighlightedChunks(currentText + m.message.content || '');
+
+      //   if (!message) {
+      //     messages.value.push({
+      //       id: '' + responseId,
+      //       message: markup,
+      //       author: 'AI',
+      //       timestamp: Date.now(),
+      //     })
+      //   } else {
+      //     message.message = markup;
+      //   }
+      // })
 
       console.log(res)
       return
