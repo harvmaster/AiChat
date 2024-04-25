@@ -4,9 +4,9 @@ import Provider from './Provider';
 import { ChatCompletionRequest, ChatCompletionResponse } from '../types';
 
 class GPT3_5Turbo {
-  provider = Provider;
+  static provider = Provider;
 
-  async sendChat (request: ChatCompletionRequest, callback?: (response: ChatCompletionResponse) => void): Promise<ChatCompletionResponse> {
+  static async sendChat (request: ChatCompletionRequest, callback?: (response: ChatCompletionResponse) => void): Promise<ChatCompletionResponse> {
     const openai = new OpenAI({ apiKey: Provider.token.value, dangerouslyAllowBrowser: true });
 
     const stream = await openai.chat.completions.create({ model: 'gpt-3.5-turbo', messages: request.messages, stream: true });

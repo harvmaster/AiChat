@@ -1,4 +1,5 @@
 import { Model, ChatCompletionRequest, ChatCompletionResponse, OpenProvider } from '../types';
+import OllamaProvider from './Provider';
 
 class Ollama implements Model {
   public id = 'ollama'
@@ -7,7 +8,7 @@ class Ollama implements Model {
   public model = 'phi3'
   public provider: OpenProvider
 
-  constructor (provider: OpenProvider, model?: string) {
+  constructor (provider: OllamaProvider, model?: string) {
     this.provider = provider
     if (model) this.model = model
   }

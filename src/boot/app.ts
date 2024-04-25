@@ -1,13 +1,18 @@
 import { reactive } from "vue";
+import { Model } from '../services/models';
 
 type Settings = {
-  selectedProvider?: Provider;
+  selectedModel?: Model;
 }
 
 class App {
   conversations: Conversation[] = reactive([]);
 
   settings: Settings = reactive({
-    selectedProvider: undefined
+    selectedModel: undefined
   })
 }
+
+const app = new App();
+
+export default app;
