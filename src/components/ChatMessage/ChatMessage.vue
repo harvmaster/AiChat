@@ -35,7 +35,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, defineEmits } from 'vue';
 import ChatMessageChunk from './ChatMessageChunk.vue';
-import { HighlightedMessage } from 'src/utils/HighlightMesasge'
+import { HighlightedMessage } from 'src/utils/HighlightMessage'
 
 export type ChatMessageProps = {
   id: string;

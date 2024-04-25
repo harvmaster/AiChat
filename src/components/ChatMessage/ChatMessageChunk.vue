@@ -59,7 +59,7 @@
 import { computed, ref } from 'vue';
 import { copyToClipboard } from 'quasar'
 
-import { Chunk } from 'src/utils/HighlightMesasge'
+import { Chunk } from 'src/utils/HighlightMessage'
 
 export type ChatMessageChunkProps = Chunk & {
   index: number;

@@ -119,9 +119,11 @@ import { useTokenStore } from 'src/stores/tokenStore';
 import { useConversationStore } from 'src/stores/conversations';
 import ChatMessage, { ChatMessageProps } from 'src/components/ChatMessage/ChatMessage.vue';
 
-import getHighlightedChunks from 'src/utils/HighlightMesasge';
+import getHighlightedChunks from 'src/utils/HighlightMessage';
 import { ChatCompletionChunk } from 'openai/resources/chat/completions';
 import { Notify } from 'quasar';
+
+import Ollama from 'src/services/models/ollama/Ollama'
 
 const router = useRouter()
 
@@ -208,11 +210,32 @@ const sendMessage = async (event?: KeyboardEvent) => {
       input.value = '';
 
       const responseId = generateUUID();
-      const agent = getAIAgent();
-      const stream = await agent(formattedMessage, true)
-      if (!stream) {
-        return;
-      }
+      // const agent = getAIAgent();
+      // const stream = await agent(formattedMessage, true)
+      // if (!stream) {
+      //   return;
+      // }
+
+      const ollama = new Ollama()
+      const res = await ollama.sendChat({ messages: formattedMessage }, async (m) => {
+        const message = messages.value.find(message => message.id === '' + responseId);
+        const currentText = message?.message.input || '';
+        const markup = await getHighlightedChunks(currentText + m.message.content || '');
+
+        if (!message) {
+          messages.value.push({
+            id: '' + responseId,
+            message: markup,
+            author: 'AI',
+            timestamp: Date.now(),
+          })
+        } else {
+          message.message = markup;
+        }
+      })
+
+      console.log(res)
+      return
 
       const asyncStream = stream as AsyncIterable<ChatCompletionChunk | Uint8Array>;
       for await (const chunk of asyncStream) {
