@@ -1,15 +1,15 @@
 import OpenAI from 'openai';
+import Provider from './Provider';
 
-import { Agent, ChatCompletionRequest, ChatCompletionRequestOptions, ChatCompletionResponse } from '../Agent';
+import { ChatCompletionRequest, ChatCompletionResponse } from '../types';
 
-class GPT4_Turbo implements Agent {
-  private openai: OpenAI;
-  constructor (token: string) {
-    this.openai = new OpenAI({ apiKey: token, dangerouslyAllowBrowser: true });
-  }
+class GPT4Turbo {
+  provider = Provider;
 
-  async sendChat(request: ChatCompletionRequest, callback?: (response: ChatCompletionResponse) => void): Promise<ChatCompletionResponse> {
-    const stream = await this.openai.chat.completions.create({ model: 'gpt-4-turbo', messages: request.messages, stream: true });
+  async sendChat (request: ChatCompletionRequest, callback?: (response: ChatCompletionResponse) => void): Promise<ChatCompletionResponse> {
+    const openai = new OpenAI({ apiKey: Provider.token.value, dangerouslyAllowBrowser: true });
+
+    const stream = await openai.chat.completions.create({ model: 'gpt-4-turbo', messages: request.messages, stream: true });
 
     let result = ''
     for await (const chunk of stream) {
@@ -26,5 +26,5 @@ class GPT4_Turbo implements Agent {
     }
   }
 }
-
-export default GPT4_Turbo;
+    
+export default GPT4Turbo;

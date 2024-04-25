@@ -2,15 +2,9 @@
   <q-page class="row items-stretch q-pa-md justify-center">
     <div class="col-12 col-md-8 col-lg-6 column">
       <!-- Chat history -->
-      <!-- <q-scroll-area class="chat-history q-pb-md"> -->
       <div class="col relative full-width">
-        <div class="row q-pb-md scrollable q-pr-sm">
-          <transition-group name="list" tag="div" class="col-12 row q-col-gutter-x-sm">
-            <chat-message class="col-12" v-for="chatMessage of messages" :key="chatMessage.id" :id="chatMessage.id" :author="chatMessage.author" :message="chatMessage.message" :timestamp="chatMessage.timestamp" @delete="deleteMessage"/>
-          </transition-group>
-        </div>
+        <chat-history class="row q-pb-md scrollable q-pr-sm" :messages="messages" />
       </div>
-      <!-- </q-scroll-area> -->
 
       <!-- Chat input -->
       <div class="col-auto row q-pa-md row justify-center">
@@ -43,23 +37,9 @@
 </template>
 
 <style lang="scss">
-p {
-  margin: 0;
-}
-
-.card-background {
-  background-color: $primary;
-}
-
 .input-border {
   border: 2px solid $secondary;
   border-radius: 1rem;
-}
-
-.chat-history {
-  max-height: 75vh;
-  height: 75vh;
-  width: 100%;
 }
 
 .my-select {
@@ -69,10 +49,6 @@ p {
   color: white;
   padding: 0.5rem 1rem;
   cursor: pointer;
-}
-.max-100vh {
-  max-height: 100%;
-  overflow: hidden;
 }
 .relative {
   position: relative;
@@ -110,24 +86,6 @@ p {
   }
 
 }
-
-.list-move, /* apply transition to moving elements */
-.list-enter-active,
-.list-leave-active {
-  transition: all 0.5s ease;
-}
-.list-enter-from {
-  opacity: 0;
-  transform: translateY(30px);
-}
-
-.list-leave-to {
-  opacity: 0;
-  transform: translateX(30px);
-}
-.list-leave-active {
-  position: absolute;
-}
 </style>
 
 <script setup lang="ts">
@@ -138,6 +96,7 @@ import { useRouter } from 'vue-router';
 import { useTokenStore } from 'src/stores/tokenStore';
 import { useConversationStore } from 'src/stores/conversations';
 import ChatMessage, { ChatMessageProps } from 'src/components/ChatMessage/ChatMessage.vue';
+import ChatHistory from 'src/components/ChatMessage/ChatHistory.vue';
 
 import getHighlightedChunks from 'src/utils/HighlightMessage';
 import { ChatCompletionChunk } from 'openai/resources/chat/completions';

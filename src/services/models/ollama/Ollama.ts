@@ -1,20 +1,20 @@
-import { Agent, ChatCompletionRequest, ChatCompletionRequestOptions, ChatCompletionResponse, ChatMessage } from '../Agent';
+import { Model, ChatCompletionRequest, ChatCompletionResponse, OpenProvider } from '../types';
 
-class Ollama implements Agent {
-  public url = 'https://ai.ollama.mc.hzuccon.com'
+class Ollama implements Model {
+  public id = 'ollama'
+  public name = 'Ollama'
+
   public model = 'phi3'
+  public provider: OpenProvider
 
-  constructor (url?: string, model?: string) {
-    if (url) this.url = url
+  constructor (provider: OpenProvider, model?: string) {
+    this.provider = provider
     if (model) this.model = model
   }
 
   async sendChat (request: ChatCompletionRequest, callback?: (response: ChatCompletionResponse) => void): Promise<ChatCompletionResponse> {
-    const response = await fetch(`${this.url}/api/chat`, {
+    const response = await fetch(`${this.provider.url.value}/api/chat`, {
       method: 'POST',
-      headers: {
-        // 'Content-Type': 'application/json'
-      },
       body: JSON.stringify({ model: this.model, messages: request.messages })
     })
 

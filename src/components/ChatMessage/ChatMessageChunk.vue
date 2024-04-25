@@ -18,6 +18,9 @@
 </template>
 
 <style>
+p {
+  margin: 0;
+}
 .relative {
   position: relative;
 }
@@ -33,8 +36,6 @@
   border: none;
   border-radius: 0.5rem;
   padding: 0.5rem 1rem;
-  /* height: 2em;
-  width: 2em; */
   cursor: pointer;
   transform: translate(-0.5rem, 0.5rem);
   transform-origin: center center;
