@@ -5,7 +5,7 @@
       <!-- <q-scroll-area class="chat-history q-pb-md"> -->
       <div class="col relative full-width">
         <div class="row q-pb-md scrollable q-pr-sm">
-          <chat-message v-for="chatMessage of messages" :key="chatMessage.id" :id="chatMessage.id" :author="chatMessage.author" :message="chatMessage.message" :timestamp="chatMessage.timestamp" @delete="deleteMessage"/>
+          <chat-message class="col-12" v-for="chatMessage of messages" :key="chatMessage.id" :id="chatMessage.id" :author="chatMessage.author" :message="chatMessage.message" :timestamp="chatMessage.timestamp" @delete="deleteMessage"/>
         </div>
       </div>
       <!-- </q-scroll-area> -->
@@ -84,6 +84,8 @@ p {
   width: 100%;
   height: 100%;
   overflow-y: auto;
+  overflow-x: hidden;
+  display: flow;
 
   // Attractive scroll bar
   &::-webkit-scrollbar {
@@ -119,6 +121,7 @@ import ChatMessage, { ChatMessageProps } from 'src/components/ChatMessage/ChatMe
 
 import getHighlightedChunks from 'src/utils/HighlightMesasge';
 import { ChatCompletionChunk } from 'openai/resources/chat/completions';
+import { Notify } from 'quasar';
 
 const router = useRouter()
 
@@ -147,118 +150,47 @@ const messages = ref<ChatMessageProps[]>([
 
 const sendMessage = async (event?: KeyboardEvent) => {
   // Dont do anything if its an empty message
-  if (!input.value.trim()) return;
+  try {
+    if (!input.value.trim()) return;
 
-  // Is in code block
-  const codeWrapperStarts = input.value.match(/^(?:\n|^)```..*?/mgi) || [];
-  const wholeCode = input.value.match(/(^(?:\n|^)```..*?\n)([^]*?)(\n```)/gmi) || [];
+    // Is in code block
+    const codeWrapperStarts = input.value.match(/^(?:\n|^)```..*?/mgi) || [];
+    const wholeCode = input.value.match(/(^(?:\n|^)```..*?\n)([^]*?)(\n```)/gmi) || [];
 
-  if (codeWrapperStarts.length != wholeCode.length) {
-    return;
-  }
-
-  if (event) {
-    event.preventDefault();
-  }
-
-  if (input.value.length > 1) {
-    // Is in a current conversation
-    let conversationId = router.currentRoute.value.params.id as string;
-    if (!conversationId) {
-      conversationId = generateUUID()
-      conversationStore.addConversation({
-        id: conversationId,
-        summary: input.value,
-        messages: [],
-      })
-      router.push('/' + conversationId)
-    }
-
-    const openai = new OpenAI({ apiKey: tokenStore.token, dangerouslyAllowBrowser: true });
-
-    const mark = await getHighlightedChunks(input.value);
-
-    const message = {
-      id: generateUUID(),
-      author: 'User',
-      message: mark,
-      timestamp: Date.now(),
-    }
-    
-    messages.value.push(message);
-
-    const formattedMessage = messages.value.map(message => {
-      return {
-        role: message.author === 'AI' ? 'assistant' : 'user',
-        content: message.message.input,
-      } as OpenAI.ChatCompletionMessage;
-    })
-
-    await conversationStore.addMessage(conversationId, {
-      id: message.id,
-      author: 'User',
-      content: input.value,
-      timestamp: message.timestamp,
-    })
-
-    input.value = '';
-
-    const responseId = generateUUID();
-    const agent = getAIAgent();
-    const stream = await agent(formattedMessage, true)
-    if (!stream) {
+    if (codeWrapperStarts.length != wholeCode.length) {
       return;
     }
 
-    const asyncStream = stream as AsyncIterable<ChatCompletionChunk | Uint8Array>;
-    for await (const chunk of asyncStream) {
-      // console.log(chunk.choices[0]?.delta?.content)
-      let decoded
-      if (chunk instanceof Uint8Array) {
-        const decodedChunk = new TextDecoder().decode(chunk)
-        console.log(decodedChunk)
-        const decodedParts = decodedChunk.match(/{(.*)}/g)
-        const bodyParts = decodedParts?.map(part => JSON.parse(part) as { message: { content: string } }) || []
-        const body = bodyParts.map(part => part.message.content).join('')
-        decoded = body
-      }
-      if (!(chunk instanceof Uint8Array) && chunk.choices[0]?.delta?.content && !decoded) {
-        decoded = chunk.choices[0]?.delta?.content;
-      }
-      if (!(chunk instanceof Uint8Array) && !chunk.choices[0]?.delta?.content) {
-        continue;
-      }
-      // get existing message
-      const message = messages.value.find(message => message.id === '' + responseId);
-      const currentText = message?.message.input || '';
-      const markup = await getHighlightedChunks(currentText + decoded || '');
+    if (event) {
+      event.preventDefault();
+    }
 
-      if (!message) {
-        messages.value.push({
-          id: '' + responseId,
-          message: markup,
-          author: 'AI',
-          timestamp: Date.now(),
+    if (input.value.length > 1) {
+      // Is in a current conversation
+      let conversationId = router.currentRoute.value.params.id as string;
+      if (!conversationId) {
+        conversationId = generateUUID()
+        conversationStore.addConversation({
+          id: conversationId,
+          summary: input.value,
+          messages: [],
         })
-      } else {
-        message.message = markup;
+        router.push('/' + conversationId)
+      }
+
+      const openai = new OpenAI({ apiKey: tokenStore.token, dangerouslyAllowBrowser: true });
+
+      const mark = await getHighlightedChunks(input.value);
+
+      const message = {
+        id: generateUUID(),
+        author: 'User',
+        message: mark,
+        timestamp: Date.now(),
       }
       
-      scrollToBottom()
-    }
+      messages.value.push(message);
 
-    const response = messages.value.find(message => message.id === '' + responseId);
-    if (!response) {
-      return;
-    }
-    await conversationStore.addMessage(conversationId, {
-      id: response.id,
-      author: 'AI',
-      content: response?.message.input,
-      timestamp: response.timestamp,
-    })
-
-    if (messages.value.length < 4) {
       const formattedMessage = messages.value.map(message => {
         return {
           role: message.author === 'AI' ? 'assistant' : 'user',
@@ -266,23 +198,102 @@ const sendMessage = async (event?: KeyboardEvent) => {
         } as OpenAI.ChatCompletionMessage;
       })
 
-      const summary = await openai.chat.completions.create({
-        model: 'gpt-3.5-turbo',
-        messages: [{
-          role: 'system',
-          content: `Summarise this conversation in no more than 6 words`,
-        },
-          {
-            role: 'user',
-            content: `Summarise: ${formattedMessage.map(message => message.content).join(' ')}`,
-          }
-        ],
-      });
-      if (!summary.choices[0]?.message?.content) {
+      await conversationStore.addMessage(conversationId, {
+        id: message.id,
+        author: 'User',
+        content: input.value,
+        timestamp: message.timestamp,
+      })
+
+      input.value = '';
+
+      const responseId = generateUUID();
+      const agent = getAIAgent();
+      const stream = await agent(formattedMessage, true)
+      if (!stream) {
         return;
       }
-      conversationStore.updateConversation(conversationId, summary.choices[0]?.message?.content)
+
+      const asyncStream = stream as AsyncIterable<ChatCompletionChunk | Uint8Array>;
+      for await (const chunk of asyncStream) {
+        // console.log(chunk.choices[0]?.delta?.content)
+        let decoded
+        if (chunk instanceof Uint8Array) {
+          const decodedChunk = new TextDecoder().decode(chunk)
+          console.log(decodedChunk)
+          const decodedParts = decodedChunk.match(/{(.*)}/g)
+          const bodyParts = decodedParts?.map(part => JSON.parse(part) as { message: { content: string } }) || []
+          const body = bodyParts.map(part => part.message.content).join('')
+          decoded = body
+        }
+        if (!(chunk instanceof Uint8Array) && chunk.choices[0]?.delta?.content && !decoded) {
+          decoded = chunk.choices[0]?.delta?.content;
+        }
+        if (!(chunk instanceof Uint8Array) && !chunk.choices[0]?.delta?.content) {
+          continue;
+        }
+        // get existing message
+        const message = messages.value.find(message => message.id === '' + responseId);
+        const currentText = message?.message.input || '';
+        const markup = await getHighlightedChunks(currentText + decoded || '');
+
+        if (!message) {
+          messages.value.push({
+            id: '' + responseId,
+            message: markup,
+            author: 'AI',
+            timestamp: Date.now(),
+          })
+        } else {
+          message.message = markup;
+        }
+        
+        scrollToBottom()
+      }
+
+      const response = messages.value.find(message => message.id === '' + responseId);
+      if (!response) {
+        return;
+      }
+      await conversationStore.addMessage(conversationId, {
+        id: response.id,
+        author: 'AI',
+        content: response?.message.input,
+        timestamp: response.timestamp,
+      })
+
+      if (messages.value.length < 4) {
+        const formattedMessage = messages.value.map(message => {
+          return {
+            role: message.author === 'AI' ? 'assistant' : 'user',
+            content: message.message.input,
+          } as OpenAI.ChatCompletionMessage;
+        })
+
+        const summary = await openai.chat.completions.create({
+          model: 'gpt-3.5-turbo',
+          messages: [{
+            role: 'system',
+            content: `Summarise this conversation in no more than 6 words`,
+          },
+            {
+              role: 'user',
+              content: `Summarise: ${formattedMessage.map(message => message.content).join(' ')}`,
+            }
+          ],
+        });
+        if (!summary.choices[0]?.message?.content) {
+          return;
+        }
+        conversationStore.updateConversation(conversationId, summary.choices[0]?.message?.content)
+      }
     }
+  } catch (error: any) {
+    Notify.create({
+      message: `An error occured, ${error.message}`,
+      color: 'negative',
+      position: 'top-right',
+    });
   }
 };
 
