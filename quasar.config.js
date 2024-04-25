@@ -79,9 +79,15 @@ module.exports = configure(function (/* ctx */) {
       // extendViteConf (viteConf) {},
       // viteVuePluginOptions: {},
       extendViteConf (viteConf) {
-        viteConf.server.hmr = {}
-        viteConf.server.hmr.host = 'ai.portfolio.mc.hzuccon.com'
-        viteConf.server.hmr.clientPort = 443
+        // NOTE: Quasar expects us to extend the Vite Configuration by re-assigning the viteConf parameter.
+        /* eslint-disable no-param-reassign */
+
+        // Allow relative URLs to work for Gitlab Pages deployment.
+        viteConf.base = '';
+
+        // viteConf.server.hmr = {}
+        // viteConf.server.hmr.host = 'ai.portfolio.mc.hzuccon.com'
+        // viteConf.server.hmr.clientPort = 443
       },
 
       
@@ -92,9 +98,15 @@ module.exports = configure(function (/* ctx */) {
 
     // Full list of options: https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#devServer
     devServer: {
-      // https: true
-      port: 9000,
-      open: true // opens browser window automatically
+      // opens browser window automatically
+      open: true,
+      // Terminate if port is not available.
+      strictPort: true,
+      hmr: {
+        // If a specific Hot Module Reload (HMR) port is given, use it.
+        // NOTE: This allows HMR to work behind reverse-proxies.
+        clientPort: Number(process.env.HMR_PORT) ?? undefined,
+      },
     },
 
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#framework
