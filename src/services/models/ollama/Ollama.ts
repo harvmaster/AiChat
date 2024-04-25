@@ -37,23 +37,10 @@ class Ollama implements Agent {
       for (const chunk of chunks) {
         if (chunk.message?.content) {
           if (callback) await callback({ message: { finished: chunk.done, content: chunk.message.content } });
-          else result += chunk.message.content;
+          result += chunk.message.content;
         }
       }
     }
-
-    // for await (const encodedChunk of response.body) {
-    //   const text = decoder.decode(encodedChunk, { stream: true })
-    //   const textChunks = text.match(/{(.*)}\n/g)
-    //   const chunks = textChunks?.map(chunk => JSON.parse(chunk)) || []
-
-    //   for (const chunk of chunks) {
-    //     if (chunk.message?.content) {
-    //       if (callback) await callback({ message: { finished: chunk.done, content: chunk.message.content } });
-    //       else result += chunk.message.content;
-    //     }
-    //   }
-    // }
 
     return {
       message: {

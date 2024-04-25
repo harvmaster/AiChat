@@ -15,7 +15,7 @@ class GPT3_5Turbo implements Agent {
     for await (const chunk of stream) {
       if (chunk.choices[0]?.delta?.content) {
         if (callback) callback({ message: { finished: true, content: chunk.choices[0].delta.content } });
-        else result += chunk.choices[0].delta.content;
+        result += chunk.choices[0].delta.content;
       }
     }
     return {

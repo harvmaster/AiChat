@@ -5,7 +5,9 @@
       <!-- <q-scroll-area class="chat-history q-pb-md"> -->
       <div class="col relative full-width">
         <div class="row q-pb-md scrollable q-pr-sm">
-          <chat-message class="col-12" v-for="chatMessage of messages" :key="chatMessage.id" :id="chatMessage.id" :author="chatMessage.author" :message="chatMessage.message" :timestamp="chatMessage.timestamp" @delete="deleteMessage"/>
+          <transition-group name="list" tag="div" class="col-12 row q-col-gutter-x-sm">
+            <chat-message class="col-12" v-for="chatMessage of messages" :key="chatMessage.id" :id="chatMessage.id" :author="chatMessage.author" :message="chatMessage.message" :timestamp="chatMessage.timestamp" @delete="deleteMessage"/>
+          </transition-group>
         </div>
       </div>
       <!-- </q-scroll-area> -->
@@ -108,6 +110,24 @@ p {
   }
 
 }
+
+.list-move, /* apply transition to moving elements */
+.list-enter-active,
+.list-leave-active {
+  transition: all 0.5s ease;
+}
+.list-enter-from {
+  opacity: 0;
+  transform: translateY(30px);
+}
+
+.list-leave-to {
+  opacity: 0;
+  transform: translateX(30px);
+}
+.list-leave-active {
+  position: absolute;
+}
 </style>
 
 <script setup lang="ts">
@@ -125,7 +145,6 @@ import { Notify } from 'quasar';
 
 import Ollama from 'src/services/models/ollama/Ollama'
 import GPT3_5Turbo from 'src/services/models/openai/gpt3.5-turbo';
-import stream from 'stream';
 
 const router = useRouter()
 
