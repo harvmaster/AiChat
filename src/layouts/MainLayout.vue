@@ -122,6 +122,7 @@
 
 .rainbow-text {
   background-image: linear-gradient(to left, rgb(79, 79, 255), rgb(255, 97, 97));
+  background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }

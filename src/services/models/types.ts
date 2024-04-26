@@ -26,7 +26,7 @@ export interface BaseModel {
   id: string;
   name: string;
   model: string;
-  // Engine: Provider;
+  provider: Provider;
   sendChat(request: ChatCompletionRequest, callback?: (result: ChatCompletionResponse) => void,): Promise<ChatCompletionResponse>;
 }
 
