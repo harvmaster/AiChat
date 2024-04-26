@@ -8,14 +8,24 @@
 
       <!-- Chat input -->
       <div class="col-auto row q-pa-md row justify-center">
-        <chat-input />
+        <chat-input class="col-12" />
+
         <div class="col-auto row q-pt-md justify-center">
-          <select v-model="aiAgentSelector" class="text-white bg-primary my-select">
-            <option v-for="option in aiAgentOptions" :key="option" :value="option">{{ option }}</option>
-          </select>
+          <div class="row input-border cursor-pointer" @click="toggleSettings" :class="app.settings.value.selectedModel?.provider.isClosed ? 'q-pa-md' : 'q-pa-sm'">
+            <div class="col-12 text-white text-h6 text-center">
+              {{ app.settings.value.selectedModel?.name }}
+            </div>
+            <div 
+              v-if="(app.settings.value.selectedModel) && !(app.settings.value.selectedModel.provider.isClosed)" 
+              class="col-12 text-caption text-white self-end q-pl-sm text-center"
+            >
+              ({{ app.settings.value.selectedModel?.provider.url }})
+            </div>
+          </div>
         </div>
       </div>
     </div>
+    <settings-dialog ref="SettingsDialogElement" />
   </q-page>
 </template>
 
@@ -64,35 +74,32 @@
   }
 
 }
+.no-line-height {
+  line-height: 0;
+}
 </style>
 
 <script setup lang="ts">
-import { computed, ref, nextTick, watch, onMounted, onActivated } from 'vue';
-import { useRouter } from 'vue-router';
+import { computed, ref } from 'vue';
+import { app } from 'boot/app';
 
-import { useTokenStore } from 'src/stores/tokenStore';
 import useCurrentConversation from 'src/composeables/useCurrentConversation';
 
 import ChatHistory from 'src/components/ChatMessage/ChatHistory.vue';
 import ChatInput from 'src/components/ChatInput/ChatInput.vue';
+import SettingsDialog from 'src/components/Settings/SettingsDialog.vue';
 import { Message } from 'src/types';
 
-const router = useRouter()
-
-const tokenStore = useTokenStore();
 const currentConversation = useCurrentConversation();
 
-const input = ref('');
-const aiAgentSelector = ref('ollama (:11434)');
-const aiAgentOptions = ref([
-  'openai-gpt-3.5-turbo',
-  'openai-gpt-4-turbo',
-  'ollama (:11434)'
-])
+const SettingsDialogElement = ref<InstanceType<typeof SettingsDialog> | null>(null);
 
 const messages = computed<Message[]>(() => {
   const conversation = currentConversation.value;
   return conversation ? conversation.messages : [];
 })
 
+const toggleSettings = () => {
+  SettingsDialogElement.value?.toggleVisible();
+}
 </script>

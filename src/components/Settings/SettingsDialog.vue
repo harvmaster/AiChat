@@ -11,7 +11,6 @@
           <!-- Profile Selection Menu -->
           <div class="col-12 col-md-auto row">
             <div class="col-12 scroll-area">
-            <!-- <q-scroll-area class="col-12" style="height: 30vh; min-width: 15em"> -->
               <q-list class="fit">
 
                 <div
@@ -54,67 +53,50 @@
                   <q-popup-edit ref="addProviderPopup" v-model="newProvider" label="Provider" class="bg-accent" >
                     <input v-model="newProvider" autofocus class="my-input text-white text-h6" placeholder="Provider Name" @keydown.enter="createProvider"/>
                   </q-popup-edit>
-
-                  <!-- <q-btn class="text-bold " outline color="positive" @click="openModelCreator">
-                    Add Provider
-                  </q-btn> -->
                 </div>
 
               </q-list>
-            <!-- </q-scroll-area> -->
             </div>
           </div>
 
+          <q-separator v-if="Platform.is.mobile" horizontal class="col-12 bg-accent text-accent q-pm-xs" style="background-color: white; height: 2px"/>
+
           <!-- Model Editor -->
           <div class="col-12 col-md row fit-content">
-            <div class="row col-12 col-md-auto q-pa-md">
-
-              <!-- Model Creator -->
-              <div v-if="modelCreator" class="row">
-                <div class="col-12 row">
-                  <div class="col-12">
-                    <!-- <q-input filled v-model="modelCreatorData.provider.name" placeholder="Provider" input-class="text-white" label-color="white" bg-color="accent" color="white"/> -->
-                  </div>
-                  <q-dialog v-model="modelCreator" class="settings-dialog" :seamless="false">
-                    <div class="q-pa-md text-h6 text-white">
-                      test
-                    </div>
-                  </q-dialog>
-
-                </div>
-                <!-- <div class="form-input" style="width: 15em"> -->
-                  <!-- <input class="q-pa-md my-input text-white" v-model="modelCreatorData.provider.name" /> -->
-                <!-- </div> -->
-              </div>
+            <div class="row col-12 col-md-auto q-pa-md fit-content">
 
               <!-- Closed Model Editor -->
-              <div v-else-if="selectedModel && selectedModel.provider.isClosed" class="row">
-                <div class="col-12 text-h6 text-white q-pb-sm">
+              <div v-if="selectedModel && selectedModel.provider.isClosed" class="column align-start">
+                <div class="col-auto text-h6 text-white q-pb-sm">
                   {{ selectedModel.name }}
                 </div>
-                <div class="col-12 row">
-                  <div class="col-12 q-py-sm">
-                    <q-input filled v-model="selectedModel.provider.token" label="API Key" input-class="text-white" label-color="white" bg-color="accent" color="white"/>
-                  </div>
-                  <div class="col-auto q-py-sm row q-pa-sm">
-                    <div class="col-12 text-white">Temperature</div>
-                    <div class="col-auto row">
-                      <counter-input class="col-auto" v-model="selectedModel.temperature" :step="0.1" @update:model-value="clampTemperature"/>
+
+                <div class="col-auto row items-start">
+                  <div class="fit-content q-py-sm">
+                    <div class="input-container">
+                      <input class="my-input text-white text-h6" v-model="selectedModel.provider.token" placeholder="API Token"/>
                     </div>
+                  </div>
+                </div>
+
+                <div class="col-auto row">
+                  <div class="row fit-content">
+                    <div class="col-12 text-white">Temperature</div>
+                    <counter-input class="col-auto" v-model="selectedModel.temperature" :step="0.1" @update:model-value="clampTemperature"/>
                   </div>
                 </div>
               </div>
 
               <!-- Open Model Editor -->
-              <div v-else-if="selectedModel && !selectedModel.provider.isClosed" class="col-12 row items-start justify-start align-start">
-                <div class="text-white col-12 row">
+              <div v-else-if="selectedModel && !selectedModel.provider.isClosed" class="column align-start fit-content">
+                <div class="text-white col-auto row">
                   <div class="col-auto q-pr-sm">
                     <q-btn flat round dense icon="edit" color="white" @click="focusOpenModelName" />
                   </div>
                   <input ref="openModelName" class="my-input text-white my-number-input text-h6 col-auto" v-model="selectedModel.name" />
                 </div>
 
-                <div class="col-12 row items-start">
+                <div class="col-auto row items-start">
                   <div class="fit-content q-py-sm">
                     <div class="input-container">
                       <input class="my-input text-white text-h6" v-model="selectedModel.provider.url" placeholder="URL"/>
@@ -122,7 +104,7 @@
                   </div>
                 </div>
 
-                <div class="col-12 row">
+                <div class="col-auto row">
                   <div class="row fit-content">
                     <div class="col-12 text-white">Temperature</div>
                     <counter-input class="col-auto" v-model="selectedModel.temperature" :step="0.1" @update:model-value="clampTemperature"/>
@@ -199,7 +181,7 @@
 @media screen and (min-width: 1000px) {
   .settings-dialog {
     max-height: 40vh;
-    max-width: 60vw;
+    max-width: 40vw;
     overflow-y: auto;
   }
   .scroll-area {
@@ -216,14 +198,19 @@
 import { computed, onMounted, ref } from 'vue'
 import { app } from 'boot/app'
 
-import { QPopupEdit } from 'quasar';
+import { Platform, QPopupEdit } from 'quasar';
 import { Model, OpenModel } from 'src/services/models/types';
 
 import CounterInput from 'components/Inputs/CounterInput.vue'
 import { OllamaModel, OllamaProvider } from 'src/services/models/ollama';
 import generateUUID from 'src/composeables/generateUUID'
 
-const show = ref(true)
+const show = ref(false)
+const toggleVisible = () => {
+  show.value = !show.value
+}
+defineExpose({ toggleVisible: () => toggleVisible() })
+
 const modelCreator = ref(false)
 const selectedModel = computed(() => app.settings.value.selectedModel)
 

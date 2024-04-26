@@ -49,8 +49,6 @@
       </div>
     </q-drawer>
 
-    <SettingsDialog />
-
     <q-page-container>
       <router-view />
     </q-page-container>

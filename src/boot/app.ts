@@ -48,7 +48,7 @@ class App {
     ]
 
     this.models.value = [ ...formattedModels, ...openaiModels ];
-    this.settings.value.selectedModel = formattedModels[0];
+    this.settings.value.selectedModel = this.models.value[0];
 
     const conversations = await getConversations({ getMessages: true });
     this.conversations.value = conversations;
