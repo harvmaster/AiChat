@@ -23,7 +23,7 @@
       side="left"
       class="bg-secondary text-white q-pa-sm"
     >
-      <div class="drawer-item row" clickable @click="createNewConversation">
+      <div class="drawer-item row" clickable @click="createConversation">
         <div class="col-auto text-weight-bolder q-pl-md q-pr-lg rainbow-text">
           AI
         </div>
@@ -44,10 +44,12 @@
         </div>
 
         <div class="drawer-item-interactions col-auto row">
-          <q-btn class="self-center" flat round dense icon="delete" color="red-4" @click.stop.prevent="conversationStore.deleteConversation(conversation.id)" />
+          <q-btn class="self-center" flat round dense icon="delete" color="red-4" @click.stop.prevent="() => deleteConversation(conversation)" />
         </div>
       </div>
     </q-drawer>
+
+    <SettingsDialog />
 
     <q-page-container>
       <router-view />
@@ -126,11 +128,16 @@
 </style>
 
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from 'vue'
-import { useTokenStore } from 'src/stores/tokenStore';
+import { Conversation, Message } from 'src/types';
 
-import { useConversationStore } from 'src/stores/conversations';
+import { computed, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router';
+import { app } from 'boot/app'
+
+import { useTokenStore } from 'src/stores/tokenStore';
+import deleteConversationFromDatabase from 'src/utils/Database/Conversations/deleteConversation';
+
+import SettingsDialog from 'src/components/Settings/SettingsDialog.vue'
 
 const router = useRouter()
 
@@ -153,20 +160,19 @@ const toggleDrawer = () => {
   drawer.value = !drawer.value
 }
 
-const conversationStore = useConversationStore()
-
-const createNewConversation = () => {
+const createConversation = () => {
   router.push('/')
 }
 
+const deleteConversation = async (conversation: Conversation) => {
+  await deleteConversationFromDatabase(conversation)
+  app.conversations.value = app.conversations.value.filter((c: Conversation) => c.id !== conversation.id)
+}
+
 const sortedConversation = computed(() => {
-  return [...conversationStore.conversations].sort((a, b) => b.messages.sort((c, d) => c.timestamp - d.timestamp)[0]?.timestamp - a.messages.sort((c, d) => c.timestamp - d.timestamp)[0]?.timestamp)
+  return [...app.conversations.value].sort((a, b) => b.messages.sort((c: Message, d: Message) => c.createdAt - d.createdAt)[0]?.createdAt - a.messages.sort((c: Message, d: Message) => c.createdAt - d.createdAt)[0]?.createdAt)
 })
 const routeToConversation = (id: string) => {
   router.push(`/${id}`)
 }
-
-onMounted(async () => {
-  conversationStore.readFromDb()
-})
 </script>

@@ -8,7 +8,8 @@ class Ollama implements Model {
   public model = 'phi3'
   public provider: OpenProvider
 
-  constructor (provider: OllamaProvider, model?: string) {
+  constructor (id: string, provider: OllamaProvider, model?: string) {
+    this.id = id
     this.provider = provider
     if (model) this.model = model
   }

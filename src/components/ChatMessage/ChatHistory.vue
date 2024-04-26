@@ -9,8 +9,9 @@
 
         :id="message.id"
         :author="message.author"
-        :message="message.message"
-        :timestamp="message.timestamp"
+        :content="message.content"
+        :created-at="message.createdAt"
+        :model-id="message.modelId"
       />
     </transition-group>
   </div>
@@ -37,10 +38,11 @@
 </style>
 
 <script setup lang="ts">
-import ChatMessage, { ChatMessageProps } from './ChatMessage.vue'
+import { Message } from 'src/types';
+import ChatMessage from './ChatMessage.vue'
 
 export type ChatHistoryProps = {
-  messages: ChatMessageProps[]
+  messages: Message[]
 }
 
 const props = defineProps<ChatHistoryProps>()

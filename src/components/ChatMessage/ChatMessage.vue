@@ -12,8 +12,8 @@
           <q-btn flat round dense icon="delete" color="red-4 opacity-50 opacity-h-75 transition-025" @click="deleteMessage" />
         </div>
       </div>
-      <div class="col-12" v-for="(chunk, index) of message.chunks" :key="chunk.input" >
-        <chat-message-chunk :type="chunk.type" :output="chunk.output" :input="chunk.input" :index="index" :parentLength="message.chunks.length"/>
+      <div class="col-12" v-for="(chunk, index) of content.chunks" :key="chunk.raw" >
+        <chat-message-chunk :type="chunk.type" :output="chunk.output" :raw="chunk.raw" :index="index" :parentLength="content.chunks.length"/>
       </div>
     </div>
   </div>
@@ -36,21 +36,20 @@ p {
 </style>
 
 <script setup lang="ts">
-import { computed, onMounted, ref, defineEmits } from 'vue';
-import ChatMessageChunk from './ChatMessageChunk.vue';
-import { HighlightedMessage } from 'src/utils/HighlightMessage'
+import { Message } from 'src/types';
 
-export type ChatMessageProps = {
-  id: string;
-  author: string;
-  message: HighlightedMessage
-  timestamp: number;
-}
+import { computed, onMounted, ref, defineEmits } from 'vue';
+
+import useCurrentConversation from 'src/composeables/useCurrentConversation';
+import deleteMessageFromDatabase from 'src/utils/Database/Messages/deleteMessage';
+
+import ChatMessageChunk from './ChatMessageChunk.vue';
+
+export type ChatMessageProps = Message
 
 const props = defineProps<ChatMessageProps>()
-const emits = defineEmits<{
-  (e: 'delete', id: string): void
-}>()
+
+const currentConveration = useCurrentConversation()
 
 const now = ref(new Date())
 const timeSinceTimer = () => {
@@ -60,7 +59,7 @@ const timeSinceTimer = () => {
 }
 
 const timeAgo = computed(() => {
-  const date = new Date(props.timestamp)
+  const date = new Date(props.createdAt)
   const diff = now.value.getTime() - date.getTime()
   const seconds = Math.floor(diff / 1000)
   const minutes = Math.floor(seconds / 60)
@@ -83,6 +82,13 @@ onMounted(() => {
 })
 
 const deleteMessage = () => {
-  emits('delete', props.id)
+  const conversation = currentConveration.value
+  if (!conversation) return
+
+  const index = conversation.messages.findIndex(message => message.id === props.id)
+  if (index === -1) return
+
+  conversation.messages.splice(index, 1)
+  deleteMessageFromDatabase(props)
 }
 </script>

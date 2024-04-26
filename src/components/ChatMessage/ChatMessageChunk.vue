@@ -60,7 +60,7 @@ p {
 import { computed, ref } from 'vue';
 import { copyToClipboard } from 'quasar'
 
-import { Chunk } from 'src/utils/HighlightMessage'
+import { Chunk } from 'src/types'
 
 export type ChatMessageChunkProps = Chunk & {
   index: number;
@@ -96,7 +96,7 @@ const getFirstGroup = (regexp: RegExp, str: string) => {
 }
 
 const copy = () => {
-  const code = getFirstGroup(/(?:^```.*?\n)([^]*.*)(?:```)/gmi, props.input)
+  const code = getFirstGroup(/(?:^```.*?\n)([^]*.*)(?:```)/gmi, props.raw)
   console.log(code)
 
   if (code) copyToClipboard(code.join(''))

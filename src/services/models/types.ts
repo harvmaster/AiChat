@@ -22,32 +22,36 @@ export type ChatCompletionRequestOptions = {
   stream: boolean;
 }
 
-export interface Model {
+export interface BaseModel {
   id: string;
   name: string;
+  model: string;
   sendChat(request: ChatCompletionRequest, callback?: (result: ChatCompletionResponse) => void,): Promise<ChatCompletionResponse>;
 }
 
 export type BaseProvider = {
   id: string;
   name: string;
+  type: string;
 }
 
-export type ClosedModel = Model & {
+export interface ClosedModel extends BaseModel {
   provider: ClosedProvider
 }
-export type ClosedProvider = BaseProvider & {
+export interface ClosedProvider extends BaseProvider {
   token: Ref<string>;
   isClosed: true;
 }
 
-export type OpenModel = Model & {
+export interface OpenModel extends BaseModel  {
   provider: OpenProvider
 }
-export type OpenProvider = BaseProvider & {
+export interface OpenProvider extends BaseProvider {
   name: string;
   url: Ref<string>;
   isClosed: false;
 }
 
-export interface Provider extends BaseProvider {};
+export type Model = ClosedModel | OpenModel;
+
+export type Provider = ClosedProvider | OpenProvider;
