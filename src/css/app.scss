@@ -9,6 +9,11 @@
   outline: none;
 }
 
+.input-border {
+  border: 2px solid $secondary;
+  border-radius: 1rem;
+}
+
 pre {
   border: none;
   background-color: #1f1f1f;

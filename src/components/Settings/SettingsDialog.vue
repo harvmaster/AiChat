@@ -1,54 +1,23 @@
 <template>
-  <q-dialog v-model="show" class="" position="bottom" seamless>
+  <q-dialog v-model="show" class="" position="bottom" :seamless="false">
     <div class="q-pa-md">
-      <div class="row bg-secondary settings-dialog">
+      <div class="row bg-secondary settings-dialog q-pa-md">
 
-        <!-- Sidebar -->
-        <div class="col-auto row items-start q-pa-md category-menu">
-
-          <!-- Settings -->
-          <div class="col-12 row q-pa-sm q-px-md settings-category">
-            <div class="col-auto self-center">
-              <q-icon name="settings" class="text-white" size="2em"/>
-            </div>
-            <div class="q-pl-sm col-auto text-h6 text-white self-center">
-              Settings
-            </div>
-          </div>
-
-          <!-- Profile -->
-          <div class="col-12 row q-pa-sm q-pl-sm q-pr-xl settings-category">
-            <div class="col-auto self-center">
-              <q-icon name="person" class="text-white" size="2em"/>
-            </div>
-            <div class="q-pl-sm col-auto text-h6 text-white self-center">
-              Profiles
-            </div>
-          </div>
-
-          <!-- Models -->
-          <div class="col-12 row q-pa-sm q-px-md settings-category">
-            <div class="col-auto self-center">
-              <q-icon name="settings" class="text-white" size="2em"/>
-            </div>
-            <div class="q-pl-sm col-auto text-h6 text-white self-center">
-              Models
-            </div>
-          </div>
-        </div>
+        
 
         <!-- Main Content -->
-        <div class="col row">
+        <div class="col-12 col-md row">
 
           <!-- Profile Selection Menu -->
-          <div class="col-auto row">
-            <q-scroll-area class="col-12" style="height: 30vh; width: 15em">
-              <q-list class="">
+          <div class="col-12 col-md-auto row">
+            <q-scroll-area class="col-12" style="height: 30vh; min-width: 15em">
+              <q-list class="fit">
+
                 <div
                   v-for="group of groupedModels"
                   :key="group[0].provider.id"
                 >
-                  <div class="text-h6 text-white q-pt-md">
+                  <div class="text-h6 text-white">
                     {{ group[0].provider.name }}
                   </div>
                   <q-item
@@ -56,26 +25,62 @@
                     :key="model.id"
                     clickable
                     v-ripple
-                    @click="() => log(model)"
+                    @click="() => selectModel(model)"
                   >
                     <q-item-section>
                       <q-item-label class="text-white">{{ model.name }}</q-item-label>
                     </q-item-section>
                   </q-item>
                 </div>
+
+                <div class="q-pa-md">
+                  <q-btn class="text-bold " outline color="positive" @click="openModelCreator">
+                    Add Model
+                  </q-btn>
+                </div>
+
               </q-list>
             </q-scroll-area>
           </div>
 
-          <!-- Profile Settings -->
-          <div class="col">
+          <!-- Model Editor -->
+          <div class="col-12 col-md">
             <div class="row q-pa-md">
-              <div class="col-auto">
-                <q-icon name="person" class="text-white" size="md"/>
+
+              <!-- Model Creator -->
+              <div v-if="modelCreator" class="">
+                <div class="form-input" style="width: 15em">
+                  <input class="q-pa-md my-input text-white" v-model="selectedModel.name" />
+                </div>
               </div>
-              <div class="col-auto text-white">
-                Profile Settings
+
+              <!-- Closed Model Editor -->
+              <div v-else-if="selectedModel && selectedModel.provider.isClosed" class="row">
+                <div class="col-12 text-h6 text-white q-pb-sm">
+                  {{ selectedModel.name }}
+                </div>
+                <div class="col-12 row">
+                  <div class="col-12 q-py-sm">
+                    <q-input filled v-model="selectedModel.provider.token" label="API Key" input-class="text-white" label-color="white" bg-color="accent" color="white"/>
+                  </div>
+                  <div class="col-auto q-py-sm row q-pa-sm">
+                    <div class="col-12 text-white">Temperature</div>
+                    <div class="col-auto row">
+                      <counter-input class="col-auto" v-model="selectedModel.provider.temperature" :step="0.1" @update:model-value="clampTemperature"/>
+                      <!-- <input class="col-auto q-pt-sm q-px-md my-input text-white text-h6" type="number" inputmode="decimal" step="0.1" min="0" max="2" v-model.number="selectedModel.provider.temperature" @change="clampTemperature" /> -->
+                    </div>
+                  </div>
+                </div>
               </div>
+
+              <!-- Open Model Editor -->
+              <div v-else-if="selectedModel && !selectedModel.provider.isClosed">
+                <div class="form-input-border q-pa-sm text-white">
+                  <input class="q-pa-md my-input text-white my-number-input" type="number" inputmode="decimal" v-model="selectedModel.name" />
+                </div>
+              </div>
+
+
             </div>
           </div>
 
@@ -86,13 +91,26 @@
   </q-dialog>
 </template>
 
-<stytle scoped lang="scss">
+<style lang="scss" scoped>
+.form-input-border {
+  border: 2px solid $primary;
+  border-radius: 1em;
+}
+.my-number-input {
+  width: 5em;
+
+  &::-webkit-inner-spin-button,
+  &::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  } 
+  
+}
 .settings-dialog {
   max-height: 100vh;
   max-width: 100vw;
   border-radius: 2em 2em 2em 2em;
 }
-
 
 @media screen and (min-width: 1000px) {
   .settings-dialog {
@@ -119,15 +137,18 @@
 .category-menu {
   display: flow;
 }
-</stytle>
+</style>
 
 <script lang="ts" setup>
-import { computed, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { app } from 'boot/app'
 import { Model } from 'src/services/models/types';
 
+import CounterInput from 'components/Inputs/CounterInput.vue'
+
 const show = ref(true)
-const selectedTab = ref('profiles')
+const modelCreator = ref(false)
+const selectedModel = computed(() => app.settings.value.selectedModel)
 
 const models = app.models.value
 
@@ -148,6 +169,22 @@ const groupedModels = computed(() => {
 
 const log = (model: Model) => {
   console.log(model)
+}
+
+const openModelCreator = () => {
+  modelCreator.value = true
+}
+
+const selectModel = (model: Model) => {
+  modelCreator.value = false
+  app.settings.value.selectedModel = model
+}
+
+const clampTemperature = () => {
+  let temperature = parseFloat(parseFloat(selectedModel.value.provider.temperature).toFixed(2))
+  if (temperature > 2) temperature = 2
+  if (temperature < 0) temperature = 0
+  selectedModel.value.provider.temperature = temperature
 }
 
 </script>

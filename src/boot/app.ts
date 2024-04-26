@@ -18,10 +18,11 @@ type Settings = {
 class App {
   readonly conversations = reactive<{ value: Conversation[] }>({ value: []})
   readonly providers = reactive<{ value: Provider[] }>({ value: [] });
-  readonly models: { value: Model[] } = reactive<{ value: Model[] }>({ value: [] });
+  readonly models = reactive<{ value: Model[] }>({ value: [] });
 
-  settings: Settings = reactive({
-    selectedModel: undefined
+  readonly settings = reactive<{ value: Settings }>({ value: {
+      selectedModel: undefined
+    }
   })
 
   async loadFromDatabase () {
@@ -47,7 +48,7 @@ class App {
     ]
 
     this.models.value = [ ...formattedModels, ...openaiModels ];
-    this.settings.selectedModel = formattedModels[0];
+    this.settings.value.selectedModel = formattedModels[0];
 
     const conversations = await getConversations({ getMessages: true });
     this.conversations.value = conversations;
@@ -57,6 +58,11 @@ class App {
     watch(this.conversations, () => {
       console.log('Conversations updated:', this.conversations);
       saveConversations(this.conversations.value).catch(err => console.error('Failed to save conversations:', err));
+    })
+
+    watch(this.settings, () => {
+      console.log('Settings updated:', this.settings);
+      
     })
   }
 

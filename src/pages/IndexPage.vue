@@ -75,6 +75,7 @@ import useCurrentConversation from 'src/composeables/useCurrentConversation';
 
 import ChatHistory from 'src/components/ChatMessage/ChatHistory.vue';
 import ChatInput from 'src/components/ChatInput/ChatInput.vue';
+import { Message } from 'src/types';
 
 const router = useRouter()
 
@@ -88,8 +89,6 @@ const aiAgentOptions = ref([
   'openai-gpt-4-turbo',
   'ollama (:11434)'
 ])
-
-const currentConversationId = computed(() => router.currentRoute.value.params.id as string);
 
 const messages = computed<Message[]>(() => {
   const conversation = currentConversation.value;

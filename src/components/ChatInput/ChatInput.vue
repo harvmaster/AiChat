@@ -20,10 +20,7 @@
 </template>
 
 <style lang="scss" scoped>
-.input-border {
-  border: 2px solid $secondary;
-  border-radius: 1rem;
-}
+
 </style>
 
 <script setup lang="ts">
