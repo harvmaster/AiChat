@@ -3,8 +3,6 @@
     <div class="q-pa-md row justify-center fit-content">
       <div class="row bg-secondary settings-dialog q-pa-md overflow-hidden">
 
-        
-
         <!-- Main Content -->
         <div class="col-12 col-md row ">
 
@@ -21,8 +19,8 @@
                     <div class="col-auto self-center q-pr-sm"> 
                       {{ group[0].provider.name }}
                     </div>
-                    <div class="col-auto">
-                      <q-btn class="text-bold " outline color="white" flat icon="add" round @click="openModelCreator">
+                    <div v-if="!group[0].provider.isClosed" class="col-auto">
+                      <q-btn class="text-bold " outline color="white" flat icon="add" round @click="() => addModel(group[0].provider.id)">
                         <q-tooltip>
                           Add Model
                         </q-tooltip>
@@ -37,7 +35,7 @@
                     @click="() => selectModel(model)"
                   >
                     <q-item-section>
-                      <q-item-label class="text-white">{{ model.name }}</q-item-label>
+                      <q-item-label class="text-white model-list-item" :class="selectedModel?.id == model.id ? 'selected-item' : ''">{{ model.name }}</q-item-label>
                     </q-item-section>
                   </q-item>
                 </div>
@@ -89,7 +87,7 @@
 
               <!-- Open Model Editor -->
               <div v-else-if="selectedModel && !selectedModel.provider.isClosed" class="column align-start fit-content">
-                <div class="text-white col-auto row">
+                <div class="text-white col-auto row q-pb-sm">
                   <div class="col-auto q-pr-sm">
                     <q-btn flat round dense icon="edit" color="white" @click="focusOpenModelName" />
                   </div>
@@ -147,6 +145,14 @@
   width: fit-content;
 }
 
+.model-list-item {
+  transition: transform 0.5s;
+}
+.selected-item {
+  transform: translateX(1em);
+  font-weight: bold;
+}
+
 .scroll-area {
   min-height: 10em;
   height: fit-content;
@@ -195,7 +201,7 @@
 </style>
 
 <script lang="ts" setup>
-import { computed, onMounted, ref } from 'vue'
+import { computed, nextTick, onMounted, ref } from 'vue'
 import { app } from 'boot/app'
 
 import { Platform, QPopupEdit } from 'quasar';
@@ -240,14 +246,6 @@ const groupedModels = computed(() => {
   return grouped
 })
 
-const log = (model: Model) => {
-  console.log(model)
-}
-
-const openModelCreator = () => {
-  modelCreator.value = true
-}
-
 const selectModel = (model: Model) => {
   modelCreator.value = false
   app.settings.value.selectedModel = model
@@ -273,6 +271,19 @@ const createProvider = (event: KeyboardEvent) => {
 const focusOpenModelName = () => {
   const input = openModelName.value as HTMLInputElement
   input.focus()
+}
+
+const addModel = (providerId: string) => {
+  const provider = app.models.value.find(model => model.provider.id === providerId)?.provider
+  if (!provider) return
+  if (provider.isClosed) {
+    return
+  }
+
+  const model = new OllamaModel(generateUUID(), provider, 1, 'Example model')
+  app.models.value.push(model)
+
+  nextTick(() => selectModel(model))
 }
 
 </script>
