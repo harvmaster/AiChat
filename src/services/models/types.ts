@@ -1,4 +1,4 @@
-import { Ref } from 'vue';
+import type { Ref } from 'vue';
 import type { ChatCompletionMessageParam } from 'openai/resources';
 
 
@@ -26,10 +26,11 @@ export interface BaseModel {
   id: string;
   name: string;
   model: string;
+  // Engine: Provider;
   sendChat(request: ChatCompletionRequest, callback?: (result: ChatCompletionResponse) => void,): Promise<ChatCompletionResponse>;
 }
 
-export type BaseProvider = {
+export interface BaseProvider {
   id: string;
   name: string;
   type: string;
@@ -39,7 +40,7 @@ export interface ClosedModel extends BaseModel {
   provider: ClosedProvider
 }
 export interface ClosedProvider extends BaseProvider {
-  token: Ref<string>;
+  token: string;
   isClosed: true;
 }
 
@@ -47,8 +48,7 @@ export interface OpenModel extends BaseModel  {
   provider: OpenProvider
 }
 export interface OpenProvider extends BaseProvider {
-  name: string;
-  url: Ref<string>;
+  url: string;
   isClosed: false;
 }
 

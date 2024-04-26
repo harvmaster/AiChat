@@ -1,6 +1,6 @@
-import { reactive, ref, watch } from 'vue';
+import { reactive, watch } from 'vue';
 
-import { BaseModel, Model, Provider } from 'src/services/models';
+import { ClosedModel, Model, OpenModel, Provider } from 'src/services/models';
 import { OllamaModel, OllamaProvider } from 'src/services/models/ollama';
 import { GPT3_5Turbo, GPT4Turbo } from 'src/services/models/openai';
 
@@ -18,7 +18,7 @@ type Settings = {
 class App {
   readonly conversations = reactive<{ value: Conversation[] }>({ value: []})
   readonly providers = reactive<{ value: Provider[] }>({ value: [] });
-  readonly models = reactive<{ value: BaseModel[] }>({ value: [] });
+  readonly models: { value: Model[] } = reactive<{ value: Model[] }>({ value: [] });
 
   settings: Settings = reactive({
     selectedModel: undefined
@@ -39,9 +39,9 @@ class App {
 
       const provider = new OllamaProvider(provider_db.id, provider_db.name, provider_db.url);
       return new OllamaModel(model.id, provider, model.model);
-    }).filter((model) => model != null) as Model[];
+    }).filter((model) => model != null) as OpenModel[]
 
-    const openaiModels = [
+    const openaiModels: ClosedModel[] = [
       GPT3_5Turbo,
       GPT4Turbo
     ]

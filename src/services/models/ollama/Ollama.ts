@@ -1,7 +1,7 @@
-import { Model, ChatCompletionRequest, ChatCompletionResponse, OpenProvider } from '../types';
+import { Model, ChatCompletionRequest, ChatCompletionResponse, OpenProvider, OpenModel } from '../types';
 import OllamaProvider from './Provider';
 
-class Ollama implements Model {
+class Ollama implements OpenModel {
   public id = 'ollama'
   public name = 'Ollama'
 
@@ -15,7 +15,7 @@ class Ollama implements Model {
   }
 
   async sendChat (request: ChatCompletionRequest, callback?: (response: ChatCompletionResponse) => void): Promise<ChatCompletionResponse> {
-    const response = await fetch(`${this.provider.url.value}/api/chat`, {
+    const response = await fetch(`${this.provider.url}/api/chat`, {
       method: 'POST',
       body: JSON.stringify({ model: this.model, messages: request.messages })
     })

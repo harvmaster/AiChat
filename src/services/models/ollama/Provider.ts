@@ -7,13 +7,13 @@ class OllamaProvider implements OpenProvider {
   type = 'ollama';
   isClosed = false as const;
 
-  url = ref('https://ollama.com');
+  url = 'https://ollama.com';
 
   constructor (id: string, name: string, url?: string) {
     this.id = id;
     this.name = name;
     if (url) {
-      this.url.value = url;
+      this.url = url;
     }
   }
 }

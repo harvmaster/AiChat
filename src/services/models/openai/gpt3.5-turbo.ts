@@ -10,7 +10,7 @@ class GPT3_5Turbo implements ClosedModel {
   provider = Provider;
 
   async sendChat (request: ChatCompletionRequest, callback?: (response: ChatCompletionResponse) => void): Promise<ChatCompletionResponse> {
-    const openai = new OpenAI({ apiKey: Provider.token.value, dangerouslyAllowBrowser: true });
+    const openai = new OpenAI({ apiKey: Provider.token, dangerouslyAllowBrowser: true });
 
     const stream = await openai.chat.completions.create({ model: 'gpt-3.5-turbo', messages: request.messages, stream: true });
 

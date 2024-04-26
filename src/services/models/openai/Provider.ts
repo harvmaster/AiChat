@@ -8,14 +8,14 @@ const openAIProvider: ClosedProvider = {
   type: 'openai',
   isClosed: true,
 
-  token: ref(''),
+  token: '',
 }
 
 export const initOpenAIProvider = async () => {
   const providers = await getProviders();
   const provider = providers.find((provider) => provider.id === openAIProvider.id);
   if (provider && provider.token) {
-    openAIProvider.token.value = provider.token;
+    openAIProvider.token = provider.token;
   }
 }
 

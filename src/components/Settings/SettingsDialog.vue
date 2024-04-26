@@ -1,6 +1,6 @@
 <template>
-  <q-dialog v-model="show" class="">
-    <div>
+  <q-dialog v-model="show" class="" position="bottom" seamless>
+    <div class="q-pa-md">
       <div class="row bg-secondary settings-dialog">
 
         <!-- Sidebar -->
@@ -42,26 +42,29 @@
 
           <!-- Profile Selection Menu -->
           <div class="col-auto row">
-            <q-scroll-area class="col-12" style="height: 50vh; width: 15em">
+            <q-scroll-area class="col-12" style="height: 30vh; width: 15em">
               <q-list class="">
-                <q-item
-                  v-for="profile in profiles"
-                  :key="profile.id"
-                  clickable
-                  v-ripple
-                  @click="selectedTab = 'profiles'"
-                  class=""
-                  :class="'profiles' == selectedTab ? 'highlightTab' : ''"
+                <div
+                  v-for="group of groupedModels"
+                  :key="group[0].provider.id"
                 >
-                  <q-item-section>
-                    <q-item-label class="text-white">{{ profile.name }}</q-item-label>
-                  </q-item-section>
-                </q-item>
+                  <div class="text-h6 text-white q-pt-md">
+                    {{ group[0].provider.name }}
+                  </div>
+                  <q-item
+                    v-for="model of group"
+                    :key="model.id"
+                    clickable
+                    v-ripple
+                    @click="() => log(model)"
+                  >
+                    <q-item-section>
+                      <q-item-label class="text-white">{{ model.name }}</q-item-label>
+                    </q-item-section>
+                  </q-item>
+                </div>
               </q-list>
             </q-scroll-area>
-            <div class="col-12 bg-primary">
-              <q-btn flat round dense icon="add" color="white" @click="selectedTab = 'profiles'" />
-            </div> 
           </div>
 
           <!-- Profile Settings -->
@@ -87,13 +90,13 @@
 .settings-dialog {
   max-height: 100vh;
   max-width: 100vw;
-  border-radius: 2em;
+  border-radius: 2em 2em 2em 2em;
 }
 
 
 @media screen and (min-width: 1000px) {
   .settings-dialog {
-    max-height: 60vh;
+    max-height: 30vh;
     max-width: 60vw;
   }
 }
@@ -119,44 +122,32 @@
 </stytle>
 
 <script lang="ts" setup>
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
+import { app } from 'boot/app'
+import { Model } from 'src/services/models/types';
 
 const show = ref(true)
 const selectedTab = ref('profiles')
 
-const profiles = ref([
-  { id: 1, name: 'Profile 1' },
-  { id: 2, name: 'Profile 2' },
-  { id: 3, name: 'Profile 3' },
-  { id: 4, name: 'Profile 4' },
-  { id: 5, name: 'Profile 5' },
-  { id: 6, name: 'Profile 6' },
-  { id: 7, name: 'Profile 7' },
-  { id: 8, name: 'Profile 8' },
-  { id: 9, name: 'Profile 9' },
-  { id: 10, name: 'Profile 10' },
-  { id: 11, name: 'Profile 11' },
-  { id: 12, name: 'Profile 12' },
-  { id: 13, name: 'Profile 13' },
-  { id: 14, name: 'Profile 14' },
-  { id: 15, name: 'Profile 15' },
-  { id: 16, name: 'Profile 16' },
-  { id: 17, name: 'Profile 17' },
-  { id: 18, name: 'Profile 18' },
-  { id: 19, name: 'Profile 19' },
-  { id: 20, name: 'Profile 20' },
-  { id: 21, name: 'Profile 21' },
-  { id: 22, name: 'Profile 22' },
-  { id: 23, name: 'Profile 23' },
-  { id: 24, name: 'Profile 24' },
-  { id: 25, name: 'Profile 25' },
-  { id: 26, name: 'Profile 26' },
-  { id: 27, name: 'Profile 27' },
-  { id: 28, name: 'Profile 28' },
-  { id: 29, name: 'Profile 29' },
-  { id: 30, name: 'Profile 30' },
-  { id: 31, name: 'Profile 31' },
-  { id: 32, name: 'Profile 32' },
-  { id: 33, name: 'Profile 33' }
-])
+const models = app.models.value
+
+type ModelGroups = {
+  [key: string]: Model[]
+}
+const groupedModels = computed(() => {
+  const grouped: ModelGroups = {}
+  console.log(models)
+  models.forEach(model => {
+    if (!grouped[model.provider.id]) {
+      grouped[model.provider.id] = []
+    }
+    grouped[model.provider.id].push(model)
+  })
+  return grouped
+})
+
+const log = (model: Model) => {
+  console.log(model)
+}
+
 </script>

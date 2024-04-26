@@ -8,6 +8,8 @@ export default async function getMessagesByConversationId (conversationId: strin
   const tx = db.db.transaction('messages', 'readonly');
   const store = tx.objectStore('messages');
 
+  if (!conversationId) return []
+
   const messages = await store.index('conversationId').getAll(conversationId);
 
   await tx.done;
