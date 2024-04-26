@@ -18,4 +18,11 @@ import 'prismjs/components/prism-rust';
 import 'prismjs/components/prism-sql';
 import 'prismjs/components/prism-typescript';
 import 'prismjs/components/prism-yaml';
+
+import { app } from 'boot/app'
+
+const initApp = async () => {
+  await app.loadFromDatabase()
+}
+initApp()
 </script>
