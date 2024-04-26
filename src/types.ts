@@ -45,6 +45,7 @@ export type Database__Model = {
   id: string;
   name: string;
   model: string;
+  temperature: number;
   providerId: string;
   createdAt: number;
 }

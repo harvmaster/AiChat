@@ -26,6 +26,8 @@ export interface BaseModel {
   id: string;
   name: string;
   model: string;
+  temperature: number;
+  createdAt?: number;
   provider: Provider;
   sendChat(request: ChatCompletionRequest, callback?: (result: ChatCompletionResponse) => void,): Promise<ChatCompletionResponse>;
 }

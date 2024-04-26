@@ -39,7 +39,7 @@ class App {
       }
 
       const provider = new OllamaProvider(provider_db.id, provider_db.name, provider_db.url);
-      return new OllamaModel(model.id, provider, model.model);
+      return new OllamaModel(model.id, provider, model.temperature, model.model);
     }).filter((model) => model != null) as OpenModel[]
 
     const openaiModels: ClosedModel[] = [

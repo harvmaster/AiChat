@@ -7,6 +7,7 @@ class GPT3_5Turbo implements ClosedModel {
   id = 'gpt-3.5-turbo';
   name = 'GPT-3.5 Turbo';
   model = 'gpt-3.5-turbo';
+  temperature = 1;
   provider = Provider;
 
   async sendChat (request: ChatCompletionRequest, callback?: (response: ChatCompletionResponse) => void): Promise<ChatCompletionResponse> {

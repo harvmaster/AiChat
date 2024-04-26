@@ -29,6 +29,8 @@ import { app } from 'boot/app'
 import { useRouter } from 'vue-router'
 
 import isInCodeBlock from 'src/composeables/isInCodeblock'
+import generateUUID from 'src/composeables/generateUUID'
+
 import useCurrentConversation from '../../composeables/useCurrentConversation'
 import getHighlightedChunks from 'src/utils/HighlightMessage'
 
@@ -74,15 +76,6 @@ const createConversation = () => {
 
   return conversation
 }
-
-const generateUUID = () => {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-    var r = (Math.random() * 16) | 0,
-      v = c == 'x' ? r : (r & 0x3) | 0x8;
-    return v.toString(16);
-  });
-}
-
 
 const handleTab = (event: KeyboardEvent) => {
   const codeWrappers = input.value.split('```');

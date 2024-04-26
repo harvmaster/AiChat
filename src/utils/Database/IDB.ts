@@ -20,6 +20,7 @@ interface DatabaseSchema {
     id: string;
     name: string;
     model: string;
+    temperature: string;
     providerId: string;
     createdAt: number;
   }

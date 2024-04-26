@@ -13,8 +13,10 @@ export default async function saveModels(models: Model[]) {
       id: model.id,
       name: model.name,
       model: (model as OpenModel).model,
-      // providerId: model.provider.id,
-      providerId: Date.now(),
+      temperature: model.temperature,
+      providerId: model.provider.id,
+      // providerId: Date.now(),
+      createdAt: model.createdAt || Date.now(),
     }
   })
 
@@ -40,5 +42,5 @@ export default async function saveModels(models: Model[]) {
 
   await tx.done;
 
-  return models;
+  // return models;
 }

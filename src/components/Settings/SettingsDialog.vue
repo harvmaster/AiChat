@@ -1,24 +1,34 @@
 <template>
-  <q-dialog v-model="show" class="" position="bottom" :seamless="false">
-    <div class="q-pa-md">
-      <div class="row bg-secondary settings-dialog q-pa-md">
+  <q-dialog v-model="show" class="" position="bottom" :seamless="false" full-width>
+    <div class="q-pa-md row justify-center fit-content">
+      <div class="row bg-secondary settings-dialog q-pa-md overflow-hidden">
 
         
 
         <!-- Main Content -->
-        <div class="col-12 col-md row">
+        <div class="col-12 col-md row ">
 
           <!-- Profile Selection Menu -->
           <div class="col-12 col-md-auto row">
-            <q-scroll-area class="col-12" style="height: 30vh; min-width: 15em">
+            <div class="col-12 scroll-area">
+            <!-- <q-scroll-area class="col-12" style="height: 30vh; min-width: 15em"> -->
               <q-list class="fit">
 
                 <div
                   v-for="group of groupedModels"
                   :key="group[0].provider.id"
                 >
-                  <div class="text-h6 text-white">
-                    {{ group[0].provider.name }}
+                  <div class="text-h6 text-white row">
+                    <div class="col-auto self-center q-pr-sm"> 
+                      {{ group[0].provider.name }}
+                    </div>
+                    <div class="col-auto">
+                      <q-btn class="text-bold " outline color="white" flat icon="add" round @click="openModelCreator">
+                        <q-tooltip>
+                          Add Model
+                        </q-tooltip>
+                      </q-btn>
+                    </div>
                   </div>
                   <q-item
                     v-for="model of group"
@@ -33,25 +43,48 @@
                   </q-item>
                 </div>
 
-                <div class="q-pa-md">
-                  <q-btn class="text-bold " outline color="positive" @click="openModelCreator">
-                    Add Model
-                  </q-btn>
+                <div class="q-pa-md text-white text-bold row cursor-pointer">
+                  <div class="col-auto self-center">
+                    Add Provider
+                  </div>
+                  <div class="col-auto self-center text-h6 q-px-md">
+                    +
+                  </div>
+                  
+                  <q-popup-edit ref="addProviderPopup" v-model="newProvider" label="Provider" class="bg-accent" >
+                    <input v-model="newProvider" autofocus class="my-input text-white text-h6" placeholder="Provider Name" @keydown.enter="createProvider"/>
+                  </q-popup-edit>
+
+                  <!-- <q-btn class="text-bold " outline color="positive" @click="openModelCreator">
+                    Add Provider
+                  </q-btn> -->
                 </div>
 
               </q-list>
-            </q-scroll-area>
+            <!-- </q-scroll-area> -->
+            </div>
           </div>
 
           <!-- Model Editor -->
-          <div class="col-12 col-md">
-            <div class="row q-pa-md">
+          <div class="col-12 col-md row fit-content">
+            <div class="row col-12 col-md-auto q-pa-md">
 
               <!-- Model Creator -->
-              <div v-if="modelCreator" class="">
-                <div class="form-input" style="width: 15em">
-                  <input class="q-pa-md my-input text-white" v-model="selectedModel.name" />
+              <div v-if="modelCreator" class="row">
+                <div class="col-12 row">
+                  <div class="col-12">
+                    <!-- <q-input filled v-model="modelCreatorData.provider.name" placeholder="Provider" input-class="text-white" label-color="white" bg-color="accent" color="white"/> -->
+                  </div>
+                  <q-dialog v-model="modelCreator" class="settings-dialog" :seamless="false">
+                    <div class="q-pa-md text-h6 text-white">
+                      test
+                    </div>
+                  </q-dialog>
+
                 </div>
+                <!-- <div class="form-input" style="width: 15em"> -->
+                  <!-- <input class="q-pa-md my-input text-white" v-model="modelCreatorData.provider.name" /> -->
+                <!-- </div> -->
               </div>
 
               <!-- Closed Model Editor -->
@@ -66,17 +99,34 @@
                   <div class="col-auto q-py-sm row q-pa-sm">
                     <div class="col-12 text-white">Temperature</div>
                     <div class="col-auto row">
-                      <counter-input class="col-auto" v-model="selectedModel.provider.temperature" :step="0.1" @update:model-value="clampTemperature"/>
-                      <!-- <input class="col-auto q-pt-sm q-px-md my-input text-white text-h6" type="number" inputmode="decimal" step="0.1" min="0" max="2" v-model.number="selectedModel.provider.temperature" @change="clampTemperature" /> -->
+                      <counter-input class="col-auto" v-model="selectedModel.temperature" :step="0.1" @update:model-value="clampTemperature"/>
                     </div>
                   </div>
                 </div>
               </div>
 
               <!-- Open Model Editor -->
-              <div v-else-if="selectedModel && !selectedModel.provider.isClosed">
-                <div class="form-input-border q-pa-sm text-white">
-                  <input class="q-pa-md my-input text-white my-number-input" type="number" inputmode="decimal" v-model="selectedModel.name" />
+              <div v-else-if="selectedModel && !selectedModel.provider.isClosed" class="col-12 row items-start justify-start align-start">
+                <div class="text-white col-12 row">
+                  <div class="col-auto q-pr-sm">
+                    <q-btn flat round dense icon="edit" color="white" @click="focusOpenModelName" />
+                  </div>
+                  <input ref="openModelName" class="my-input text-white my-number-input text-h6 col-auto" v-model="selectedModel.name" />
+                </div>
+
+                <div class="col-12 row items-start">
+                  <div class="fit-content q-py-sm">
+                    <div class="input-container">
+                      <input class="my-input text-white text-h6" v-model="selectedModel.provider.url" placeholder="URL"/>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-12 row">
+                  <div class="row fit-content">
+                    <div class="col-12 text-white">Temperature</div>
+                    <counter-input class="col-auto" v-model="selectedModel.temperature" :step="0.1" @update:model-value="clampTemperature"/>
+                  </div>
                 </div>
               </div>
 
@@ -96,15 +146,14 @@
   border: 2px solid $primary;
   border-radius: 1em;
 }
-.my-number-input {
-  width: 5em;
-
-  &::-webkit-inner-spin-button,
-  &::-webkit-outer-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-  } 
-  
+.input-container {
+  border: 1px solid $primary;
+  border-radius: 1em;
+  padding: 1em;
+  max-width: 20em;
+}
+.align-start {
+  align-content: start;
 }
 .settings-dialog {
   max-height: 100vh;
@@ -112,43 +161,80 @@
   border-radius: 2em 2em 2em 2em;
 }
 
-@media screen and (min-width: 1000px) {
-  .settings-dialog {
-    max-height: 30vh;
-    max-width: 60vw;
-  }
-}
-
 .fit-content {
   width: fit-content;
 }
-.highlightTab {
-  background-color: #2c2c2c;
-}
 
-.settings-category {
-  border-radius: 1em;
-  cursor: pointer;
-}
-.settings-category:hover {
-  background-color: #2c2c2c;
-}
+.scroll-area {
+  min-height: 10em;
+  height: fit-content;
+  max-height: 50vh;
+  width: 100%;
 
-.category-menu {
+  overflow-y: auto;
+  overflow-x: hidden;
   display: flow;
+
+  // Attractive scroll bar
+  &::-webkit-scrollbar {
+    width: 10px;
+    border-radius: 10px;
+
+    &-track {
+      background: $secondary;
+      border-radius: 10px;
+    }
+
+    &-thumb {
+      background: $accent;
+      border-radius: 10px;
+    }
+
+    &-thumb:hover {
+      background: $accent;
+    }
+  }
 }
+
+@media screen and (min-width: 1000px) {
+  .settings-dialog {
+    max-height: 40vh;
+    max-width: 60vw;
+    overflow-y: auto;
+  }
+  .scroll-area {
+    width: 15em;
+    min-height: 10em;
+    height: fit-content;
+    max-height: 30vh;
+  }
+}
+
 </style>
 
 <script lang="ts" setup>
 import { computed, onMounted, ref } from 'vue'
 import { app } from 'boot/app'
-import { Model } from 'src/services/models/types';
+
+import { QPopupEdit } from 'quasar';
+import { Model, OpenModel } from 'src/services/models/types';
 
 import CounterInput from 'components/Inputs/CounterInput.vue'
+import { OllamaModel, OllamaProvider } from 'src/services/models/ollama';
+import generateUUID from 'src/composeables/generateUUID'
 
 const show = ref(true)
 const modelCreator = ref(false)
 const selectedModel = computed(() => app.settings.value.selectedModel)
+
+const addProviderPopup = ref<QPopupEdit | null>(null)
+const openModelName = ref<HTMLInputElement | null>(null)
+
+
+const generateProvider = () => new OllamaProvider(generateUUID(), '', '')
+const generateModel = () => new OllamaModel(generateUUID(), generateProvider(), 1, 'Example model')
+
+const newProvider = ref('')
 
 const models = app.models.value
 
@@ -181,10 +267,25 @@ const selectModel = (model: Model) => {
 }
 
 const clampTemperature = () => {
-  let temperature = parseFloat(parseFloat(selectedModel.value.provider.temperature).toFixed(2))
+  if (!selectedModel.value) return
+  let temperature = parseFloat(parseFloat(selectedModel.value.temperature.toString()).toFixed(2))
   if (temperature > 2) temperature = 2
   if (temperature < 0) temperature = 0
-  selectedModel.value.provider.temperature = temperature
+  selectedModel.value.temperature = temperature
+}
+
+const createProvider = (event: KeyboardEvent) => {
+  if (event.key === 'Enter') {
+    app.models.value.push(new OllamaModel(generateUUID(), new OllamaProvider(generateUUID(), newProvider.value, ''), 1, 'Example model'))
+    modelCreator.value = false
+    addProviderPopup.value?.hide()
+    newProvider.value = ''
+  }
+}
+
+const focusOpenModelName = () => {
+  const input = openModelName.value as HTMLInputElement
+  input.focus()
 }
 
 </script>

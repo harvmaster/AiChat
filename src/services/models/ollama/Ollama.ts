@@ -4,13 +4,15 @@ import OllamaProvider from './Provider';
 class Ollama implements OpenModel {
   public id = 'ollama'
   public name = 'Ollama'
-
   public model = 'phi3'
+  public temperature = 1;
+  
   public provider: OpenProvider
 
-  constructor (id: string, provider: OllamaProvider, model?: string) {
+  constructor (id: string, provider: OllamaProvider, temperature: number, model?: string) {
     this.id = id
     this.provider = provider
+    this.temperature = Math.max(Math.min(temperature || 1, 2), 0)
     if (model) this.model = model
   }
 
