@@ -19,7 +19,7 @@ class Ollama implements OpenModel {
   async sendChat (request: ChatCompletionRequest, callback?: (response: ChatCompletionResponse) => void): Promise<ChatCompletionResponse> {
     const response = await fetch(`${this.provider.url}/api/chat`, {
       method: 'POST',
-      body: JSON.stringify({ model: this.model, messages: request.messages })
+      body: JSON.stringify({ model: this.model, messages: request.messages, temperature: this.temperature })
     })
 
     if (!response.ok) throw new Error('Failed to send chat')

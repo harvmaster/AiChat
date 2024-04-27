@@ -49,6 +49,8 @@ const sendMessage = async (event?: KeyboardEvent) => {
     return
   }
 
+  event?.preventDefault()
+
   let conversation = currentConveration.value
   console.log(conversation)
   if (!conversation) {
@@ -63,6 +65,7 @@ const sendMessage = async (event?: KeyboardEvent) => {
     author: 'user',
     modelId: '',
   })
+  console.log('----------')
   console.log(conversation)
 
   const model = app.settings.value.selectedModel
@@ -70,15 +73,18 @@ const sendMessage = async (event?: KeyboardEvent) => {
     return
   }
 
+  input.value = ''
+
   const messageId = generateUUID()
   const messages = convertMessagesToPrompt(conversation.messages)
+  const getConversation = () => app.conversations.value.find(c => c.id === conversation.id)
   model.sendChat({ messages }, async (response) => {
-    const existingMessage = conversation.messages.find(m => m.id === messageId)
+    const existingMessage = getConversation()?.messages.find(m => m.id === messageId)
     if (existingMessage) {
       const content = `${existingMessage.content.raw}${response.message.content}`
       existingMessage.content = await getHighlightedChunks(content)
     } else {
-      conversation.messages.push({
+      getConversation()?.messages.push({
         id: messageId,
         content: await getHighlightedChunks(response.message.content),
         createdAt: Date.now(),
@@ -135,4 +141,4 @@ const inputRows = computed(() => {
   return Math.min(5, Math.max(1, input.value.split('\n').length))
 })
 
-</script>../../composeables/useCurrentConversation
+</script>

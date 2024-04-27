@@ -1,3 +1,5 @@
+import { Model } from "./services/models";
+
 export type Conversation = {
   id: string;
   summary: string;
@@ -48,4 +50,12 @@ export type Database__Model = {
   temperature: number;
   providerId: string;
   createdAt: number;
+}
+
+export type Settings = {
+  selectedModel?: Model;
+}
+
+export type Database__Settings = {
+  selectedModel: string;
 }

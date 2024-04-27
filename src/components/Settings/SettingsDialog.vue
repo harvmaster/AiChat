@@ -1,7 +1,7 @@
 <template>
   <q-dialog v-model="show" class="" position="bottom" :seamless="false" full-width>
-    <div class="q-pa-md row justify-center fit-content">
-      <div class="row bg-secondary settings-dialog q-pa-md overflow-hidden">
+    <div class="q-pa-md row justify-center fit-content" @click="toggleVisible">
+      <div class="row bg-secondary settings-dialog q-pa-md overflow-hidden" @click.stop="() => {}">
 
         <!-- Main Content -->
         <div class="col-12 col-md row ">
