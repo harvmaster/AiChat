@@ -133,26 +133,9 @@ import { computed, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router';
 import { app } from 'boot/app'
 
-import { useTokenStore } from 'src/stores/tokenStore';
 import deleteConversationFromDatabase from 'src/utils/Database/Conversations/deleteConversation';
 
-import SettingsDialog from 'src/components/Settings/SettingsDialog.vue'
-
 const router = useRouter()
-
-const tokenStore = useTokenStore()
-const token = ref('')
-const showToken = ref(false)
-
-const toggleToken = () => {
-  showToken.value = !showToken.value
-}
-
-const updateToken = () => {
-  tokenStore.setToken(token.value)
-}
-
-watch(token, updateToken, { immediate: true })
 
 const drawer = ref(false)
 const toggleDrawer = () => {

@@ -78,7 +78,7 @@ const sendMessage = async (event?: KeyboardEvent) => {
   const messageId = generateUUID()
   const messages = convertMessagesToPrompt(conversation.messages)
   const getConversation = () => app.conversations.value.find(c => c.id === conversation.id)
-  model.sendChat({ messages }, async (response) => {
+  await model.sendChat({ messages }, async (response) => {
     const existingMessage = getConversation()?.messages.find(m => m.id === messageId)
     if (existingMessage) {
       const content = `${existingMessage.content.raw}${response.message.content}`
@@ -93,6 +93,14 @@ const sendMessage = async (event?: KeyboardEvent) => {
       })
     }
   })
+
+  if (conversation.messages.length < 4) {
+    const summaryPrompt = createSummaryPrompt(conversation.messages)
+
+    const resposne = await model.sendChat({ messages: summaryPrompt })
+    const conv = getConversation() || conversation
+    conv.summary = resposne.message.content
+  }
 
 }
 
@@ -141,4 +149,17 @@ const inputRows = computed(() => {
   return Math.min(5, Math.max(1, input.value.split('\n').length))
 })
 
+const createSummaryPrompt = (messages: Message[]): ChatHistory => {
+  const formattedMessages = convertMessagesToPrompt(messages)
+  return [
+    {
+      role: 'system',
+      content: 'Summarise this conversation into 5 words or less'
+    },
+    {
+      role: 'user',
+      content: formattedMessages.map(m => m.content).join(' ')
+    }
+  ]
+}
 </script>

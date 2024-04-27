@@ -98,7 +98,7 @@
                 </div>
 
                 <div class="col-auto row items-start">
-                  <div class="fit-content q-py-sm">
+                  <div class="col-12 col-md-auto q-py-sm">
                     <div class="input-container">
                       <input class="my-input text-white text-h6" v-model="selectedModel.provider.url" placeholder="URL"/>
                     </div>

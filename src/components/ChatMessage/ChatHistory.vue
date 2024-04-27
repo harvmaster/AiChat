@@ -1,6 +1,6 @@
 <template>
-  <div class="">
-    <transition-group name="list" tag="div" class="row col-12">
+  <div ref="ChatHistoryElement" class="">
+    <transition-group name="list" tag="div" class="row col-12" mode="out-in">
       <chat-message
         class="col-12"
 
@@ -39,7 +39,7 @@
 
 <script setup lang="ts">
 import { Message } from 'src/types';
-import { watch } from 'vue'
+import { watch, ref, nextTick } from 'vue'
 import ChatMessage from './ChatMessage.vue'
 
 export type ChatHistoryProps = {
@@ -47,9 +47,22 @@ export type ChatHistoryProps = {
 }
 
 const props = defineProps<ChatHistoryProps>()
+defineExpose({
+  scrollToBottom: () => {
+    nextTick(() => {
+      if (ChatHistoryElement.value) {
+        ChatHistoryElement.value.scrollTop = ChatHistoryElement.value.scrollHeight
+      }
+    })
+  }
+})
 
-// watch(props.messages, () => {
-//   console.log('ChatHistory: messages changed', props.messages)
-// })
+const ChatHistoryElement = ref<HTMLElement | null>(null)
+
+watch(props.messages, () => {
+  if (ChatHistoryElement.value && ChatHistoryElement.value.scrollTop + ChatHistoryElement.value.clientHeight - ChatHistoryElement.value.scrollHeight > -90) {
+    ChatHistoryElement.value.scrollTop = ChatHistoryElement.value.scrollHeight
+  }
+})
 
 </script>

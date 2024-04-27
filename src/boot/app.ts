@@ -45,17 +45,17 @@ class App {
     console.log('Loaded from database:', this.models, this.conversations, this.settings);
 
     watch(this.conversations, () => {
-      console.log('Conversations updated:', this.conversations);
+      // console.log('Conversations updated:', this.conversations);
       saveConversations(this.conversations.value).catch(err => console.error('Failed to save conversations:', err));
     })
 
     watch(this.settings, () => {
-      console.log('Settings updated:', this.settings);
+      // console.log('Settings updated:', this.settings);
       saveSettings(this.settings.value).catch(err => console.error('Failed to save settings:', err));
     })
 
     watch(this.models, () => {
-      console.log('Models updated:', this.models);
+      // console.log('Models updated:', this.models);
       saveModels(this.models.value).catch(err => console.error('Failed to save models:', err));
     })
   }

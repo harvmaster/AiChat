@@ -3,7 +3,7 @@
     <div class="col-12 col-md-8 col-lg-6 column">
       <!-- Chat history -->
       <div class="col relative full-width">
-        <chat-history v-if="currentConversation" class="row q-pb-md scrollable q-pr-sm" :messages="currentConversation?.messages" />
+        <chat-history ref="ChatHistoryElement" v-if="currentConversation" class="row q-pb-md scrollable q-pr-sm" :messages="currentConversation?.messages" />
       </div>
 
       <!-- Chat input -->
@@ -106,14 +106,13 @@ import { Message } from 'src/types';
 const currentConversation = useCurrentConversation();
 
 const SettingsDialogElement = ref<InstanceType<typeof SettingsDialog> | null>(null);
+const ChatHistoryElement = ref<InstanceType<typeof ChatHistory> | null>(null);
 
-const messages = computed<Message[]>(() => {
-  const conversation = currentConversation.value;
-  return conversation ? conversation.messages : [];
-})
-
-watch(currentConversation, () => {
-  console.log('indexPAge: currentConversation changed', currentConversation.value);
+watch(currentConversation, (oldConversation, newConversation) => {
+  if (oldConversation?.id == newConversation?.id) return;
+  if (ChatHistoryElement.value) {
+    ChatHistoryElement.value.scrollToBottom();
+  }
 })
 
 const toggleSettings = () => {

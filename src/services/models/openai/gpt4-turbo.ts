@@ -18,7 +18,7 @@ class GPT4Turbo implements ClosedModel {
     let result = ''
     for await (const chunk of stream) {
       if (chunk.choices[0]?.delta?.content) {
-        if (callback) callback({ message: { finished: true, content: chunk.choices[0].delta.content } });
+        if (callback) callback({ message: { finished: false, content: chunk.choices[0].delta.content } });
         result += chunk.choices[0].delta.content;
       }
     }
