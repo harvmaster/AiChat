@@ -8,13 +8,15 @@
         placeholder="Send a message"
         v-model="input"
         :rows="inputRows"
+        :disabled="loading"
         @keypress.enter.exact="sendMessage"
         @keydown.tab="handleTab"
         >
       </textarea>
     </div>
       <div class="col-auto self-center">
-        <q-btn flat round dense icon="send" color="accent" @click="() => sendMessage()" />
+        <q-spinner v-if="loading" color="white" />
+        <q-btn v-else flat round dense icon="send" color="accent" @click="() => sendMessage()" />
       </div>
   </div>
 </template>
@@ -35,9 +37,12 @@ import useCurrentConversation from '../../composeables/useCurrentConversation'
 import getHighlightedChunks from 'src/utils/HighlightMessage'
 import { Message } from 'src/types'
 import { ChatHistory } from 'src/services/models'
+import { Notify } from 'quasar'
 
 const router = useRouter()
 const input = ref('')
+
+const loading = ref(false)
 
 const currentConveration = useCurrentConversation()
 
@@ -52,7 +57,6 @@ const sendMessage = async (event?: KeyboardEvent) => {
   event?.preventDefault()
 
   let conversation = currentConveration.value
-  console.log(conversation)
   if (!conversation) {
     conversation = createConversation()
     router.push(`/${conversation.id}`)
@@ -65,8 +69,6 @@ const sendMessage = async (event?: KeyboardEvent) => {
     author: 'user',
     modelId: '',
   })
-  console.log('----------')
-  console.log(conversation)
 
   const model = app.settings.value.selectedModel
   if (!model) {
@@ -74,32 +76,54 @@ const sendMessage = async (event?: KeyboardEvent) => {
   }
 
   input.value = ''
+  loading.value = true
 
   const messageId = generateUUID()
   const messages = convertMessagesToPrompt(conversation.messages)
   const getConversation = () => app.conversations.value.find(c => c.id === conversation.id)
-  await model.sendChat({ messages }, async (response) => {
-    const existingMessage = getConversation()?.messages.find(m => m.id === messageId)
-    if (existingMessage) {
-      const content = `${existingMessage.content.raw}${response.message.content}`
-      existingMessage.content = await getHighlightedChunks(content)
-    } else {
-      getConversation()?.messages.push({
-        id: messageId,
-        content: await getHighlightedChunks(response.message.content),
-        createdAt: Date.now(),
-        author: 'assistant',
-        modelId: model.id,
-      })
-    }
-  })
+  
+  try {
+    await model.sendChat({ messages }, async (response) => {
+      const existingMessage = getConversation()?.messages.find(m => m.id === messageId)
+      if (existingMessage) {
+        const content = `${existingMessage.content.raw}${response.message.content}`
+        existingMessage.content = await getHighlightedChunks(content)
+      } else {
+        getConversation()?.messages.push({
+          id: messageId,
+          content: await getHighlightedChunks(response.message.content),
+          createdAt: Date.now(),
+          author: 'assistant',
+          modelId: model.id,
+        })
+      }
+    })
+  } catch(err) {
+    console.error(err)
+    Notify.create({
+      message: 'Failed to send message, please try again later',
+      color: 'negative',
+      position: 'bottom',
+    })
+  }
+
+  loading.value = false
 
   if (conversation.messages.length < 4) {
     const summaryPrompt = createSummaryPrompt(conversation.messages)
 
-    const resposne = await model.sendChat({ messages: summaryPrompt })
-    const conv = getConversation() || conversation
-    conv.summary = resposne.message.content
+    try {
+      const resposne = await model.sendChat({ messages: summaryPrompt })
+      const conv = getConversation() || conversation
+      conv.summary = resposne.message.content
+    } catch (err) {
+      console.error(err)
+      Notify.create({
+        message: 'Failed to summarise conversation, please try again later',
+        color: 'negative',
+        position: 'top-right',
+      })
+    }
   }
 
 }

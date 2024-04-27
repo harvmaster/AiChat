@@ -39,7 +39,7 @@
 
 <script setup lang="ts">
 import { Message } from 'src/types';
-import { watch, ref, nextTick } from 'vue'
+import { watch, ref, nextTick, computed } from 'vue'
 import ChatMessage from './ChatMessage.vue'
 
 export type ChatHistoryProps = {
@@ -47,22 +47,29 @@ export type ChatHistoryProps = {
 }
 
 const props = defineProps<ChatHistoryProps>()
-defineExpose({
-  scrollToBottom: () => {
-    nextTick(() => {
-      if (ChatHistoryElement.value) {
-        ChatHistoryElement.value.scrollTop = ChatHistoryElement.value.scrollHeight
-      }
-    })
-  }
-})
 
 const ChatHistoryElement = ref<HTMLElement | null>(null)
 
-watch(props.messages, () => {
+watch(props.messages, (oldMessages, newMessages) => {
   if (ChatHistoryElement.value && ChatHistoryElement.value.scrollTop + ChatHistoryElement.value.clientHeight - ChatHistoryElement.value.scrollHeight > -90) {
-    ChatHistoryElement.value.scrollTop = ChatHistoryElement.value.scrollHeight
+    scrollToBottom()
   }
 })
 
+const messagesLength = computed(() => props.messages.length)
+watch(messagesLength, () => {
+  scrollToBottom()
+})
+
+const scrollToBottom = () => {
+  nextTick(() => {
+    if (ChatHistoryElement.value) {
+      ChatHistoryElement.value.scrollTop = ChatHistoryElement.value.scrollHeight
+    }
+  })
+}
+
+defineExpose({
+  scrollToBottom
+})
 </script>
