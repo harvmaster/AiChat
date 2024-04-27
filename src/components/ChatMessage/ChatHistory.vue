@@ -39,6 +39,7 @@
 
 <script setup lang="ts">
 import { Message } from 'src/types';
+import { watch } from 'vue'
 import ChatMessage from './ChatMessage.vue'
 
 export type ChatHistoryProps = {
@@ -46,5 +47,9 @@ export type ChatHistoryProps = {
 }
 
 const props = defineProps<ChatHistoryProps>()
+
+// watch(props.messages, () => {
+//   console.log('ChatHistory: messages changed', props.messages)
+// })
 
 </script>

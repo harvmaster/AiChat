@@ -5,8 +5,7 @@ import saveProviders from "../Providers/saveProviders";
 export default async function saveModels(models: Model[]) {
   const db = await EasyIDB.getDB(settings.dbName, settings.dbVersion);
 
-  const tx = db.db.transaction('models', 'readwrite');
-  const store = tx.objectStore('models');
+  
 
   const formattedModels = models.map((model) => {
     return {
@@ -30,17 +29,18 @@ export default async function saveModels(models: Model[]) {
       url: (model as OpenModel).provider.url,
       isClosed: model.provider.isClosed,
       // createdAt: model.provider.createdAt,
-      createdAt: Date.now(),
+      createdAt: model.provider.createdAt || Date.now(),
     }
   })
 
   await saveProviders(formattedProviders);
+
+  const tx = db.db.transaction('models', 'readwrite');
+  const store = tx.objectStore('models');
 
  for (const model of formattedModels) {
     store.put(model);
   }
 
   await tx.done;
-
-  // return models;
 }

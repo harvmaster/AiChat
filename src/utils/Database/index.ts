@@ -10,5 +10,5 @@ export { default as saveModels } from './Models/saveModels';
 export { default as getMessages } from './Messages/getMessages';
 export { default as saveMessages } from './Messages/saveMessages';
 
-export { default as getProvders } from './Providers/getProviders';
+export { default as getProviders } from './Providers/getProviders';
 export { default as saveProviders } from './Providers/saveProviders';

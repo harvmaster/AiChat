@@ -1,15 +1,15 @@
 import { reactive, watch } from 'vue';
 
 import { ClosedModel, Model, OpenModel, Provider } from 'src/services/models';
-import { OllamaModel, OllamaProvider } from 'src/services/models/ollama';
-import { GPT3_5Turbo, GPT4Turbo } from 'src/services/models/openai';
+import { OllamaModel, OllamaProvider, loadOllamaModels } from 'src/services/models/ollama';
+import { GPT3_5Turbo, GPT4Turbo, initOpenAIProvider } from 'src/services/models/openai';
 
 import getProviders from 'src/utils/Database/Providers/getProviders';
 import getModels from 'src/utils/Database/Models/getModels';
 import getConversations from 'src/utils/Database/Conversations/getConversations';
 
 import { Conversation } from 'src/types';
-import { saveConversations } from 'src/utils/Database';
+import { saveConversations, saveModels } from 'src/utils/Database';
 
 type Settings = {
   selectedModel?: Model;
@@ -26,26 +26,13 @@ class App {
   })
 
   async loadFromDatabase () {
-    const providers = await getProviders();
-    const models = await getModels();
-
-    const formattedModels = models.map((model) => {
-      const provider_db = providers.find((provider) => provider.id === model.providerId);
-      if (!provider_db) {
-        return null;
-      }
-      if (provider_db.type !== 'ollama') {
-        return null;
-      }
-
-      const provider = new OllamaProvider(provider_db.id, provider_db.name, provider_db.url);
-      return new OllamaModel(model.id, provider, model.temperature, model.model);
-    }).filter((model) => model != null) as OpenModel[]
+    const formattedModels = await loadOllamaModels();
 
     const openaiModels: ClosedModel[] = [
       GPT3_5Turbo,
       GPT4Turbo
     ]
+    await initOpenAIProvider()
 
     this.models.value = [ ...formattedModels, ...openaiModels ];
     this.settings.value.selectedModel = this.models.value[0];
@@ -62,7 +49,12 @@ class App {
 
     watch(this.settings, () => {
       console.log('Settings updated:', this.settings);
-      
+      // saveSettings
+    })
+
+    watch(this.models, () => {
+      console.log('Models updated:', this.models);
+      saveModels(this.models.value).catch(err => console.error('Failed to save models:', err));
     })
   }
 

@@ -35,7 +35,7 @@
                     @click="() => selectModel(model)"
                   >
                     <q-item-section>
-                      <q-item-label class="text-white model-list-item" :class="selectedModel?.id == model.id ? 'selected-item' : ''">{{ model.name }}</q-item-label>
+                      <q-item-label class="text-white model-list-item" :class="selectedModel?.id == model.id ? 'selected-item' : ''">{{ model.model }}</q-item-label>
                     </q-item-section>
                   </q-item>
                 </div>
@@ -91,7 +91,7 @@
                   <div class="col-auto q-pr-sm">
                     <q-btn flat round dense icon="edit" color="white" @click="focusOpenModelName" />
                   </div>
-                  <input ref="openModelName" class="my-input text-white my-number-input text-h6 col-auto" v-model="selectedModel.name" />
+                  <input ref="openModelName" class="my-input text-white my-number-input text-h6 col-auto" v-model="selectedModel.model" />
                 </div>
 
                 <div class="col-auto row items-start">

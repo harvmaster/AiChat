@@ -9,6 +9,7 @@ const openAIProvider: ClosedProvider = {
   isClosed: true,
 
   token: '',
+  createdAt: Date.now(),
 }
 
 export const initOpenAIProvider = async () => {
@@ -16,6 +17,7 @@ export const initOpenAIProvider = async () => {
   const provider = providers.find((provider) => provider.id === openAIProvider.id);
   if (provider && provider.token) {
     openAIProvider.token = provider.token;
+    openAIProvider.createdAt = provider.createdAt;
   }
 }
 

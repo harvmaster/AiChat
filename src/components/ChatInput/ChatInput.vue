@@ -33,6 +33,8 @@ import generateUUID from 'src/composeables/generateUUID'
 
 import useCurrentConversation from '../../composeables/useCurrentConversation'
 import getHighlightedChunks from 'src/utils/HighlightMessage'
+import { Message } from 'src/types'
+import { ChatHistory } from 'src/services/models'
 
 const router = useRouter()
 const input = ref('')
@@ -61,8 +63,42 @@ const sendMessage = async (event?: KeyboardEvent) => {
     author: 'user',
     modelId: '',
   })
+  console.log(conversation)
+
+  const model = app.settings.value.selectedModel
+  if (!model) {
+    return
+  }
+
+  const messageId = generateUUID()
+  const messages = convertMessagesToPrompt(conversation.messages)
+  model.sendChat({ messages }, async (response) => {
+    const existingMessage = conversation.messages.find(m => m.id === messageId)
+    if (existingMessage) {
+      const content = `${existingMessage.content.raw}${response.message.content}`
+      existingMessage.content = await getHighlightedChunks(content)
+    } else {
+      conversation.messages.push({
+        id: messageId,
+        content: await getHighlightedChunks(response.message.content),
+        createdAt: Date.now(),
+        author: 'assistant',
+        modelId: model.id,
+      })
+    }
+  })
 
 }
+
+const convertMessagesToPrompt = (messages: Message[]): ChatHistory => {
+  return messages.map(message => {
+    return {
+      content: message.content.raw,
+      role: message.author === 'user' ? 'user' : 'assistant',
+    }
+  })
+}
+
 
 const createConversation = () => {
   const conversation = {
