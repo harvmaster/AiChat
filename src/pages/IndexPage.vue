@@ -11,16 +11,20 @@
         <chat-input class="col-12" />
 
         <div class="col-auto row q-pt-md justify-center">
-          <div class="row input-border cursor-pointer" @click="toggleSettings" :class="app.settings.value.selectedModel?.provider.isClosed ? 'q-pa-md' : 'q-pa-sm'">
-            <div class="col-12 text-white text-h6 text-center">
-              {{ app.settings.value.selectedModel?.name }}
+          <div class="row pill model-settings-button cursor-pointer" @click="toggleSettings" :class="app.settings.value.selectedModel?.provider.isClosed ? 'q-pa-md' : 'q-pa-sm'">
+            <div class="col-auto text-blue-2 text-h6 text-center">
+              {{ app.settings.value.selectedModel?.provider.name }}
+              ({{ app.settings.value.selectedModel?.model }})
             </div>
-            <div 
+            <div class="col-auto text-blue-2 text-h6 q-px-sm">
+              <q-icon name="keyboard_arrow_up" />
+            </div>
+            <!-- <div 
               v-if="(app.settings.value.selectedModel) && !(app.settings.value.selectedModel.provider.isClosed)" 
               class="col-12 text-caption text-white self-end q-pl-sm text-center"
             >
               ({{ app.settings.value.selectedModel?.provider.url }})
-            </div>
+            </div> -->
           </div>
         </div>
       </div>
@@ -74,8 +78,17 @@
   }
 
 }
-.no-line-height {
-  line-height: 0;
+.model-settings-button {
+  background-color: $primary;
+  border: 2px solid $secondary;
+  border-radius: 1rem;
+  color: white;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  transition: background-color 0.25s;
+}
+.model-settings-button:hover {
+  background-color: $secondary;
 }
 </style>
 

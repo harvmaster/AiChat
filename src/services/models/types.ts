@@ -36,7 +36,7 @@ export interface BaseProvider {
   id: string;
   name: string;
   type: string;
-  createdAt?: number;
+  createdAt: number;
 }
 
 export interface ClosedModel extends BaseModel {

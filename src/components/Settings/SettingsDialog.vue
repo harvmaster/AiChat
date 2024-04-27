@@ -91,7 +91,10 @@
                   <div class="col-auto q-pr-sm">
                     <q-btn flat round dense icon="edit" color="white" @click="focusOpenModelName" />
                   </div>
-                  <input ref="openModelName" class="my-input text-white my-number-input text-h6 col-auto" v-model="selectedModel.model" />
+                  <input ref="openModelName" class="my-input text-white my-number-input text-h6 col" v-model="selectedModel.model" />
+                  <div class="col-auto">
+                    <q-btn flat round dense icon="delete" color="red-4" @click="deleteModel" />
+                  </div>
                 </div>
 
                 <div class="col-auto row items-start">
@@ -211,6 +214,8 @@ import CounterInput from 'components/Inputs/CounterInput.vue'
 import { OllamaModel, OllamaProvider } from 'src/services/models/ollama';
 import generateUUID from 'src/composeables/generateUUID'
 
+import deleteModelFromDatabase from 'src/utils/Database/Models/deleteModel'
+
 const show = ref(false)
 const toggleVisible = () => {
   show.value = !show.value
@@ -237,13 +242,14 @@ type ModelGroups = {
 const groupedModels = computed(() => {
   const grouped: ModelGroups = {}
   console.log(models)
-  models.forEach(model => {
+  app.models.value.forEach(model => {
     if (!grouped[model.provider.id]) {
       grouped[model.provider.id] = []
     }
     grouped[model.provider.id].push(model)
   })
-  return grouped
+  const groupedArray = Object.values(grouped)
+  return groupedArray.sort((a: Model[], b: Model[]) => b[0].provider.createdAt - a[0].provider.createdAt)
 })
 
 const selectModel = (model: Model) => {
@@ -284,6 +290,14 @@ const addModel = (providerId: string) => {
   app.models.value.push(model)
 
   nextTick(() => selectModel(model))
+}
+
+const deleteModel = () => {
+  if (!selectedModel.value) return
+  deleteModelFromDatabase(selectedModel.value)
+  app.models.value = app.models.value.filter(model => model.id !== selectedModel.value?.id)
+  app.settings.value.selectedModel = app.models.value[0]
+
 }
 
 </script>
