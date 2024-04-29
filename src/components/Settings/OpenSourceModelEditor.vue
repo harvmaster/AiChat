@@ -21,7 +21,7 @@
     <div class="col-auto row">
       <div class="row fit-content q-py-sm">
         <div class="col-12 text-white">Temperature</div>
-        <counter-input class="col-auto" v-model="selectedModel.advancedSettings.temperature" :step="0.1" @update:model-value="clampTemperature"/>
+        <counter-input class="col-auto" v-model="selectedModel.advancedSettings.temperature!" :step="0.1" @update:model-value="clampTemperature"/>
       </div>
     </div>
 
@@ -47,7 +47,7 @@
 </style>
 
 <script lang="ts" setup>
-import { computed, ref, defineEmits } from 'vue'
+import { computed, ref, defineEmits, watch} from 'vue'
 import { app } from 'boot/app'
 
 import CounterInput from '../Inputs/CounterInput.vue';
@@ -81,6 +81,10 @@ const deleteModel = () => {
   app.models.value = app.models.value.filter(model => model.id !== selectedModel.value?.id)
   app.settings.value.selectedModel = app.models.value[0]
 }
+
+watch(() => app.settings.value.selectedModel?.advancedSettings.temperature, () => {
+  clampTemperature()
+})
 
 const toggleAdvanced = () => {
   emits('toggleAdvanced')

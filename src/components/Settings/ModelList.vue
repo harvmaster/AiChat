@@ -1,49 +1,54 @@
 <template>
   <div class="col-12 scroll-area">
     <q-list class="fit">
+      <transition-group name="slide-x" tag="div">
 
-      <div
-        v-for="group of groupedModels"
-        :key="group[0].provider.id"
-      >
-        <div class="text-h6 text-white row">
-          <div class="col-auto self-center q-pr-sm"> 
-            {{ group[0].provider.name }}
-          </div>
-          <div v-if="!group[0].provider.isClosed" class="col-auto">
-            <q-btn class="text-bold " outline color="white" flat icon="add" round @click="() => addModel(group[0].provider.id)">
-              <q-tooltip>
-                Add Model
-              </q-tooltip>
-            </q-btn>
-          </div>
-        </div>
-        <q-item
-          v-for="model of group"
-          :key="model.id"
-          clickable
-          v-ripple
-          @click="() => selectModel(model)"
+        <div
+          v-for="group of groupedModels"
+          :key="group[0].provider.id"
         >
-          <q-item-section>
-            <q-item-label class="text-white model-list-item" :class="selectedModel?.id == model.id ? 'selected-item' : ''">{{ model.model }}</q-item-label>
-          </q-item-section>
-        </q-item>
-      </div>
+          <div class="text-h6 text-white row">
+            <div class="col-auto self-center q-pr-sm"> 
+              {{ group[0].provider.name }}
+            </div>
+            <div v-if="!group[0].provider.isClosed" class="col-auto">
+              <q-btn class="text-bold " outline color="white" flat icon="add" round @click="() => addModel(group[0].provider.id)">
+                <q-tooltip>
+                  Add Model
+                </q-tooltip>
+              </q-btn>
+            </div>
+          </div>
 
-      <div class="q-pa-md text-white text-bold row cursor-pointer">
-        <div class="col-auto self-center">
-          Add Provider
-        </div>
-        <div class="col-auto self-center text-h6 q-px-md">
-          +
+          <transition-group name="slide-x" tag="div">
+            <q-item
+              v-for="model of group"
+              :key="model.id"
+              clickable
+              v-ripple
+              @click="() => selectModel(model)"
+            >
+              <q-item-section>
+                <q-item-label class="text-white model-list-item" :class="selectedModel?.id == model.id ? 'selected-item' : ''">{{ model.model }}</q-item-label>
+              </q-item-section>
+            </q-item>
+          </transition-group>
         </div>
         
-        <q-popup-edit ref="addProviderPopup" v-model="newProvider" label="Provider" class="bg-accent" >
-          <input v-model="newProvider" autofocus class="my-input text-white text-h6" placeholder="Provider Name" @keydown.enter="createProvider"/>
-        </q-popup-edit>
-      </div>
-
+        <div class="q-pa-md text-white text-bold row cursor-pointer">
+          <div class="col-auto self-center">
+            Add Provider
+          </div>
+          <div class="col-auto self-center text-h6 q-px-md">
+            +
+          </div>
+          
+          <q-popup-edit ref="addProviderPopup" v-model="newProvider" label="Provider" class="bg-accent" >
+            <input v-model="newProvider" autofocus class="my-input text-white text-h6" placeholder="Provider Name" @keydown.enter="createProvider"/>
+          </q-popup-edit>
+        </div>
+    
+      </transition-group>
     </q-list>
   </div>
 </template>
@@ -94,6 +99,18 @@
     height: fit-content;
     max-height: 30vh;
   }
+}
+
+.slide-x-move, 
+.slide-x-enter-active, .slide-x-leave-active {
+  transition: all 0.5s;
+}
+.slide-x-enter-from, .slide-x-leave-to {
+  transform: translateX(-100%);
+  opacity: 0;
+}
+.slide-x-leave-active {
+  position: absolute;
 }
 </style>
 

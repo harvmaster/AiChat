@@ -1,5 +1,8 @@
 <template>
   <div class="options-container">
+    <div class="text-h6 text-white q-px-md q-pb-sm">
+      Advanced Settings
+    </div>
     <form autocorrect="off">
       <textarea 
       v-if="selectedModel" 
@@ -91,11 +94,12 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch, nextTick } from 'vue'
 import { app } from 'boot/app'
-import { ChatHistory, OpenModel } from 'src/services/models';
+import { Model } from 'src/services/models';
 
 import useAIGenerator from 'src/composeables/useAIGenerator'
+import { Notify } from 'quasar';
 
-const selectedModel = computed<OpenModel | undefined>(() => app.settings.value.selectedModel as OpenModel)
+const selectedModel = computed<Model | undefined>(() => app.settings.value.selectedModel)
 const advancedSettingsBuffer = ref<string>('')
 const jsonError = ref<boolean>(false)
 
@@ -108,19 +112,25 @@ const inputStyles = computed(() => {
 const { loading, generateAIResponse } = useAIGenerator()
 
 const fixWithAI = async () => {
-  const phi3 = app.models.value.find(m => m.model == 'phi3')
-  if (!phi3) return
+  if (!selectedModel.value) return
 
   const prompt = `Please correct this JSON object to be valid and fit the shape of an Ollama API Request Options Object: \n\n${advancedSettingsBuffer.value}. The expected TS type is Partial<{num_keep: number,seed: number,num_predict: number,top_k: number,top_p: number,tfs_z: number,typical_p: number,repeat_last_n: number,temperature: number,repeat_penalty: number,presence_penalty: number,frequency_penalty: number,mirostat: number,mirostat_tau: number,mirostat_eta: number,penalize_newline: boolean,stop: string[],numa: boolean,num_ctx: number,num_batch: number,num_gqa: number,num_gpu: number,main_gpu: number,low_vram: boolean,f16_kv: boolean,vocab_only: boolean,use_mmap: boolean,use_mlock: boolean,rope_frequency_base: number,rope_frequency_scale: number,num_thread: number}>. Responsd with JSON only. Do not provide the key that where not in the incompelte JSON.`
 
   advancedSettingsBuffer.value = ''
-  const res = await generateAIResponse(phi3, prompt, (message) => {
+  const res = await generateAIResponse(selectedModel.value, prompt, (message) => {
     try {
       advancedSettingsBuffer.value += message.message.content
       advancedSettingsBuffer.value = JSON.stringify(JSON.parse(advancedSettingsBuffer.value), null, 2)
     } catch (err) {
-      // do nothing
+      // Do Nothing
     }
+  }).catch(() => {
+    Notify.create({
+      message: 'Failed to generate AI response',
+      color: 'negative',
+      position: 'top-right',
+      icon: 'error'
+    })
   })
 }
 
