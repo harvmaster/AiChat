@@ -100,8 +100,7 @@ import useCurrentConversation from 'src/composeables/useCurrentConversation';
 
 import ChatHistory from 'src/components/ChatMessage/ChatHistory.vue';
 import ChatInput from 'src/components/ChatInput/ChatInput.vue';
-// import SettingsDialog from 'src/components/Settings/SettingsDialog.vue';
-import SettingsDialog from 'src/components/Settings/SDialog.vue';
+import SettingsDialog from 'src/components/Settings/SettingsDialog.vue';
 import { Message } from 'src/types';
 
 const currentConversation = useCurrentConversation();
