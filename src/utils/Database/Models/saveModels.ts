@@ -5,16 +5,21 @@ import saveProviders from "../Providers/saveProviders";
 export default async function saveModels(models: Model[]) {
   const db = await EasyIDB.getDB(settings.dbName, settings.dbVersion);
 
-  
-
   const formattedModels = models.map((model) => {
+
+    let settingsString
+    try {
+      settingsString = JSON.stringify((model as OpenModel).advancedSettings)
+    } catch (err) {
+      settingsString = undefined
+    }
+    
     return {
       id: model.id,
       name: model.name,
       model: (model as OpenModel).model,
-      temperature: model.temperature,
+      advancedSettings: settingsString,
       providerId: model.provider.id,
-      // providerId: Date.now(),
       createdAt: model.createdAt || Date.now(),
     }
   })
@@ -28,7 +33,6 @@ export default async function saveModels(models: Model[]) {
       token: (model as ClosedModel).provider.token,
       url: (model as OpenModel).provider.url,
       isClosed: model.provider.isClosed,
-      // createdAt: model.provider.createdAt,
       createdAt: model.provider.createdAt || Date.now(),
     }
   })

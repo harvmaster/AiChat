@@ -42,19 +42,7 @@
 </template>
 
 <style lang="scss" scoped>
-.form-input-border {
-  border: 2px solid $primary;
-  border-radius: 1em;
-}
-.input-container {
-  border: 1px solid $primary;
-  border-radius: 1em;
-  padding: 1em;
-  max-width: 20em;
-}
-.align-start {
-  align-content: start;
-}
+
 .settings-dialog {
   max-height: 100vh;
   max-width: 100vw;
@@ -65,48 +53,11 @@
   width: fit-content;
 }
 
-.scroll-area {
-  min-height: 10em;
-  height: fit-content;
-  max-height: 50vh;
-  width: 100%;
-
-  overflow-y: auto;
-  overflow-x: hidden;
-  display: flow;
-
-  // Attractive scroll bar
-  &::-webkit-scrollbar {
-    width: 10px;
-    border-radius: 10px;
-
-    &-track {
-      background: $secondary;
-      border-radius: 10px;
-    }
-
-    &-thumb {
-      background: $accent;
-      border-radius: 10px;
-    }
-
-    &-thumb:hover {
-      background: $accent;
-    }
-  }
-}
-
 @media screen and (min-width: 1000px) {
   .settings-dialog {
     max-height: 40vh;
     max-width: 40vw;
     overflow-y: auto;
-  }
-  .scroll-area {
-    width: 15em;
-    min-height: 10em;
-    height: fit-content;
-    max-height: 30vh;
   }
 }
 .advanced-input-container {

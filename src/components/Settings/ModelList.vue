@@ -86,6 +86,15 @@
     }
   }
 }
+
+@media screen and (min-width: 1000px) {
+  .scroll-area {
+    width: 15em;
+    min-height: 10em;
+    height: fit-content;
+    max-height: 30vh;
+  }
+}
 </style>
 
 <script lang="ts" setup>
@@ -115,7 +124,7 @@ const groupedModels = computed(() => {
   return groupedArray.sort((a: Model[], b: Model[]) => b[0].provider.createdAt - a[0].provider.createdAt)
 })
 
-const selectedModel = ref<Model | null>(null)
+const selectedModel = computed(() => app.settings.value.selectedModel)
 const selectModel = (model: Model) => {
   app.settings.value.selectedModel = model
 }

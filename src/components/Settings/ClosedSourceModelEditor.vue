@@ -28,6 +28,9 @@
   padding: 1em;
   max-width: 20em;
 }
+.align-start {
+  align-content: start;
+}
 </style>
 
 <script lang="ts" setup>

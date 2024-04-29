@@ -26,10 +26,8 @@ export interface BaseModel {
   id: string;
   name: string;
   model: string;
-  temperature: number;
   createdAt?: number;
   provider: Provider;
-  advancedSettings?: string;
   sendChat(request: ChatCompletionRequest, callback?: (result: ChatCompletionResponse) => void,): Promise<ChatCompletionResponse>;
 }
 
@@ -50,6 +48,7 @@ export interface ClosedProvider extends BaseProvider {
 
 export interface OpenModel extends BaseModel  {
   provider: OpenProvider
+  advancedSettings: OllamaOptions;
 }
 export interface OpenProvider extends BaseProvider {
   url: string;
@@ -59,3 +58,37 @@ export interface OpenProvider extends BaseProvider {
 export type Model = ClosedModel | OpenModel;
 
 export type Provider = ClosedProvider | OpenProvider;
+
+export type OllamaOptions = {
+  num_keep: number,
+  seed: number,
+  num_predict: number,
+  top_k: number,
+  top_p: number,
+  tfs_z: number,
+  typical_p: number,
+  repeat_last_n: number,
+  temperature: number,
+  repeat_penalty: number,
+  presence_penalty: number,
+  frequency_penalty: number,
+  mirostat: number,
+  mirostat_tau: number,
+  mirostat_eta: number,
+  penalize_newline: boolean,
+  stop: string[],
+  numa: boolean,
+  num_ctx: number,
+  num_batch: number,
+  num_gqa: number,
+  num_gpu: number,
+  main_gpu: number,
+  low_vram: boolean,
+  f16_kv: boolean,
+  vocab_only: boolean,
+  use_mmap: boolean,
+  use_mlock: boolean,
+  rope_frequency_base: number,
+  rope_frequency_scale: number,
+  num_thread: number
+}

@@ -21,7 +21,7 @@
     <div class="col-auto row">
       <div class="row fit-content q-py-sm">
         <div class="col-12 text-white">Temperature</div>
-        <counter-input class="col-auto" v-model="selectedModel.temperature" :step="0.1" @update:model-value="clampTemperature"/>
+        <counter-input class="col-auto" v-model="selectedModel.advancedSettings.temperature" :step="0.1" @update:model-value="clampTemperature"/>
       </div>
     </div>
 
@@ -40,6 +40,9 @@
   padding: 1em;
   max-width: 20em;
 }
+.align-start {
+  align-content: start;
+}
 
 </style>
 
@@ -50,15 +53,17 @@ import { app } from 'boot/app'
 import CounterInput from '../Inputs/CounterInput.vue';
 
 import deleteModelFromDatabase from 'src/utils/Database/Models/deleteModel'
+import { OpenModel } from 'src/services/models';
 
-const selectedModel = computed(() => app.settings.value.selectedModel)
+const selectedModel = computed<OpenModel | undefined>(() => app.settings.value.selectedModel as OpenModel)
 
 const clampTemperature = () => {
   if (!selectedModel.value) return
-  let temperature = parseFloat(parseFloat(selectedModel.value.temperature.toString()).toFixed(2))
+  let temperature = parseFloat(parseFloat(selectedModel.value.advancedSettings.temperature.toString()).toFixed(2))
+  console.log(temperature)
   if (temperature > 2) temperature = 2
   if (temperature < 0) temperature = 0
-  selectedModel.value.temperature = temperature
+  selectedModel.value.advancedSettings.temperature = temperature
 }
 
 const openModelName = ref<HTMLInputElement | null>(null)
