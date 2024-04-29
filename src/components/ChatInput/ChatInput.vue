@@ -83,7 +83,7 @@ const sendMessage = async (event?: KeyboardEvent) => {
   const getConversation = () => app.conversations.value.find(c => c.id === conversation.id)
   
   try {
-    await model.sendChat({ messages }, async (response) => {
+    const res = await model.sendChat({ messages }, async (response) => {
       const existingMessage = getConversation()?.messages.find(m => m.id === messageId)
       if (existingMessage) {
         const content = `${existingMessage.content.raw}${response.message.content}`
@@ -98,6 +98,9 @@ const sendMessage = async (event?: KeyboardEvent) => {
         })
       }
     })
+
+    const existingMessage = getConversation()?.messages.find(m => m.id === messageId)
+    if (existingMessage) existingMessage.content = await getHighlightedChunks(res.message.content)
   } catch(err) {
     console.error(err)
     Notify.create({
