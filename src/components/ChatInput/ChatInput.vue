@@ -34,6 +34,7 @@ import isInCodeBlock from 'src/composeables/isInCodeblock'
 import generateUUID from 'src/composeables/generateUUID'
 
 import useCurrentConversation from '../../composeables/useCurrentConversation'
+import useAIChat from 'src/composeables/useAIChat'
 import getHighlightedChunks from 'src/utils/HighlightMessage'
 import { Message } from 'src/types'
 import { ChatHistory } from 'src/services/models'
@@ -42,7 +43,7 @@ import { Notify } from 'quasar'
 const router = useRouter()
 const input = ref('')
 
-const loading = ref(false)
+const { loading, getChatResponse } = useAIChat()
 
 const currentConveration = useCurrentConversation()
 
@@ -76,14 +77,13 @@ const sendMessage = async (event?: KeyboardEvent) => {
   }
 
   input.value = ''
-  loading.value = true
 
   const messageId = generateUUID()
   const messages = convertMessagesToPrompt(conversation.messages)
   const getConversation = () => app.conversations.value.find(c => c.id === conversation.id)
   
   try {
-    const res = await model.sendChat({ messages }, async (response) => {
+    const res = await getChatResponse(model, messages, async (response) => {
       const existingMessage = getConversation()?.messages.find(m => m.id === messageId)
       if (existingMessage) {
         const content = `${existingMessage.content.raw}${response.message.content}`
@@ -109,8 +109,6 @@ const sendMessage = async (event?: KeyboardEvent) => {
       position: 'bottom',
     })
   }
-
-  loading.value = false
 
   if (conversation.messages.length < 4) {
     const summaryPrompt = createSummaryPrompt(conversation.messages)

@@ -9,6 +9,7 @@ export const useAIGenerator = () => {
     try {
       loading.value = true
       const response = await model.generateText({ prompt }, callback);
+      loading.value = false;
       return response;
     } catch (err: any) {
       throw new Error(`Failed to generate AI response: ${err.message}`)

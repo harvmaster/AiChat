@@ -60,9 +60,9 @@ const selectedModel = computed<OpenModel | undefined>(() => app.settings.value.s
 const clampTemperature = () => {
   if (!selectedModel.value) return
   if (!selectedModel.value.advancedSettings) return selectedModel.value.advancedSettings = { temperature: 1 }
-  if (!selectedModel.value.advancedSettings.temperature) return selectedModel.value.advancedSettings.temperature = 1
+  if (!selectedModel.value.advancedSettings.temperature && isNaN(selectedModel.value.advancedSettings.temperature as number)) return selectedModel.value.advancedSettings.temperature = 1
   
-  let temperature = parseFloat(parseFloat(selectedModel.value.advancedSettings.temperature.toString()).toFixed(2))
+  let temperature = parseFloat(parseFloat(selectedModel.value.advancedSettings.temperature?.toString() as string).toFixed(2))
   if (isNaN(temperature)) temperature = 1
   if (temperature > 2) temperature = 2
   if (temperature < 0) temperature = 0
