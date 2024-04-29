@@ -49,7 +49,7 @@ export interface ClosedProvider extends BaseProvider {
 
 export interface OpenModel extends BaseModel  {
   provider: OpenProvider
-  advancedSettings: OllamaOptions;
+  advancedSettings: Partial<OllamaOptions>;
 }
 export interface OpenProvider extends BaseProvider {
   url: string;
