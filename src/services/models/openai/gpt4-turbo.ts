@@ -1,7 +1,8 @@
 import OpenAI from 'openai';
 import Provider from './Provider';
 
-import { ChatCompletionRequest, ChatCompletionResponse, ClosedModel } from '../types';
+import { ChatCompletionRequest, ChatCompletionResponse, ClosedModel, TextGenerationRequest } from '../types';
+import { Stream } from 'openai/streaming';
 
 export type OpenAIAdvancedOptions = {
   temperature: number
@@ -18,11 +19,21 @@ class GPT4Turbo implements ClosedModel {
   provider = Provider;
   advancedSettings: OpenAIAdvancedOptions = {...defaultAdvancedOptions};
 
-  async sendChat (request: ChatCompletionRequest, callback?: (response: ChatCompletionResponse) => void): Promise<ChatCompletionResponse> {
+  async sendChat (request: ChatCompletionRequest, callback?: (response: ChatCompletionResponse) => void, options?: OpenAIAdvancedOptions): Promise<ChatCompletionResponse> {
     const openai = new OpenAI({ apiKey: Provider.token, dangerouslyAllowBrowser: true });
-
     const stream = await openai.chat.completions.create({ model: 'gpt-4-turbo', messages: request.messages, stream: true });
 
+    return await this.handleResponse(stream, callback);
+  }
+
+  async generateText (request: TextGenerationRequest, callback?: (response: ChatCompletionResponse) => void, options?: OpenAIAdvancedOptions): Promise<ChatCompletionResponse> {
+    const openai = new OpenAI({ apiKey: Provider.token, dangerouslyAllowBrowser: true });
+    const stream = await openai.chat.completions.create({ model: 'gpt-4-turbo', messages: [{ content: request.prompt, role: 'user' }], stream: true });
+  
+    return await this.handleResponse(stream, callback);  
+  }
+
+  async handleResponse (stream: Stream<OpenAI.Chat.Completions.ChatCompletionChunk>, callback?: (res: ChatCompletionResponse) => void): Promise<ChatCompletionResponse> {
     let result = ''
     for await (const chunk of stream) {
       if (chunk.choices[0]?.delta?.content) {

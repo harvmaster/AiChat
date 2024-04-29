@@ -1,4 +1,4 @@
-import { Model, ChatCompletionRequest, ChatCompletionResponse, OpenProvider, OpenModel, OllamaOptions } from '../types';
+import { Model, ChatCompletionRequest, ChatCompletionResponse, OpenProvider, OpenModel, OllamaOptions, TextGenerationRequest } from '../types';
 import OllamaProvider from './Provider';
 
 export const defaultOptions: Partial<OllamaOptions> = {
@@ -56,12 +56,25 @@ class Ollama implements OpenModel {
     }
   }
 
-  async sendChat (request: ChatCompletionRequest, callback?: (response: ChatCompletionResponse) => void): Promise<ChatCompletionResponse> {
+  async sendChat (request: ChatCompletionRequest, callback?: (response: ChatCompletionResponse) => void, options?: OllamaOptions): Promise<ChatCompletionResponse> {
     const response = await fetch(`${this.provider.url}/api/chat`, {
       method: 'POST',
       body: JSON.stringify({ model: this.model, messages: request.messages, options: {...this.advancedSettings} })
     })
 
+    return await this.handleResponse(response, callback)
+  }
+
+  async generateText (request: TextGenerationRequest, callback?: (response: ChatCompletionResponse) => void, options?: OllamaOptions): Promise<ChatCompletionResponse> {
+    const response = await fetch(`${this.provider.url}/api/generate`, {
+      method: 'POST',
+      body: JSON.stringify({ model: this.model, prompt: request.prompt, format: 'json', options: {...this.advancedSettings} })
+    })
+
+    return await this.handleResponse(response, callback)
+  }
+
+  async handleResponse (response: Response, callback?: (res: ChatCompletionResponse) => void): Promise<ChatCompletionResponse> {
     if (!response.ok) throw new Error('Failed to send chat')
     if (!response.body) throw new Error('Failed to read response body')
 
@@ -82,6 +95,10 @@ class Ollama implements OpenModel {
         if (chunk.message?.content) {
           if (callback) await callback({ message: { finished: chunk.done, content: chunk.message.content } });
           result += chunk.message.content;
+        }
+        if (chunk.response) {
+          if (callback) await callback({ message: { finished: chunk.done, content: chunk.response } });
+          result += chunk.response;
         }
       }
     }

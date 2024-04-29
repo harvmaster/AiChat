@@ -10,6 +10,19 @@
       spellcheck="false"
       placeholder="Advanced Settings"
       />
+      <div class="absolute-bottom-right button-container">
+        <q-btn
+          v-if="jsonError"
+          unelevated
+          :disable="loading"
+          color="accent"
+          class="fix-button"
+          label="Fix with AI"
+          @click="fixWithAI"
+        >
+          <q-spinner v-if="loading" />
+        </q-btn>
+      </div>
     </form>
   </div>
 </template>
@@ -21,6 +34,17 @@
   padding: 1em;
   background-color: $secondary;
   border-radius: 2em;
+
+  position: relative;
+}
+
+.button-container {
+  padding: 2em;
+}
+
+.fix-button {
+  border-radius: 0.5em 0.5em 1em 0.5em;
+  
 }
 
 .json-editor {
@@ -66,7 +90,9 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
 import { app } from 'boot/app'
-import { OpenModel } from 'src/services/models';
+import { ChatHistory, OpenModel } from 'src/services/models';
+
+import useAIGenerator from 'src/composeables/useAIGenerator'
 
 const selectedModel = computed<OpenModel | undefined>(() => app.settings.value.selectedModel as OpenModel)
 const advancedSettingsBuffer = ref<string>('')
@@ -78,8 +104,26 @@ const inputStyles = computed(() => {
   }
 })
 
-watch(app.settings, (newValue, oldValue) => {
-  console.log('test')
+const { loading, generateAIResponse } = useAIGenerator()
+
+const fixWithAI = async () => {
+  const phi3 = app.models.value.find(m => m.model == 'phi3')
+  if (!phi3) return
+
+  // const messages = [
+    // { content: 'There is an error in the users JSON. Give the user the entire JSON body back with the error corrected. The shape of the intended object is an Ollama API Request Options. All of these options are optional. DO NOT ADD ANY KEYS THAT ARE NOT ALREADY IN THE USERS PROMPT. Respond in only JSON. Nothing else', role: 'system' },
+    // { content: advancedSettingsBuffer.value, role: 'user' }
+  // ] as ChatHistory 
+  
+  const prompt = `Please correct this JSON object to be valid and fit the shape of an Ollama API Request Options Object: \n\n${advancedSettingsBuffer.value}. The expected TS type is Partial<{num_keep: number,seed: number,num_predict: number,top_k: number,top_p: number,tfs_z: number,typical_p: number,repeat_last_n: number,temperature: number,repeat_penalty: number,presence_penalty: number,frequency_penalty: number,mirostat: number,mirostat_tau: number,mirostat_eta: number,penalize_newline: boolean,stop: string[],numa: boolean,num_ctx: number,num_batch: number,num_gqa: number,num_gpu: number,main_gpu: number,low_vram: boolean,f16_kv: boolean,vocab_only: boolean,use_mmap: boolean,use_mlock: boolean,rope_frequency_base: number,rope_frequency_scale: number,num_thread: number}>. Responsd with JSON only. Do not provide the key that where not in the incompelte JSON.`
+
+  advancedSettingsBuffer.value = ''
+  const res = await generateAIResponse(phi3, prompt, (message) => {
+    advancedSettingsBuffer.value += message.message.content
+  })
+}
+
+watch(app.settings, () => {
   advancedSettingsBuffer.value = JSON.stringify(selectedModel.value?.advancedSettings, null, 2)
 })
 
@@ -88,7 +132,6 @@ watch(advancedSettingsBuffer, (newValue, oldValue) => {
     selectedModel.value!.advancedSettings = JSON.parse(newValue)
     jsonError.value = false
   } catch (e) {
-    console.error(e)
     jsonError.value = true
   }
 })

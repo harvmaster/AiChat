@@ -1,5 +1,7 @@
 import type { Ref } from 'vue';
 import type { ChatCompletionMessageParam } from 'openai/resources';
+import { Stream } from 'openai/streaming';
+import OpenAI from 'openai';
 
 
 export type ChatMessage = ChatCompletionMessageParam
@@ -22,6 +24,10 @@ export type ChatCompletionRequestOptions = {
   stream: boolean;
 }
 
+export type TextGenerationRequest = {
+  prompt: string;
+}
+
 export interface BaseModel {
   id: string;
   name: string;
@@ -30,6 +36,7 @@ export interface BaseModel {
   provider: Provider;
   advancedSettings: any;
   sendChat(request: ChatCompletionRequest, callback?: (result: ChatCompletionResponse) => void,): Promise<ChatCompletionResponse>;
+  generateText(request: TextGenerationRequest, callback?: (result: ChatCompletionResponse) => void,): Promise<ChatCompletionResponse>;
 }
 
 export interface BaseProvider {
@@ -41,6 +48,7 @@ export interface BaseProvider {
 
 export interface ClosedModel extends BaseModel {
   provider: ClosedProvider
+  handleResponse(response: Stream<OpenAI.Chat.Completions.ChatCompletionChunk>, callback?: (result: ChatCompletionResponse) => void): Promise<ChatCompletionResponse>;
 }
 export interface ClosedProvider extends BaseProvider {
   token: string;
@@ -50,6 +58,7 @@ export interface ClosedProvider extends BaseProvider {
 export interface OpenModel extends BaseModel  {
   provider: OpenProvider
   advancedSettings: Partial<OllamaOptions>;
+  handleResponse(response: Response, callback?: (result: ChatCompletionResponse) => void): Promise<ChatCompletionResponse>;
 }
 export interface OpenProvider extends BaseProvider {
   url: string;
