@@ -9,6 +9,7 @@
       autocorrect="off" 
       spellcheck="false"
       placeholder="Advanced Settings"
+      @keydown.tab.prevent="handleTab"
       />
       <div class="absolute-bottom-right button-container">
         <q-btn
@@ -88,7 +89,7 @@
 </style>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, watch, nextTick } from 'vue'
 import { app } from 'boot/app'
 import { ChatHistory, OpenModel } from 'src/services/models';
 
@@ -110,11 +111,6 @@ const fixWithAI = async () => {
   const phi3 = app.models.value.find(m => m.model == 'phi3')
   if (!phi3) return
 
-  // const messages = [
-    // { content: 'There is an error in the users JSON. Give the user the entire JSON body back with the error corrected. The shape of the intended object is an Ollama API Request Options. All of these options are optional. DO NOT ADD ANY KEYS THAT ARE NOT ALREADY IN THE USERS PROMPT. Respond in only JSON. Nothing else', role: 'system' },
-    // { content: advancedSettingsBuffer.value, role: 'user' }
-  // ] as ChatHistory 
-  
   const prompt = `Please correct this JSON object to be valid and fit the shape of an Ollama API Request Options Object: \n\n${advancedSettingsBuffer.value}. The expected TS type is Partial<{num_keep: number,seed: number,num_predict: number,top_k: number,top_p: number,tfs_z: number,typical_p: number,repeat_last_n: number,temperature: number,repeat_penalty: number,presence_penalty: number,frequency_penalty: number,mirostat: number,mirostat_tau: number,mirostat_eta: number,penalize_newline: boolean,stop: string[],numa: boolean,num_ctx: number,num_batch: number,num_gqa: number,num_gpu: number,main_gpu: number,low_vram: boolean,f16_kv: boolean,vocab_only: boolean,use_mmap: boolean,use_mlock: boolean,rope_frequency_base: number,rope_frequency_scale: number,num_thread: number}>. Responsd with JSON only. Do not provide the key that where not in the incompelte JSON.`
 
   advancedSettingsBuffer.value = ''
@@ -123,12 +119,32 @@ const fixWithAI = async () => {
   })
 }
 
+const handleTab = (event: KeyboardEvent) => {
+  event.preventDefault();
+  const target = event.target as HTMLTextAreaElement;
+  const cursorPosition = target?.selectionStart
+
+  advancedSettingsBuffer.value =
+  advancedSettingsBuffer.value.substring(0, cursorPosition) +
+    '  ' +
+    advancedSettingsBuffer.value.substring(cursorPosition);
+  nextTick(() => {  
+    const target = event.target as HTMLTextAreaElement;
+    target.selectionStart = target.selectionEnd = cursorPosition + 2;
+  });
+}
+
 watch(app.settings, () => {
   advancedSettingsBuffer.value = JSON.stringify(selectedModel.value?.advancedSettings, null, 2)
 })
 
 watch(advancedSettingsBuffer, (newValue, oldValue) => {
   try {
+    const parsed = JSON.parse(newValue)
+    if (JSON.stringify(parsed) === JSON.stringify(selectedModel.value?.advancedSettings)) {
+      jsonError.value = false
+      return
+    }
     selectedModel.value!.advancedSettings = JSON.parse(newValue)
     jsonError.value = false
   } catch (e) {

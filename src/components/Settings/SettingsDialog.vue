@@ -35,7 +35,9 @@
       <!-- End content -->
 
       <div class="col-12 col-md self-end q-px-md q-pt-md">
-        <fixed-options-editor v-if="showAdvanced" @click.stop="" />
+        <transition enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown">
+          <fixed-options-editor v-if="showAdvanced" @click.stop="" />
+        </transition>
       </div>
 
     </div>
@@ -56,7 +58,7 @@
   .content-container {
     min-height: 10em;
     max-height: 40vh;
-    max-width: 40vw;
+    max-width: 40em;
     overflow-y: auto;
   }
 }
