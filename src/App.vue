@@ -12,7 +12,6 @@ import 'prismjs/components/prism-go';
 import 'prismjs/components/prism-json';
 import 'prismjs/components/prism-java';
 import 'prismjs/components/prism-markdown';
-// import 'prismjs/components/prism-php';
 import 'prismjs/components/prism-python';
 import 'prismjs/components/prism-rust';
 import 'prismjs/components/prism-sql';
