@@ -115,7 +115,12 @@ const fixWithAI = async () => {
 
   advancedSettingsBuffer.value = ''
   const res = await generateAIResponse(phi3, prompt, (message) => {
-    advancedSettingsBuffer.value += message.message.content
+    try {
+      advancedSettingsBuffer.value += message.message.content
+      advancedSettingsBuffer.value = JSON.stringify(JSON.parse(advancedSettingsBuffer.value), null, 2)
+    } catch (err) {
+      // do nothing
+    }
   })
 }
 
