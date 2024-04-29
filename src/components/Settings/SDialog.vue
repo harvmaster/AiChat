@@ -6,12 +6,18 @@
       <div class="col-12 col-md" />
     
       <!-- Content -->
-      <div class="q-pa-md self-end content-container row justify-center col-auto bg-secondary" @click.stop="" >
+      <div class="q-pa-md self-end content-container row justify-center col-auto bg-secondary relative" @click.stop="" >
+
+        <div class="absolute-top-right q-pa-md mobile-only">
+          <q-btn flat round dense icon="close" color="white" @click="toggleVisible"/>
+        </div>
         
         <!-- List of models -->
         <div class="col-12 col-md-auto">
           <model-list />
         </div>
+
+        <q-separator v-if="Platform.is.mobile" horizontal class="col-12 bg-accent text-accent q-pm-xs" style="background-color: white; height: 2px"/>
         
         <!-- Model Editor -->
         <div class="col-12 col-md row fit-content">
@@ -19,7 +25,7 @@
             
             <!-- Model Editors based on type of model -->
             <closed-source-model-editor v-if="selectedModel && selectedModel.provider.isClosed" />
-            <open-source-model-editor v-else-if="selectedModel && !selectedModel.provider.isClosed" />
+            <open-source-model-editor v-else-if="selectedModel && !selectedModel.provider.isClosed" @toggleAdvanced="() => showAdvanced = !showAdvanced"/>
             
           </div>
         </div>
@@ -29,7 +35,7 @@
       <!-- End content -->
 
       <div class="col-12 col-md self-end q-px-md q-pt-md">
-        <fixed-options-editor @click.stop="" />
+        <fixed-options-editor v-if="showAdvanced" @click.stop="" />
       </div>
 
     </div>
@@ -38,6 +44,7 @@
 
 <style lang="scss" scoped>
 .content-container {
+  min-height: calc(100vh - 2em);
   max-height: 100vh;
   max-width: 100vw;
   height: fit-content;
@@ -47,6 +54,7 @@
 
 @media screen and (min-width: 1000px) {
   .content-container {
+    min-height: 10em;
     max-height: 40vh;
     max-width: 40vw;
     overflow-y: auto;
@@ -55,8 +63,9 @@
 </style>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { app } from 'boot/app'
+import { Platform } from 'quasar'
 
 import ModelList from './ModelList.vue'
 import ClosedSourceModelEditor from './ClosedSourceModelEditor.vue'
@@ -70,7 +79,10 @@ const toggleVisible = () => {
 
 const selectedModel = computed(() => app.settings.value.selectedModel)
 
-
+const showAdvanced = ref(false)
+watch(() => app.settings.value.selectedModel, () => {
+  if (app.settings.value.selectedModel?.provider.isClosed) showAdvanced.value = false
+})
 
 defineExpose({ toggleVisible: () => toggleVisible() })
 </script>

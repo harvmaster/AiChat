@@ -75,11 +75,11 @@ const jsonError = ref<boolean>(false)
 const inputStyles = computed(() => {
   return {
     border: jsonError.value ? '1px solid red' : '1px solid transparent',
-    // borderColor: jsonError.value ? 'red' : 'transparent'
   }
 })
 
-watch((app.settings.value.selectedModel as OpenModel).advancedSettings, (newValue, oldValue) => {
+watch(app.settings, (newValue, oldValue) => {
+  console.log('test')
   advancedSettingsBuffer.value = JSON.stringify(selectedModel.value?.advancedSettings, null, 2)
 })
 

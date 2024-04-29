@@ -47,7 +47,7 @@
 </style>
 
 <script lang="ts" setup>
-import { computed, ref } from 'vue'
+import { computed, ref, defineEmits } from 'vue'
 import { app } from 'boot/app'
 
 import CounterInput from '../Inputs/CounterInput.vue';
@@ -60,7 +60,6 @@ const selectedModel = computed<OpenModel | undefined>(() => app.settings.value.s
 const clampTemperature = () => {
   if (!selectedModel.value) return
   let temperature = parseFloat(parseFloat(selectedModel.value.advancedSettings.temperature.toString()).toFixed(2))
-  console.log(temperature)
   if (temperature > 2) temperature = 2
   if (temperature < 0) temperature = 0
   selectedModel.value.advancedSettings.temperature = temperature
@@ -80,6 +79,8 @@ const deleteModel = () => {
 }
 
 const toggleAdvanced = () => {
-  console.log('open advanced?')
+  emits('toggleAdvanced')
 }
+
+const emits = defineEmits(['toggleAdvanced'])
 </script>

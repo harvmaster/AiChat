@@ -15,7 +15,7 @@
     <div class="col-auto row">
       <div class="row fit-content">
         <div class="col-12 text-white">Temperature</div>
-        <counter-input class="col-auto" v-model="selectedModel.temperature" :step="0.1" @update:model-value="clampTemperature"/>
+        <counter-input class="col-auto" v-model="selectedModel.advancedSettings.temperature" :step="0.1" @update:model-value="clampTemperature"/>
       </div>
     </div>
   </div>
@@ -43,10 +43,10 @@ const selectedModel = computed(() => app.settings.value.selectedModel)
 
 const clampTemperature = () => {
   if (!selectedModel.value) return
-  let temperature = parseFloat(parseFloat(selectedModel.value.temperature.toString()).toFixed(2))
+  let temperature = parseFloat(parseFloat(selectedModel.value.advancedSettings.temperature.toString()).toFixed(2))
   if (temperature > 2) temperature = 2
   if (temperature < 0) temperature = 0
-  selectedModel.value.temperature = temperature
+  selectedModel.value.advancedSettings.temperature = temperature
 }
 </script>
 

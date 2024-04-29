@@ -3,7 +3,7 @@ import Provider from './Provider';
 
 import { ChatCompletionRequest, ChatCompletionResponse, ClosedModel, Model } from '../types';
 
-export type AdvancedOptions = {
+export type OpenAIAdvancedOptions = {
   temperature: number
 }
 
@@ -17,7 +17,7 @@ class GPT3_5Turbo implements ClosedModel {
   name = 'GPT-3.5 Turbo';
   model = 'gpt-3.5-turbo';
   provider = Provider;
-  advancedSettings: AdvancedOptions = {...defaultAdvancedOptions};
+  advancedSettings: OpenAIAdvancedOptions = {...defaultAdvancedOptions};
 
   async sendChat (request: ChatCompletionRequest, callback?: (response: ChatCompletionResponse) => void): Promise<ChatCompletionResponse> {
     const openai = new OpenAI({ apiKey: Provider.token, dangerouslyAllowBrowser: true });
