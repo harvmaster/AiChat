@@ -28,6 +28,7 @@ export interface BaseModel {
   model: string;
   createdAt?: number;
   provider: Provider;
+  advancedSettings: any;
   sendChat(request: ChatCompletionRequest, callback?: (result: ChatCompletionResponse) => void,): Promise<ChatCompletionResponse>;
 }
 
