@@ -1,0 +1,144 @@
+<template>
+  <div class="col-12 scroll-area">
+    <q-list class="fit">
+
+      <div
+        v-for="group of groupedModels"
+        :key="group[0].provider.id"
+      >
+        <div class="text-h6 text-white row">
+          <div class="col-auto self-center q-pr-sm"> 
+            {{ group[0].provider.name }}
+          </div>
+          <div v-if="!group[0].provider.isClosed" class="col-auto">
+            <q-btn class="text-bold " outline color="white" flat icon="add" round @click="() => addModel(group[0].provider.id)">
+              <q-tooltip>
+                Add Model
+              </q-tooltip>
+            </q-btn>
+          </div>
+        </div>
+        <q-item
+          v-for="model of group"
+          :key="model.id"
+          clickable
+          v-ripple
+          @click="() => selectModel(model)"
+        >
+          <q-item-section>
+            <q-item-label class="text-white model-list-item" :class="selectedModel?.id == model.id ? 'selected-item' : ''">{{ model.model }}</q-item-label>
+          </q-item-section>
+        </q-item>
+      </div>
+
+      <div class="q-pa-md text-white text-bold row cursor-pointer">
+        <div class="col-auto self-center">
+          Add Provider
+        </div>
+        <div class="col-auto self-center text-h6 q-px-md">
+          +
+        </div>
+        
+        <q-popup-edit ref="addProviderPopup" v-model="newProvider" label="Provider" class="bg-accent" >
+          <input v-model="newProvider" autofocus class="my-input text-white text-h6" placeholder="Provider Name" @keydown.enter="createProvider"/>
+        </q-popup-edit>
+      </div>
+
+    </q-list>
+  </div>
+</template>
+
+<style lang="scss" scoped>
+.model-list-item {
+  transition: transform 0.5s;
+}
+.selected-item {
+  transform: translateX(1em);
+  font-weight: bold;
+}
+.scroll-area {
+  min-height: 10em;
+  height: fit-content;
+  max-height: 50vh;
+  width: 100%;
+
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flow;
+
+  // Attractive scroll bar
+  &::-webkit-scrollbar {
+    width: 10px;
+    border-radius: 10px;
+
+    &-track {
+      background: $secondary;
+      border-radius: 10px;
+    }
+
+    &-thumb {
+      background: $accent;
+      border-radius: 10px;
+    }
+
+    &-thumb:hover {
+      background: $accent;
+    }
+  }
+}
+</style>
+
+<script lang="ts" setup>
+import { ref, computed, nextTick } from 'vue'
+import { app } from 'boot/app'
+import generateUUID from 'src/composeables/generateUUID'
+
+import { QPopupEdit } from 'quasar'
+
+import {  OllamaModel, OllamaProvider } from 'src/services/models/ollama'
+import { Model } from 'src/services/models'
+
+const newProvider = ref('')
+
+type ModelGroups = {
+  [key: string]: Model[]
+}
+const groupedModels = computed(() => {
+  const grouped: ModelGroups = {}
+  app.models.value.forEach(model => {
+    if (!grouped[model.provider.id]) {
+      grouped[model.provider.id] = []
+    }
+    grouped[model.provider.id].push(model)
+  })
+  const groupedArray = Object.values(grouped)
+  return groupedArray.sort((a: Model[], b: Model[]) => b[0].provider.createdAt - a[0].provider.createdAt)
+})
+
+const selectedModel = ref<Model | null>(null)
+const selectModel = (model: Model) => {
+  app.settings.value.selectedModel = model
+}
+
+const addProviderPopup = ref<QPopupEdit | null>(null)
+const createProvider = (event: KeyboardEvent) => {
+  if (event.key === 'Enter') {
+    app.models.value.push(new OllamaModel(generateUUID(), new OllamaProvider(generateUUID(), newProvider.value, ''), 1, 'Example model'))
+    addProviderPopup.value?.hide()
+    newProvider.value = ''
+  }
+}
+
+const addModel = (providerId: string) => {
+  const provider = app.models.value.find(model => model.provider.id === providerId)?.provider
+  if (!provider) return
+  if (provider.isClosed) {
+    return
+  }
+
+  const model = new OllamaModel(generateUUID(), provider, 1, 'Example model')
+  app.models.value.push(model)
+
+  nextTick(() => selectModel(model))
+}
+</script>
