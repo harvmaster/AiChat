@@ -13,7 +13,7 @@ export const useAIChat = () => {
 
       return response
     } catch (err: any) {
-      throw new Error(err.message)
+      throw new Error(`Failed to generate AI response ${err.message}`)
     } finally {
       loading.value = false
     }
