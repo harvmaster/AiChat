@@ -38,7 +38,7 @@ export const defaultOptions: Partial<OllamaOptions> = {
 class Ollama implements OpenModel {
   public id = 'ollama'
   public name = 'Ollama'
-  public model = 'phi3'
+  public model = 'New Model'
   public advancedSettings: Partial<OllamaOptions> = {...defaultOptions};
   
   public provider: OpenProvider

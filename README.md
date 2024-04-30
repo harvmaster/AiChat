@@ -3,6 +3,8 @@
 A chat interface for OpenAI and Ollama models featuring chat streaming, local caching, and customisable model values.
 <br>
 OpenAI models utilise an OpenAI developer key which allows you to pay per token.
+<br>
+Check out the demo [here](https://ai.chat.mc.hzuccon.com/#/)
 
 ## Install the dependencies
 ```bash
