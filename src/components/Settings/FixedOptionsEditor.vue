@@ -14,7 +14,8 @@
       placeholder="Advanced Settings"
       @keydown.tab.prevent="handleTab"
       />
-      <div class="absolute-bottom-right button-container">
+      <!-- Fix with AI button. Commented out due to further complexity is explorable -->
+      <!-- <div class="absolute-bottom-right button-container">
         <q-btn
           v-if="jsonError"
           unelevated
@@ -26,7 +27,7 @@
         >
           <q-spinner v-if="loading" />
         </q-btn>
-      </div>
+      </div> -->
     </form>
   </div>
 </template>

@@ -36,7 +36,7 @@ import generateUUID from 'src/composeables/generateUUID'
 import useCurrentConversation from '../../composeables/useCurrentConversation'
 import useAIChat from 'src/composeables/useAIChat'
 import getHighlightedChunks from 'src/utils/HighlightMessage'
-import { Message } from 'src/types'
+import { Conversation, Message } from 'src/types'
 import { ChatHistory } from 'src/services/models'
 import { Notify } from 'quasar'
 
@@ -111,20 +111,9 @@ const sendMessage = async (event?: KeyboardEvent) => {
   }
 
   if (conversation.messages.length < 4) {
-    const summaryPrompt = createSummaryPrompt(conversation.messages)
-
-    try {
-      const resposne = await model.sendChat({ messages: summaryPrompt })
-      const conv = getConversation() || conversation
-      conv.summary = resposne.message.content
-    } catch (err) {
-      console.error(err)
-      Notify.create({
-        message: 'Failed to summarise conversation, please try again later',
-        color: 'negative',
-        position: 'top-right',
-      })
-    }
+    const conv = getConversation()
+    if (!conv) return
+    getConversationSummary(conv)
   }
 
 }
@@ -186,5 +175,20 @@ const createSummaryPrompt = (messages: Message[]): ChatHistory => {
       content: formattedMessages.map(m => m.content).join(' ')
     }
   ]
+}
+
+const getConversationSummary = async (conversation: Conversation) => {
+  try {
+    const res = await app.settings.value.selectedModel?.sendChat({ messages: createSummaryPrompt(conversation.messages) })
+    if (!res) return
+    conversation.summary = res?.message.content
+  } catch (err) {
+    console.error(err)
+    Notify.create({
+      message: 'Failed to summarise conversation, please try again later',
+      color: 'negative',
+      position: 'top-right',
+    })
+  }
 }
 </script>

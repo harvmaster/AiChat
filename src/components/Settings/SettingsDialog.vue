@@ -34,7 +34,7 @@
       </div> 
       <!-- End content -->
 
-      <div class="col-12 col-md self-end q-px-md q-pt-md">
+      <div class="col-12 col-md self-end q-px-md q-pt-md overflow-hidden">
         <transition enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown">
           <fixed-options-editor v-if="showAdvanced" @click.stop="" />
         </transition>

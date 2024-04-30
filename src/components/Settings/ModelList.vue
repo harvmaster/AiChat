@@ -35,7 +35,7 @@
           </transition-group>
         </div>
         
-        <div class="q-pa-md text-white text-bold row cursor-pointer">
+        <div class="q-pa-md text-white text-bold row cursor-pointer" key="add-provider">
           <div class="col-auto self-center">
             Add Provider
           </div>
@@ -149,7 +149,7 @@ const selectModel = (model: Model) => {
 const addProviderPopup = ref<QPopupEdit | null>(null)
 const createProvider = (event: KeyboardEvent) => {
   if (event.key === 'Enter') {
-    app.models.value.push(new OllamaModel(generateUUID(), new OllamaProvider(generateUUID(), newProvider.value, ''), 1, 'Example model'))
+    app.models.value.push(new OllamaModel(generateUUID(), new OllamaProvider(generateUUID(), newProvider.value, ''), Date.now(), '{ "temperature": 0.8 }', 'Example model'))
     addProviderPopup.value?.hide()
     newProvider.value = ''
   }
@@ -162,7 +162,7 @@ const addModel = (providerId: string) => {
     return
   }
 
-  const model = new OllamaModel(generateUUID(), provider, 1, 'Example model')
+  const model = new OllamaModel(generateUUID(), provider, Date.now(), '{ "temperature": 0.8 }', 'Example model')
   app.models.value.push(model)
 
   nextTick(() => selectModel(model))
