@@ -1,4 +1,3 @@
-import { ref } from 'vue';
 import { OpenProvider } from '../types';
 
 class OllamaProvider implements OpenProvider {

@@ -1,12 +1,12 @@
 import { reactive, watch } from 'vue';
 
-import { ClosedModel, Model, OpenModel, Provider } from 'src/services/models';
-import { OllamaModel, OllamaProvider, loadOllamaModels } from 'src/services/models/ollama';
+import { ClosedModel, Model, Provider } from 'src/services/models';
+import { loadOllamaModels } from 'src/services/models/ollama';
 import { GPT3_5Turbo, GPT4Turbo, initOpenAIProvider } from 'src/services/models/openai';
 
 import { Conversation, Settings } from 'src/types';
 import { 
-  getConversations, getModels, getSettings, getProviders,
+  getConversations, getSettings,
   saveConversations, saveModels, saveSettings
  } from 'src/utils/Database';
 

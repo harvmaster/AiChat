@@ -21,14 +21,14 @@ class GPT4Turbo implements ClosedModel {
 
   async sendChat (request: ChatCompletionRequest, callback?: (response: ChatCompletionResponse) => void, options?: OpenAIAdvancedOptions): Promise<ChatCompletionResponse> {
     const openai = new OpenAI({ apiKey: Provider.token, dangerouslyAllowBrowser: true });
-    const stream = await openai.chat.completions.create({ model: 'gpt-4-turbo', messages: request.messages, stream: true });
+    const stream = await openai.chat.completions.create({ model: 'gpt-4-turbo', messages: request.messages, stream: true, ...options });
 
     return await this.handleResponse(stream, callback);
   }
 
   async generateText (request: TextGenerationRequest, callback?: (response: ChatCompletionResponse) => void, options?: OpenAIAdvancedOptions): Promise<ChatCompletionResponse> {
     const openai = new OpenAI({ apiKey: Provider.token, dangerouslyAllowBrowser: true });
-    const stream = await openai.chat.completions.create({ model: 'gpt-4-turbo', messages: [{ content: request.prompt, role: 'user' }], stream: true });
+    const stream = await openai.chat.completions.create({ model: 'gpt-4-turbo', messages: [{ content: request.prompt, role: 'user' }], stream: true, ...options });
   
     return await this.handleResponse(stream, callback);  
   }

@@ -34,7 +34,7 @@
 </style>
 
 <script lang="ts" setup>
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
 import { app } from 'boot/app'
 
 import CounterInput from '../Inputs/CounterInput.vue';

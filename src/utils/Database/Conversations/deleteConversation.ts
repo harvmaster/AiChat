@@ -1,7 +1,7 @@
-import { Conversation } from "src/types";
-import EasyIDB, { settings } from "../IDB";
-import getMessagesByConversationId from "../Messages/getMessages";
-import deleteMessage from "../Messages/deleteMessage";
+import { Conversation } from 'src/types';
+import EasyIDB, { settings } from '../IDB';
+import getMessagesByConversationId from '../Messages/getMessages';
+import deleteMessage from '../Messages/deleteMessage';
 
 export default async function deleteConversation(conversation: Conversation): Promise<void> {
   const db = await EasyIDB.getDB(settings.dbName, settings.dbVersion);

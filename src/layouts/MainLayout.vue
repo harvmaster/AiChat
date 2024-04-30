@@ -129,7 +129,7 @@
 <script setup lang="ts">
 import { Conversation, Message } from 'src/types';
 
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router';
 import { app } from 'boot/app'
 

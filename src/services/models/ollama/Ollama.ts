@@ -1,4 +1,4 @@
-import { Model, ChatCompletionRequest, ChatCompletionResponse, OpenProvider, OpenModel, OllamaOptions, TextGenerationRequest } from '../types';
+import { ChatCompletionRequest, ChatCompletionResponse, OpenProvider, OpenModel, OllamaOptions, TextGenerationRequest } from '../types';
 import OllamaProvider from './Provider';
 
 export const defaultOptions: Partial<OllamaOptions> = {
@@ -40,6 +40,7 @@ class Ollama implements OpenModel {
   public name = 'Ollama'
   public model = 'New Model'
   public advancedSettings: Partial<OllamaOptions> = {...defaultOptions};
+  createdAt?: number | undefined;
   
   public provider: OpenProvider
 
@@ -47,6 +48,7 @@ class Ollama implements OpenModel {
     this.id = id
     this.provider = provider
     if (model) this.model = model
+    this.createdAt = createdAt
 
     try {
       if (!advancedSettings) throw new Error('No advanced settings')
@@ -59,7 +61,7 @@ class Ollama implements OpenModel {
   async sendChat (request: ChatCompletionRequest, callback?: (response: ChatCompletionResponse) => void, options?: OllamaOptions): Promise<ChatCompletionResponse> {
     const response = await fetch(`${this.provider.url}/api/chat`, {
       method: 'POST',
-      body: JSON.stringify({ model: this.model, messages: request.messages, options: {...this.advancedSettings} })
+      body: JSON.stringify({ model: this.model, messages: request.messages, options: { ...this.advancedSettings, ...options } })
     })
 
     return await this.handleResponse(response, callback)
@@ -68,7 +70,7 @@ class Ollama implements OpenModel {
   async generateText (request: TextGenerationRequest, callback?: (response: ChatCompletionResponse) => void, options?: OllamaOptions): Promise<ChatCompletionResponse> {
     const response = await fetch(`${this.provider.url}/api/generate`, {
       method: 'POST',
-      body: JSON.stringify({ model: this.model, prompt: request.prompt, format: 'json', options: {...this.advancedSettings} })
+      body: JSON.stringify({ model: this.model, prompt: request.prompt, format: 'json', options: { ...this.advancedSettings, ...options } })
     })
 
     return await this.handleResponse(response, callback)

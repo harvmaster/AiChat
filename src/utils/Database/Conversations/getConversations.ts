@@ -1,6 +1,6 @@
-import { Conversation } from "src/types";
-import EasyIDB, { settings } from "../IDB";
-import getMessagesByConversationId from "../Messages/getMessages";
+import { Conversation } from 'src/types';
+import EasyIDB, { settings } from '../IDB';
+import getMessagesByConversationId from '../Messages/getMessages';
 
 type GetConversationsOptions = {
   getMessages?: boolean;

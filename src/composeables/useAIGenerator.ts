@@ -1,5 +1,5 @@
-import { ref } from "vue";
-import { ChatCompletionResponse, ChatHistory, Model } from "src/services/models";
+import { ref } from 'vue';
+import { ChatCompletionResponse, Model } from 'src/services/models';
 
 
 export const useAIGenerator = () => {
@@ -11,8 +11,11 @@ export const useAIGenerator = () => {
       const response = await model.generateText({ prompt }, callback);
       loading.value = false;
       return response;
-    } catch (err: any) {
-      throw new Error(`Failed to generate AI response: ${err.message}`)
+    } catch (err) {
+      if (err instanceof Error) {
+        throw new Error(`Failed to generate AI response: ${err.message}`)
+      }
+      throw new Error('Failed to generate AI response')
     } finally {
       loading.value = false
     }

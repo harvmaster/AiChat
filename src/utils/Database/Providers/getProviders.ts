@@ -1,5 +1,5 @@
-import EasyIDB, { settings } from "../IDB";
-import { Database__Provider } from "src/types";
+import EasyIDB, { settings } from '../IDB';
+import { Database__Provider } from 'src/types';
 
 export default async function getProviders(): Promise<Database__Provider[]> {
   const db = await EasyIDB.getDB(settings.dbName, settings.dbVersion);

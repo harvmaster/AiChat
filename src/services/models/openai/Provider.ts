@@ -1,6 +1,5 @@
-import { ref } from "vue";
-import { ClosedProvider } from "../types";
-import getProviders from "src/utils/Database/Providers/getProviders";
+import { ClosedProvider } from '../types';
+import getProviders from 'src/utils/Database/Providers/getProviders';
 
 const openAIProvider: ClosedProvider = {
   id: 'openai',

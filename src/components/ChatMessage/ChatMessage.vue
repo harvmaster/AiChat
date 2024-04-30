@@ -38,7 +38,7 @@ p {
 <script setup lang="ts">
 import { Message } from 'src/types';
 
-import { computed, onMounted, ref, defineEmits } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 
 import useCurrentConversation from 'src/composeables/useCurrentConversation';
 import deleteMessageFromDatabase from 'src/utils/Database/Messages/deleteMessage';

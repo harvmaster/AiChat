@@ -1,5 +1,5 @@
-import { Message } from "src/types";
-import EasyIDB, { settings } from "../IDB";
+import { Message } from 'src/types';
+import EasyIDB, { settings } from '../IDB';
 
 export default async function deleteMessage(message: Message): Promise<void> {
   const db = await EasyIDB.getDB(settings.dbName, settings.dbVersion);

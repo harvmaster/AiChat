@@ -1,7 +1,7 @@
 import OpenAI from 'openai';
 import Provider from './Provider';
 
-import { ChatCompletionRequest, ChatCompletionResponse, ClosedModel, Model, TextGenerationRequest } from '../types';
+import { ChatCompletionRequest, ChatCompletionResponse, ClosedModel, TextGenerationRequest } from '../types';
 import { Stream } from 'openai/streaming';
 
 export type OpenAIAdvancedOptions = {
@@ -22,14 +22,14 @@ class GPT3_5Turbo implements ClosedModel {
 
   async sendChat (request: ChatCompletionRequest, callback?: (response: ChatCompletionResponse) => void, options?: OpenAIAdvancedOptions): Promise<ChatCompletionResponse> {
     const openai = new OpenAI({ apiKey: Provider.token, dangerouslyAllowBrowser: true });
-    const stream = await openai.chat.completions.create({ model: 'gpt-3.5-turbo', messages: request.messages, stream: true });
+    const stream = await openai.chat.completions.create({ model: 'gpt-3.5-turbo', messages: request.messages, stream: true, ...options });
 
     return await this.handleResponse(stream, callback);
   }
 
   async generateText (request: TextGenerationRequest, callback?: (response: ChatCompletionResponse) => void, options?: OpenAIAdvancedOptions): Promise<ChatCompletionResponse> {
     const openai = new OpenAI({ apiKey: Provider.token, dangerouslyAllowBrowser: true });
-    const stream = await openai.chat.completions.create({ model: 'gpt-3.5-turbo', messages: [{ content: request.prompt, role: 'user' }], stream: true });
+    const stream = await openai.chat.completions.create({ model: 'gpt-3.5-turbo', messages: [{ content: request.prompt, role: 'user' }], stream: true, ...options });
 
     return await this.handleResponse(stream, callback);
   }

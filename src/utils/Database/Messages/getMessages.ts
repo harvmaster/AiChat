@@ -1,6 +1,6 @@
-import { Message } from "src/types";
-import EasyIDB, { settings } from "../IDB";
-import getHighlightedChunks from "src/utils/HighlightMessage";
+import { Message } from 'src/types';
+import EasyIDB, { settings } from '../IDB';
+import getHighlightedChunks from 'src/utils/HighlightMessage';
 
 export default async function getMessagesByConversationId (conversationId: string): Promise<Message[]> {
   const db = await EasyIDB.getDB(settings.dbName, settings.dbVersion);

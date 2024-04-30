@@ -50,7 +50,7 @@ const props = defineProps<ChatHistoryProps>()
 
 const ChatHistoryElement = ref<HTMLElement | null>(null)
 
-watch(props.messages, (oldMessages, newMessages) => {
+watch(props.messages, () => {
   if (ChatHistoryElement.value && ChatHistoryElement.value.scrollTop + ChatHistoryElement.value.clientHeight - ChatHistoryElement.value.scrollHeight > -90) {
     scrollToBottom()
   }

@@ -1,4 +1,3 @@
-import type { Ref } from 'vue';
 import type { ChatCompletionMessageParam } from 'openai/resources';
 import { Stream } from 'openai/streaming';
 import OpenAI from 'openai';
@@ -34,7 +33,7 @@ export interface BaseModel {
   model: string;
   createdAt?: number;
   provider: Provider;
-  advancedSettings: any;
+  advancedSettings: unknown;
   sendChat(request: ChatCompletionRequest, callback?: (result: ChatCompletionResponse) => void,): Promise<ChatCompletionResponse>;
   generateText(request: TextGenerationRequest, callback?: (result: ChatCompletionResponse) => void,): Promise<ChatCompletionResponse>;
 }

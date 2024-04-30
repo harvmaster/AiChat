@@ -1,6 +1,6 @@
-import { ClosedModel, Model, OpenModel } from "src/services/models";
-import EasyIDB, { settings } from "../IDB";
-import saveProviders from "../Providers/saveProviders";
+import { ClosedModel, Model, OpenModel } from 'src/services/models';
+import EasyIDB, { settings } from '../IDB';
+import saveProviders from '../Providers/saveProviders';
 
 export default async function saveModels(models: Model[]) {
   const db = await EasyIDB.getDB(settings.dbName, settings.dbVersion);

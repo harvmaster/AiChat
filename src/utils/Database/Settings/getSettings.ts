@@ -1,5 +1,5 @@
-import { Database__Settings } from "src/types";
-import EasyIDB, { settings as dbSettings } from "../IDB";
+import { Database__Settings } from 'src/types';
+import EasyIDB, { settings as dbSettings } from '../IDB';
 
 const settingsId = 1;
 export default async function getSettings(): Promise<Database__Settings> {

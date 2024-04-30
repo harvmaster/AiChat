@@ -93,7 +93,7 @@
 </style>
 
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
+import { ref, watch } from 'vue';
 import { app } from 'boot/app';
 
 import useCurrentConversation from 'src/composeables/useCurrentConversation';
@@ -101,7 +101,6 @@ import useCurrentConversation from 'src/composeables/useCurrentConversation';
 import ChatHistory from 'src/components/ChatMessage/ChatHistory.vue';
 import ChatInput from 'src/components/ChatInput/ChatInput.vue';
 import SettingsDialog from 'src/components/Settings/SettingsDialog.vue';
-import { Message } from 'src/types';
 
 const currentConversation = useCurrentConversation();
 

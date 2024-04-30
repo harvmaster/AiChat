@@ -1,5 +1,5 @@
-import { Settings as SettingsType } from "src/types";
-import EasyIDB, { settings as dbSettings } from "../IDB";
+import { Settings as SettingsType } from 'src/types';
+import EasyIDB, { settings as dbSettings } from '../IDB';
 
 
 const settingsId = 1;

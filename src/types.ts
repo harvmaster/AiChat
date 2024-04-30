@@ -1,4 +1,4 @@
-import { Model } from "./services/models";
+import { Model } from './services/models';
 
 export type Conversation = {
   id: string;

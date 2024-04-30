@@ -1,7 +1,7 @@
-import { Conversation } from "src/types";
+import { Conversation } from 'src/types';
 
-import EasyIDB, { settings } from "../IDB";
-import saveMessages from "../Messages/saveMessages";
+import EasyIDB, { settings } from '../IDB';
+import saveMessages from '../Messages/saveMessages';
 
 export default async function saveConversations(conversations: Conversation[]): Promise<void> {
   const db = await EasyIDB.getDB(settings.dbName, settings.dbVersion);
