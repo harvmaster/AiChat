@@ -33,7 +33,6 @@ class App {
     this.models.value = [ ...formattedModels, ...openaiModels ];
 
     const conversations = await getConversations({ getMessages: true });
-    console.log(conversations)
     this.conversations.value = conversations;
 
     const databaseSettings = await getSettings();
@@ -56,6 +55,16 @@ class App {
     watch(this.models, () => {
       saveModels(this.models.value).catch(err => console.error('Failed to save models:', err));
     })
+  }
+
+  createConversation (summary: string) {
+    const newConversation = new Conversation({
+      id: Date.now().toString(),
+      messages: [],
+      summary
+    });
+    this.conversations.value.push(newConversation);
+    return newConversation;
   }
 
 }

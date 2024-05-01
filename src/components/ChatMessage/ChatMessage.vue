@@ -27,7 +27,6 @@
   font-weight: 500;
   border: 2px solid #242424;
   border-radius: 1rem;
-  word-break: break-all;
 }
 .relative {
   position: relative;

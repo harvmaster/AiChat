@@ -21,6 +21,15 @@
 p {
   margin: 0;
 }
+ol {
+  margin: 0;
+}
+ul {
+  margin: 0;
+}
+h1, h2, h3, h4 {
+  word-break: break-all;
+}
 .relative {
   position: relative;
 }
