@@ -4,7 +4,8 @@ import { ClosedModel, Model, Provider } from 'src/services/models';
 import { loadOllamaModels } from 'src/services/models/ollama';
 import { GPT3_5Turbo, GPT4Turbo, initOpenAIProvider } from 'src/services/models/openai';
 
-import { Conversation, Settings } from 'src/types';
+import { Settings } from 'src/types';
+import Conversation from 'src/utils/App/Conversation';
 import { 
   getConversations, getSettings,
   saveConversations, saveModels, saveSettings
@@ -32,6 +33,7 @@ class App {
     this.models.value = [ ...formattedModels, ...openaiModels ];
 
     const conversations = await getConversations({ getMessages: true });
+    console.log(conversations)
     this.conversations.value = conversations;
 
     const databaseSettings = await getSettings();

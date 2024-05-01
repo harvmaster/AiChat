@@ -1,4 +1,4 @@
-import { Conversation } from 'src/types';
+import Conversation from 'src/utils/App/Conversation';
 import EasyIDB, { settings } from '../IDB';
 import getMessagesByConversationId from '../Messages/getMessages';
 import deleteMessage from '../Messages/deleteMessage';

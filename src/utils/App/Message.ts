@@ -47,7 +47,7 @@ export class Message {
       if (oldVal === newVal) return
       this.highlightMessage()
     })
-    
+
     this.id = props.id;
     this.author = props.author;
     this.content.value = props.content;

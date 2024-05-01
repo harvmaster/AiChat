@@ -1,4 +1,5 @@
-import { Conversation } from 'src/types';
+// import { Conversation } from 'src/types';
+import Conversation from '../../App/Conversation';
 import EasyIDB, { settings } from '../IDB';
 import getMessagesByConversationId from '../Messages/getMessages';
 
@@ -16,19 +17,16 @@ export default async function getConversations(options?: GetConversationsOptions
 
   await tx.done;
 
+  // const formattedConversations = conversations.map((conversation) => {
+  //   return { ...conversation, messages: [] }
+  // })
   const formattedConversations = conversations.map((conversation) => {
-    return { ...conversation, messages: [] }
+    const conversationProps = { ...conversation, messages: [] }
+    return new Conversation(conversationProps)
   })
 
   if (options?.getMessages) {
-    const messagesPromises = formattedConversations.map(async (conversation) => {
-      const messages = await getMessagesByConversationId(conversation.id);
-      return { ...conversation, messages };
-    });
-
-    const conversationsWithMessages = await Promise.all(messagesPromises);
-
-    return conversationsWithMessages;
+    await Promise.all(formattedConversations.map(async (conversation) => conversation.loadMessages()))
   }
 
   return formattedConversations;

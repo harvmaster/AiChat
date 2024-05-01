@@ -1,6 +1,5 @@
-import { Message } from 'src/types';
+import Message from 'src/utils/App/Message';
 import EasyIDB, { settings } from '../IDB';
-import getHighlightedChunks from 'src/utils/HighlightMessage';
 
 export default async function getMessagesByConversationId (conversationId: string): Promise<Message[]> {
   const db = await EasyIDB.getDB(settings.dbName, settings.dbVersion);
@@ -14,18 +13,16 @@ export default async function getMessagesByConversationId (conversationId: strin
 
   await tx.done;
 
-  const formattedMessagesPromises = messages.map(async (message) => {
-    return {
+  const formattedMessages = messages.map(message => {
+    const messageProps = {
       id: message.id,
       author: message.author,
+      content: { raw: message.content || '' },
       modelId: message.modelId,
       createdAt: message.createdAt,
-
-      content: await getHighlightedChunks(message.content)
     }
-  })
-
-  const formattedMessages = await Promise.all(formattedMessagesPromises);
+    return new Message(messageProps)
+  }) 
 
   return formattedMessages;
 }

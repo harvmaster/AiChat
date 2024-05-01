@@ -7,11 +7,7 @@
         v-for="message in props.messages"
         :key="message.id"
 
-        :id="message.id"
-        :author="message.author"
-        :content="message.content"
-        :created-at="message.createdAt"
-        :model-id="message.modelId"
+        :message="message"
       />
     </transition-group>
   </div>
@@ -38,7 +34,7 @@
 </style>
 
 <script setup lang="ts">
-import { Message } from 'src/types';
+import Message from 'src/utils/App/Message'
 import { watch, ref, nextTick, computed } from 'vue'
 import ChatMessage from './ChatMessage.vue'
 

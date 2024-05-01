@@ -35,10 +35,11 @@ import generateUUID from 'src/composeables/generateUUID'
 
 import useCurrentConversation from '../../composeables/useCurrentConversation'
 import useAIChat from 'src/composeables/useAIChat'
-import getHighlightedChunks from 'src/utils/HighlightMessage'
-import { Conversation, Message } from 'src/types'
 import { ChatHistory } from 'src/services/models'
 import { Notify } from 'quasar'
+
+import Message from 'src/utils/App/Message'
+import Conversation from 'src/utils/App/Conversation'
 
 const router = useRouter()
 const input = ref('')
@@ -63,13 +64,12 @@ const sendMessage = async (event?: KeyboardEvent) => {
     router.push(`/${conversation.id}`)
   }
 
-  conversation.messages.push({
+  conversation.messages.push(new Message({
     id: generateUUID(),
-    content: await getHighlightedChunks(input.value),
+    content: { raw: input.value },
     createdAt: Date.now(),
     author: 'user',
-    modelId: '',
-  })
+  }))
 
   const model = app.settings.value.selectedModel
   if (!model) {
@@ -79,28 +79,23 @@ const sendMessage = async (event?: KeyboardEvent) => {
   input.value = ''
 
   const messageId = generateUUID()
-  const messages = convertMessagesToPrompt(conversation.messages)
+  const messages = conversation.getChatHistory()
   const getConversation = () => app.conversations.value.find(c => c.id === conversation.id)
   
+  const message = new Message({
+    id: messageId,
+    content: { raw: '' },
+    createdAt: Date.now(),
+    modelId: model.id,
+    author: 'assisstant'
+  })
+  getConversation()?.messages.push(message)
+
   try {
     const res = await getChatResponse(model, messages, async (response) => {
-      const existingMessage = getConversation()?.messages.find(m => m.id === messageId)
-      if (existingMessage) {
-        const content = `${existingMessage.content.raw}${response.message.content}`
-        existingMessage.content = await getHighlightedChunks(content)
-      } else {
-        getConversation()?.messages.push({
-          id: messageId,
-          content: await getHighlightedChunks(response.message.content),
-          createdAt: Date.now(),
-          author: 'assistant',
-          modelId: model.id,
-        })
-      }
+      message.content.value.raw += response.message.content
     })
-
-    const existingMessage = getConversation()?.messages.find(m => m.id === messageId)
-    if (existingMessage) existingMessage.content = await getHighlightedChunks(res.message.content)
+    message.content.value.raw = res.message.content
   } catch(err) {
     console.error(err)
     Notify.create({
@@ -118,23 +113,12 @@ const sendMessage = async (event?: KeyboardEvent) => {
 
 }
 
-const convertMessagesToPrompt = (messages: Message[]): ChatHistory => {
-  return messages.map(message => {
-    return {
-      content: message.content.raw,
-      role: message.author === 'user' ? 'user' : 'assistant',
-    }
-  })
-}
-
-
 const createConversation = () => {
-  const conversation = {
+  const conversation = new Conversation({
     id: generateUUID(),
     messages: [],
     summary: input.value.slice(0, 20),
-    createdAt: Date.now(),
-  }
+  })
 
   app.conversations.value.push(conversation)
 
@@ -163,8 +147,8 @@ const inputRows = computed(() => {
   return Math.min(5, Math.max(1, input.value.split('\n').length))
 })
 
-const createSummaryPrompt = (messages: Message[]): ChatHistory => {
-  const formattedMessages = convertMessagesToPrompt(messages)
+const createSummaryPrompt = (conversation: Conversation): ChatHistory => {
+  const formattedMessages = conversation.getChatHistory()
   return [
     {
       role: 'system',
@@ -179,7 +163,7 @@ const createSummaryPrompt = (messages: Message[]): ChatHistory => {
 
 const getConversationSummary = async (conversation: Conversation) => {
   try {
-    const res = await app.settings.value.selectedModel?.sendChat({ messages: createSummaryPrompt(conversation.messages) })
+    const res = await app.settings.value.selectedModel?.sendChat({ messages: createSummaryPrompt(conversation) })
     if (!res) return
     conversation.summary = res?.message.content
   } catch (err) {

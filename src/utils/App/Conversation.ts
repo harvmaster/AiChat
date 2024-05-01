@@ -43,8 +43,7 @@ export class Conversation {
   }
 
   public async loadMessages (): Promise<void> {
-    const messages = await getMessagesByConversationId(this.id);
-    this.messages = messages.map(message => new Message(message));
+    this.messages = await getMessagesByConversationId(this.id);
   }
 }
 

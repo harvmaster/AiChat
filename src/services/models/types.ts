@@ -33,7 +33,6 @@ export interface BaseModel {
   model: string;
   createdAt?: number;
   provider: Provider;
-  advancedSettings: unknown;
   sendChat(request: ChatCompletionRequest, callback?: (result: ChatCompletionResponse) => void,): Promise<ChatCompletionResponse>;
   generateText(request: TextGenerationRequest, callback?: (result: ChatCompletionResponse) => void,): Promise<ChatCompletionResponse>;
 }
@@ -47,6 +46,7 @@ export interface BaseProvider {
 
 export interface ClosedModel extends BaseModel {
   provider: ClosedProvider
+  advancedSettings: Partial<OllamaOptions>;
   handleResponse(response: Stream<OpenAI.Chat.Completions.ChatCompletionChunk>, callback?: (result: ChatCompletionResponse) => void): Promise<ChatCompletionResponse>;
 }
 export interface ClosedProvider extends BaseProvider {

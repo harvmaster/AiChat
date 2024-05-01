@@ -1,5 +1,4 @@
-import { Conversation } from 'src/types';
-
+import Conversation from 'src/utils/App/Conversation';
 import EasyIDB, { settings } from '../IDB';
 import saveMessages from '../Messages/saveMessages';
 
@@ -10,11 +9,7 @@ export default async function saveConversations(conversations: Conversation[]): 
   for (const conversation of conversations) {
     const tx = db.db.transaction('conversations', 'readwrite');
     const store = tx.objectStore('conversations');
-    const formatted = {
-      id: conversation.id,
-      summary: conversation.summary,
-      createdAt: conversation.createdAt,
-    }
+    const formatted = conversation.toDatabaseConversation();
     store.put(formatted);
 
     await saveMessages(conversation.id, conversation.messages);

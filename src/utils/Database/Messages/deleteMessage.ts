@@ -1,4 +1,4 @@
-import { Message } from 'src/types';
+import Message from 'src/utils/App/Message';
 import EasyIDB, { settings } from '../IDB';
 
 export default async function deleteMessage(message: Message): Promise<void> {

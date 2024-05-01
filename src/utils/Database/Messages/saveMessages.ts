@@ -1,4 +1,4 @@
-import { Message } from 'src/types';
+import Message from 'src/utils/App/Message';
 import EasyIDB, { settings } from '../IDB';
 
 export default async function saveMessages(conversationId: string, messages: Message[]): Promise<void> {
@@ -9,12 +9,7 @@ export default async function saveMessages(conversationId: string, messages: Mes
 
   for (const message of messages) {
     const formatted = {
-      id: message.id,
-      author: message.author,
-      content: message.content.raw,
-      modelId: message.modelId,
-
-      createdAt: message.createdAt,
+      ...message.toDatabaseMessage(),
       conversationId: conversationId,
     }
 

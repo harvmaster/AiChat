@@ -8,8 +8,8 @@
       <!-- Content -->
       <div class="q-pa-md self-end content-container row justify-center col-auto bg-secondary relative" @click.stop="" >
 
-        <div class="absolute-top-right q-pa-md mobile-only">
-          <q-btn flat round dense icon="close" color="white" @click="toggleVisible"/>
+        <div class="absolute-top-right q-pa-md mobile-only z-top">
+          <q-btn class="z-top" flat round dense icon="close" color="white" @click="toggleVisible"/>
         </div>
         
         <!-- List of models -->

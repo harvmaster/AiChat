@@ -127,7 +127,8 @@
 </style>
 
 <script setup lang="ts">
-import { Conversation, Message } from 'src/types';
+import Conversation from 'src/utils/App/Conversation';
+import Message from 'src/utils/App/Message';
 
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router';

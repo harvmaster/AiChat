@@ -5,15 +5,17 @@
     <div class="chat-message q-pa-md row">
       <div class="col-12 q-pb-md row">
         <div class="col row q-col-gutter-x-sm">
-          <div class="col-12 self-center flat-line-height text-h6 text-weight-bold opacity-75">{{ props.author }}</div>
+          <div class="col-12 self-center flat-line-height text-h6 text-weight-bold opacity-75">{{ props.message.author }}</div>
           <div class="col-12 self-end flat-line-height text-caption opacity-50">{{ timeAgo }}</div>
         </div>
         <div class="col-auto">
           <q-btn flat round dense icon="delete" color="red-4 opacity-50 opacity-h-75 transition-025" @click="deleteMessage" />
         </div>
       </div>
-      <div class="col-12" v-for="(chunk, index) of content.chunks" :key="chunk.raw" >
-        <chat-message-chunk :type="chunk.type" :output="chunk.output" :raw="chunk.raw" :index="index" :parentLength="content.chunks.length"/>
+      <div v-if="message.content.value.chunks" class="col-12">
+        <div class="" v-for="(chunk, index) of message.content.value.chunks" :key="chunk.raw" >
+          <chat-message-chunk :type="chunk.type" :output="chunk.output" :raw="chunk.raw" :index="index" :parentLength="message.content.value.chunks.length"/>
+        </div>
       </div>
     </div>
   </div>
@@ -36,7 +38,7 @@ p {
 </style>
 
 <script setup lang="ts">
-import { Message } from 'src/types';
+import Message from 'src/utils/App/Message';
 
 import { computed, onMounted, ref } from 'vue';
 
@@ -45,7 +47,9 @@ import deleteMessageFromDatabase from 'src/utils/Database/Messages/deleteMessage
 
 import ChatMessageChunk from './ChatMessageChunk.vue';
 
-export type ChatMessageProps = Message
+export type ChatMessageProps = {
+  message: Message
+}
 
 const props = defineProps<ChatMessageProps>()
 
@@ -59,7 +63,7 @@ const timeSinceTimer = () => {
 }
 
 const timeAgo = computed(() => {
-  const date = new Date(props.createdAt)
+  const date = new Date(props.message.createdAt)
   const diff = now.value.getTime() - date.getTime()
   const seconds = Math.floor(diff / 1000)
   const minutes = Math.floor(seconds / 60)
@@ -85,10 +89,10 @@ const deleteMessage = () => {
   const conversation = currentConveration.value
   if (!conversation) return
 
-  const index = conversation.messages.findIndex(message => message.id === props.id)
+  const index = conversation.messages.findIndex(message => message.id === props.message.id)
   if (index === -1) return
 
   conversation.messages.splice(index, 1)
-  deleteMessageFromDatabase(props)
+  deleteMessageFromDatabase(props.message)
 }
 </script>
