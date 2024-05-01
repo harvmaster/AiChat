@@ -15,7 +15,6 @@ export interface ConversationI {
 export type ConversationProps = {
   id: string;
   summary: string;
-
   messages: MessageI[];
   createdAt?: number;
 }
@@ -61,7 +60,6 @@ export interface MessageI {
   toDatabaseMessage: () => Database__Message;
   highlightMessage: () => Promise<void>;
   toChatMessage: () => ChatMessage;
-
 }
 
 export type Database__Message = {
