@@ -1,25 +1,35 @@
 import { Model } from './services/models';
+import { ChatMessage } from './services/models';
 
-export type Conversation = {
+export interface ConversationI {
+  id: string;
+  summary: string;
+  messages: MessageI[];
+  createdAt: number;
+
+  getChatHistory: () => ChatMessage[];
+  toDatabaseConversation: () => Database__Conversation;
+  loadMessages: () => Promise<void>;
+}
+
+export type ConversationProps = {
   id: string;
   summary: string;
 
-  messages: Message[];
-  createdAt: number;
+  messages: MessageI[];
+  createdAt?: number;
 }
 
-export type Message = {
+export type Database__Conversation = {
   id: string;
-  author: string;
-  content: MessageContent;
-  modelId: string;
+  summary: string;
   createdAt: number;
 }
 
 export type MessageContent = {
   raw: string;
-  markup: string;
-  chunks: Chunk[];
+  markup?: string;
+  chunks?: Chunk[];
 }
 
 export type Chunk = {
@@ -31,6 +41,35 @@ export type Chunk = {
 export type HighlightedChunk = {
   markup: string;
   highlighted?: string;
+}
+
+export type MessageProps = {
+  id: string;
+  author: string;
+  content: MessageContent;
+  modelId?: string;
+  createdAt?: number;
+}
+
+export interface MessageI {
+  id: string;
+  author: string;
+  content: { value: MessageContent };
+  modelId: string;
+  createdAt: number;
+
+  toDatabaseMessage: () => Database__Message;
+  highlightMessage: () => Promise<void>;
+  toChatMessage: () => ChatMessage;
+
+}
+
+export type Database__Message = {
+  id: string;
+  author: string;
+  content: string;
+  modelId: string;
+  createdAt: number;
 }
 
 export type Database__Provider = {

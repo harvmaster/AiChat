@@ -1,20 +1,7 @@
 import { ChatHistory } from "src/services/models";
 import Message from "./Message";
 import getMessagesByConversationId from "../Database/Messages/getMessages";
-
-export type ConversationProps = {
-  id: string;
-  summary: string;
-
-  messages: Message[];
-  createdAt?: number;
-}
-
-export type Database__Conversation = {
-  id: string;
-  summary: string;
-  createdAt: number;
-}
+import { ConversationProps, ConversationI, Database__Conversation } from "src/types";
 
 export class Conversation {
   public id: string;

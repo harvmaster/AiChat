@@ -1,41 +1,9 @@
 import { watch, reactive } from "vue";
 import getHighlightedChunks from "../HighlightMessage";
 import { ChatMessage } from "src/services/models";
+import { MessageProps, MessageContent, Database__Message, MessageI } from "src/types";
 
-type MessageContent = {
-  raw: string;
-  markup?: string;
-  chunks?: Chunk[];
-}
-
-type Chunk = {
-  raw: string;
-  output: HighlightedChunk;
-  type: 'code' | 'text';
-}
-
-type HighlightedChunk = {
-  markup: string;
-  highlighted?: string;
-}
-
-type Database__Message = {
-  id: string;
-  author: string;
-  content: string;
-  modelId: string;
-  createdAt: number;
-}
-
-export type MessageProps = {
-  id: string;
-  author: string;
-  content: MessageContent;
-  modelId?: string;
-  createdAt?: number;
-}
-
-export class Message {
+export class Message implements MessageI {
   public id: string;
   public author: string;
   readonly content = reactive<{ value: MessageContent }>({ value: { raw: '' } });
