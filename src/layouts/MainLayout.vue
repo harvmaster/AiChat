@@ -9,12 +9,6 @@
           AI Chat
         </div>
       </div>
-      <!-- <div class="col-12 col-md-auto input-border q-pa-sm row bg-primary">
-        <q-input v-model="token" input-class="col-auto text-white my-input text-h6" borderless placeholder="OpenAI Token" filled text-color="white" :type="showToken ? 'password' : 'text'" />
-        <div class="col-auto self-center q-px-md">
-          <q-btn flat round dense icon="visibility" color="white" @click="toggleToken" />
-        </div>
-      </div> -->
     </q-header>
 
     <q-drawer 
@@ -40,7 +34,7 @@
           <q-icon name="note" />
         </div> -->
         <div class="drawer-item-text col self-center">
-          <div class="text-weight-bold">{{ conversation.summary }}</div>
+          <div class="text-weight-bold">{{ conversation.summary || conversation.messages.at(0)?.content.value.raw.slice(0, 20) }}</div>
         </div>
 
         <div class="drawer-item-interactions col-auto row">

@@ -10,6 +10,7 @@ import {
   getConversations, getSettings,
   saveConversations, saveModels, saveSettings
  } from 'src/utils/Database';
+import generateUUID from 'src/composeables/generateUUID';
 
 class App {
   readonly conversations = reactive<{ value: Conversation[] }>({ value: []})
@@ -57,11 +58,11 @@ class App {
     })
   }
 
-  createConversation (summary: string) {
+  createConversation () {
     const newConversation = new Conversation({
-      id: Date.now().toString(),
+      id: generateUUID(),
       messages: [],
-      summary
+      summary: ''
     });
     this.conversations.value.push(newConversation);
     return newConversation;

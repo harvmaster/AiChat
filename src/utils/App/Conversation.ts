@@ -3,7 +3,7 @@ import Message from "./Message";
 import getMessagesByConversationId from "../Database/Messages/getMessages";
 import { ConversationProps, ConversationI, Database__Conversation } from "src/types";
 
-export class Conversation {
+export class Conversation implements ConversationI{
   public id: string;
   public summary: string;
 

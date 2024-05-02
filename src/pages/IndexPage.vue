@@ -3,12 +3,12 @@
     <div class="col-12 col-md-8 col-lg-6 column">
       <!-- Chat history -->
       <div class="col relative full-width">
-        <chat-history ref="ChatHistoryElement" v-if="currentConversation" class="row q-pb-md scrollable q-pr-sm" :messages="currentConversation?.messages" />
+        <chat-history ref="ChatHistoryElement" v-if="currentConversation" class="row q-pb-md scrollable q-pr-sm" :messages="currentConversation.messages" />
       </div>
 
       <!-- Chat input -->
       <div class="col-auto row q-pa-md row justify-center">
-        <chat-input class="col-12" />
+        <chat-input class="col-12" :loading="loading" @message="handleMessage" />
 
         <div class="col-auto row q-pt-md justify-center">
           <div class="row pill model-settings-button cursor-pointer" @click="toggleSettings" :class="app.settings.value.selectedModel?.provider.isClosed ? 'q-pa-md' : 'q-pa-sm'">
@@ -19,12 +19,6 @@
             <div class="col-auto text-blue-2 text-h6 q-px-sm">
               <q-icon name="keyboard_arrow_up" />
             </div>
-            <!-- <div 
-              v-if="(app.settings.value.selectedModel) && !(app.settings.value.selectedModel.provider.isClosed)" 
-              class="col-12 text-caption text-white self-end q-pl-sm text-center"
-            >
-              ({{ app.settings.value.selectedModel?.provider.url }})
-            </div> -->
           </div>
         </div>
       </div>
@@ -34,14 +28,6 @@
 </template>
 
 <style scoped lang="scss">
-.my-select {
-  background-color: $primary;
-  border: 2px solid $secondary;
-  border-radius: 1rem;
-  color: white;
-  padding: 0.5rem 1rem;
-  cursor: pointer;
-}
 .relative {
   position: relative;
 }
@@ -93,7 +79,7 @@
 </style>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { nextTick, ref, watch } from 'vue';
 import { app } from 'boot/app';
 
 import useCurrentConversation from 'src/composeables/useCurrentConversation';
@@ -101,6 +87,11 @@ import useCurrentConversation from 'src/composeables/useCurrentConversation';
 import ChatHistory from 'src/components/ChatMessage/ChatHistory.vue';
 import ChatInput from 'src/components/ChatInput/ChatInput.vue';
 import SettingsDialog from 'src/components/Settings/SettingsDialog.vue';
+
+import useChatInput from 'src/composeables/useChatInput';
+import { useRouter } from 'vue-router';
+
+const router = useRouter()
 
 const currentConversation = useCurrentConversation();
 
@@ -110,11 +101,24 @@ const ChatHistoryElement = ref<InstanceType<typeof ChatHistory> | null>(null);
 watch(currentConversation, (oldConversation, newConversation) => {
   if (oldConversation?.id == newConversation?.id) return;
   if (ChatHistoryElement.value) {
-    ChatHistoryElement.value.scrollToBottom();
+    nextTick(() => ChatHistoryElement.value?.scrollToBottom());
   }
 })
 
 const toggleSettings = () => {
   SettingsDialogElement.value?.toggleVisible();
+}
+
+const { loading, addChatMessage } = useChatInput();
+const handleMessage = async (message: string): Promise<void> => {
+  if (!currentConversation.value) {
+    const conversation = app.createConversation()
+    router.push(`/${conversation.id}`).then(() => {
+      handleMessage(message)
+    })
+    return
+  }
+
+  await addChatMessage(currentConversation.value, message);
 }
 </script>

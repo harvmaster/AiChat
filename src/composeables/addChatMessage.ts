@@ -6,7 +6,7 @@ import getConversationSummary from "./getConversationSummary";
 import useMessageCreator from "./useMessageCreator";
 import useAIChat from "./useAIChat";
 
-const useChatInput = () => {
+const useChatInput = async (conversation: Conversation, content: string) => {
   const { loading, getChatResponse } = useAIChat();
 
   const addChatMessage = async (conversation: Conversation, content: string) => {
