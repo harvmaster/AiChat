@@ -58,7 +58,7 @@ const now = ref(new Date())
 const timeSinceTimer = () => {
   setInterval(() => {
     now.value = new Date()
-  }, 15000)
+  },  Math.random() * 5000 + 5000)
 }
 
 const timeAgo = computed(() => {

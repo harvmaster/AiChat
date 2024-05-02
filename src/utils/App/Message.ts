@@ -1,7 +1,7 @@
-import { watch, reactive } from "vue";
-import getHighlightedChunks from "../HighlightMessage";
-import { ChatMessage } from "src/services/models";
-import { MessageProps, MessageContent, Database__Message, MessageI } from "src/types";
+import { watch, reactive } from 'vue';
+import getHighlightedChunks from '../HighlightMessage';
+import { ChatMessage } from 'src/services/models';
+import { MessageProps, MessageContent, Database__Message, MessageI } from 'src/types';
 
 export class Message implements MessageI {
   public id: string;

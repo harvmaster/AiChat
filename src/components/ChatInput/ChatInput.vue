@@ -31,7 +31,7 @@ import isInCodeBlock from 'src/composeables/isInCodeblock'
 
 const input = ref('')
 
-const props = defineProps<{
+defineProps<{
   loading: boolean
 }>()
 

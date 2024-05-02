@@ -1,7 +1,7 @@
-import { ChatHistory } from "src/services/models";
-import Message from "./Message";
-import getMessagesByConversationId from "../Database/Messages/getMessages";
-import { ConversationProps, ConversationI, Database__Conversation } from "src/types";
+import { ChatHistory } from 'src/services/models';
+import Message from './Message';
+import getMessagesByConversationId from '../Database/Messages/getMessages';
+import { ConversationProps, ConversationI, Database__Conversation } from 'src/types';
 
 export class Conversation implements ConversationI{
   public id: string;

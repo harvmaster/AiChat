@@ -106,7 +106,6 @@ const getFirstGroup = (regexp: RegExp, str: string) => {
 
 const copy = () => {
   const code = getFirstGroup(/(?:^```.*?\n)([^]*.*)(?:```)/gmi, props.raw)
-  console.log(code)
 
   if (code) copyToClipboard(code.join(''))
 

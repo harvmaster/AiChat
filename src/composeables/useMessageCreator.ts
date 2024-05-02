@@ -1,5 +1,5 @@
-import Message from "src/utils/App/Message"
-import generateUUID from "./generateUUID"
+import Message from 'src/utils/App/Message'
+import generateUUID from './generateUUID'
 
 export default function useMessageCreator () {
   const createUserMessage = (content: string) => {

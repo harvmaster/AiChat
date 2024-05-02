@@ -1,10 +1,10 @@
-import Conversation from "src/utils/App/Conversation";
+import Conversation from 'src/utils/App/Conversation';
 
-import { app } from "boot/app";
+import { app } from 'boot/app';
 
-import getConversationSummary from "./getConversationSummary";
-import useMessageCreator from "./useMessageCreator";
-import useAIChat from "./useAIChat";
+import getConversationSummary from './getConversationSummary';
+import useMessageCreator from './useMessageCreator';
+import useAIChat from './useAIChat';
 
 const useChatInput = () => {
   const { loading, getChatResponse } = useAIChat();
@@ -17,7 +17,7 @@ const useChatInput = () => {
 
   const addAssisstantMessage = async (conversation: Conversation) => {
     const model = app.settings.value.selectedModel;
-    if (!model) throw new Error("No model selected");
+    if (!model) throw new Error('No model selected');
 
     const assistantMessage = createAssisstantMessage('', model.id);
     conversation.messages.push(assistantMessage);
