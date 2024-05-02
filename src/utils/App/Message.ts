@@ -22,6 +22,16 @@ export class Message implements MessageI {
     this.modelId = props.modelId || '';
     this.createdAt = props.createdAt || Date.now();
   }
+  
+  public async highlightMessage (): Promise<void> {
+    const highlightedChunks = await getHighlightedChunks(this.content.value.raw);
+    this.content.value.markup = highlightedChunks.markup;
+    this.content.value.chunks = highlightedChunks.chunks;
+  }
+
+  public setContent (content: string): void {
+    this.content.value.raw = content;
+  }
 
   public toDatabaseMessage (): Database__Message {
     return {
@@ -31,12 +41,6 @@ export class Message implements MessageI {
       modelId: this.modelId,
       createdAt: this.createdAt
     }
-  }
-
-  public async highlightMessage (): Promise<void> {
-    const highlightedChunks = await getHighlightedChunks(this.content.value.raw);
-    this.content.value.markup = highlightedChunks.markup;
-    this.content.value.chunks = highlightedChunks.chunks;
   }
 
   public toChatMessage (): ChatMessage {

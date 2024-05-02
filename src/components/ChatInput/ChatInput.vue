@@ -15,7 +15,7 @@
       </textarea>
     </div>
       <div class="col-auto self-center">
-        <q-spinner v-if="loading" color="white" />
+        <q-spinner v-if="loading" color="white" class="q-pl-sm"/>
         <q-btn v-else flat round dense icon="send" color="accent" @click="() => sendMessage()" />
       </div>
   </div>

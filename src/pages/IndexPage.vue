@@ -79,7 +79,7 @@
 </style>
 
 <script setup lang="ts">
-import { nextTick, ref, watch } from 'vue';
+import { computed, nextTick, ref, watch } from 'vue';
 import { app } from 'boot/app';
 
 import useCurrentConversation from 'src/composeables/useCurrentConversation';
@@ -89,6 +89,7 @@ import ChatInput from 'src/components/ChatInput/ChatInput.vue';
 import SettingsDialog from 'src/components/Settings/SettingsDialog.vue';
 
 import useChatInput from 'src/composeables/useChatInput';
+import useGenerationList from 'src/composeables/useGenerationList';
 import { useRouter } from 'vue-router';
 
 const router = useRouter()
@@ -109,7 +110,10 @@ const toggleSettings = () => {
   SettingsDialogElement.value?.toggleVisible();
 }
 
-const { loading, addUserMessage, addAssisstantMessage } = useChatInput();
+const { currentlyGenerating } = useGenerationList()
+const loading = computed(() => !!currentlyGenerating.value[currentConversation.value?.id ?? ''] ?? false)
+
+const { addUserMessage, addAssisstantMessage } = useChatInput();
 const handleMessage = async (message: string): Promise<void> => {
   if (!currentConversation.value) {
     const conversation = app.createConversation()

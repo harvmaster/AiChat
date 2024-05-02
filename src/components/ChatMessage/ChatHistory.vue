@@ -44,7 +44,7 @@ import useChatInput from 'src/composeables/useChatInput'
 import useCurrentConversation from 'src/composeables/useCurrentConversation'
 
 export type ChatHistoryProps = {
-  messages: Message[]
+  messages: Message[];
 }
 
 const props = defineProps<ChatHistoryProps>()

@@ -57,8 +57,9 @@ export interface MessageI {
   modelId: string;
   createdAt: number;
 
-  toDatabaseMessage: () => Database__Message;
   highlightMessage: () => Promise<void>;
+  setContent: (content: string) => void;
+  toDatabaseMessage: () => Database__Message;
   toChatMessage: () => ChatMessage;
 }
 
