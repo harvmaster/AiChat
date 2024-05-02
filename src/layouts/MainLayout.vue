@@ -70,7 +70,7 @@
 .visible-on-small {
   display: none;
 }
-@media screen and (max-width: 600px) {
+@media screen and (max-width: 1023px) {
   .visible-on-small {
     display: inline-block;
   }
