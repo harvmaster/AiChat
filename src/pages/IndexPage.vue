@@ -102,7 +102,7 @@ const ChatHistoryElement = ref<InstanceType<typeof ChatHistory> | null>(null);
 watch(currentConversation, (oldConversation, newConversation) => {
   if (oldConversation?.id == newConversation?.id) return;
   if (ChatHistoryElement.value) {
-    nextTick(() => ChatHistoryElement.value?.scrollToBottom());
+    nextTick(() => ChatHistoryElement.value?.scrollToBottom(true, 'smooth'));
   }
 })
 

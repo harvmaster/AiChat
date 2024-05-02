@@ -99,7 +99,7 @@ const now = ref(new Date())
 const timeSinceTimer = () => {
   setInterval(() => {
     now.value = new Date()
-  },  Math.random() * 5000 + 5000)
+  },  3623) // 3623 is a prime number, will hopefully make it feel a little more authentic with its updates
 }
 
 const timeAgo = computed(() => {

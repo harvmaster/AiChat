@@ -38,7 +38,7 @@
 
 <script setup lang="ts">
 import Message from 'src/utils/App/Message'
-import { watch, ref, nextTick, computed } from 'vue'
+import { watch, ref, nextTick } from 'vue'
 import ChatMessage from './ChatMessage.vue'
 import useChatInput from 'src/composeables/useChatInput'
 import useCurrentConversation from 'src/composeables/useCurrentConversation'

@@ -51,7 +51,7 @@ const useChatInput = () => {
     }
     
     addGeneratingItem(conversation.id, assistantMessage.id, cancelGenerating);
-    const response = await getChatResponse(model, chatHistory, onToken);
+    await getChatResponse(model, chatHistory, onToken);
     // if (shouldUpateMessage) assistantMessage.content.value.raw = response.message.content;
     removeGeneratingItem(conversation.id, assistantMessage.id);
   }
