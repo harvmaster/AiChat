@@ -1,5 +1,5 @@
 <template>
-  <div ref="ChatHistoryElement" class="">
+  <div ref="ChatHistoryElement" class="" @scroll="handleScroll">
     <transition-group name="list" tag="div" class="row col-12" mode="out-in">
       <chat-message
         class="col-12"
@@ -51,23 +51,48 @@ const props = defineProps<ChatHistoryProps>()
 
 const ChatHistoryElement = ref<HTMLElement | null>(null)
 
-watch(props.messages, () => {
-  if (ChatHistoryElement.value && ChatHistoryElement.value.scrollTop + ChatHistoryElement.value.clientHeight - ChatHistoryElement.value.scrollHeight > -90) {
-    scrollToBottom()
-  }
-})
-
-const messagesLength = computed(() => props.messages.length)
-watch(messagesLength, () => {
+watch(() => props.messages.length, () => {
+  preventScroll = false
   scrollToBottom()
 })
 
-const scrollToBottom = () => {
+watch(props.messages, () => {
+  if (ChatHistoryElement.value && ChatHistoryElement.value.scrollTop + ChatHistoryElement.value.clientHeight - ChatHistoryElement.value.scrollHeight > -200) {
+    if (!preventScroll) {
+      scrollToBottom()
+    }
+  }
+})
+
+const scrollToBottom = (resetLock?: boolean, behavior?: 'smooth' | 'instant') => {
   nextTick(() => {
     if (ChatHistoryElement.value) {
-      ChatHistoryElement.value.scrollTop = ChatHistoryElement.value.scrollHeight
+      ChatHistoryElement.value.scrollTo({
+        top: ChatHistoryElement.value.scrollHeight,
+        behavior: behavior || 'instant',
+      })
     }
   })
+
+  if (resetLock) {
+    preventScroll = false
+  }
+}
+
+let lastScroll = 0
+let preventScroll = false
+const handleScroll = (event: Event) => {
+  const element = event.target as HTMLElement
+  const currentPosition = element.scrollTop + element.clientHeight
+
+  const direction = currentPosition >= lastScroll ? 'down' : 'up'
+  if  (direction == 'down') {
+    preventScroll = false
+  } else {
+    preventScroll = true
+  }
+
+  lastScroll = currentPosition
 }
 
 const currentConversation = useCurrentConversation()
