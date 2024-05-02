@@ -8,14 +8,14 @@ import useAIChat from "./useAIChat";
 
 const useChatInput = () => {
   const { loading, getChatResponse } = useAIChat();
+  const { createUserMessage, createAssisstantMessage } = useMessageCreator();
 
-  const addChatMessage = async (conversation: Conversation, content: string) => {
-  
-    const { createUserMessage, createAssisstantMessage } = useMessageCreator();
-
+  const addUserMessage = async (conversation: Conversation, content: string) => {
     const userMessage = createUserMessage(content);
     conversation.messages.push(userMessage);
+  }
 
+  const addAssisstantMessage = async (conversation: Conversation) => {
     const model = app.settings.value.selectedModel;
     if (!model) throw new Error("No model selected");
 
@@ -32,7 +32,8 @@ const useChatInput = () => {
 
   return {
     loading,
-    addChatMessage
+    addUserMessage,
+    addAssisstantMessage
   }
 }
 

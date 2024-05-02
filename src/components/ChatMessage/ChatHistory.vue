@@ -9,6 +9,9 @@
 
         :message="message"
       />
+      <div class="col-12 row justify-center q-pa-sm" v-if="messages.at(-1)?.author == 'user'">
+        <q-btn class="col-auto" btn outline color="blue-2" label="regenerate response"  @click="regenerateResponse" />
+      </div>
     </transition-group>
   </div>
 </template>
@@ -37,6 +40,8 @@
 import Message from 'src/utils/App/Message'
 import { watch, ref, nextTick, computed } from 'vue'
 import ChatMessage from './ChatMessage.vue'
+import useChatInput from 'src/composeables/useChatInput'
+import useCurrentConversation from 'src/composeables/useCurrentConversation'
 
 export type ChatHistoryProps = {
   messages: Message[]
@@ -63,6 +68,14 @@ const scrollToBottom = () => {
       ChatHistoryElement.value.scrollTop = ChatHistoryElement.value.scrollHeight
     }
   })
+}
+
+const currentConversation = useCurrentConversation()
+const { addAssisstantMessage } = useChatInput();
+const regenerateResponse = () => {
+  if (currentConversation.value) {
+    addAssisstantMessage(currentConversation.value)
+  }
 }
 
 defineExpose({

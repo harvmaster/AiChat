@@ -109,7 +109,7 @@ const toggleSettings = () => {
   SettingsDialogElement.value?.toggleVisible();
 }
 
-const { loading, addChatMessage } = useChatInput();
+const { loading, addUserMessage, addAssisstantMessage } = useChatInput();
 const handleMessage = async (message: string): Promise<void> => {
   if (!currentConversation.value) {
     const conversation = app.createConversation()
@@ -119,6 +119,7 @@ const handleMessage = async (message: string): Promise<void> => {
     return
   }
 
-  await addChatMessage(currentConversation.value, message);
+  await addUserMessage(currentConversation.value, message);
+  await addAssisstantMessage(currentConversation.value);
 }
 </script>
