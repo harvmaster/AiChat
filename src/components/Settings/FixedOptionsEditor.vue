@@ -97,9 +97,6 @@ import { ref, computed, onMounted, watch, nextTick } from 'vue'
 import { app } from 'boot/app'
 import { Model } from 'src/services/models';
 
-import useAIGenerator from 'src/composeables/useAIGenerator'
-import { Notify } from 'quasar';
-
 const selectedModel = computed<Model | undefined>(() => app.settings.value.selectedModel)
 const advancedSettingsBuffer = ref<string>('')
 const jsonError = ref<boolean>(false)
@@ -110,30 +107,29 @@ const inputStyles = computed(() => {
   }
 })
 
-const { loading, generateAIResponse } = useAIGenerator()
 
-const fixWithAI = async () => {
-  if (!selectedModel.value) return
+// const fixWithAI = async () => {
+//   if (!selectedModel.value) return
 
-  const prompt = `Please correct this JSON object to be valid and fit the shape of an Ollama API Request Options Object: \n\n${advancedSettingsBuffer.value}. The expected TS type is Partial<{num_keep: number,seed: number,num_predict: number,top_k: number,top_p: number,tfs_z: number,typical_p: number,repeat_last_n: number,temperature: number,repeat_penalty: number,presence_penalty: number,frequency_penalty: number,mirostat: number,mirostat_tau: number,mirostat_eta: number,penalize_newline: boolean,stop: string[],numa: boolean,num_ctx: number,num_batch: number,num_gqa: number,num_gpu: number,main_gpu: number,low_vram: boolean,f16_kv: boolean,vocab_only: boolean,use_mmap: boolean,use_mlock: boolean,rope_frequency_base: number,rope_frequency_scale: number,num_thread: number}>. Responsd with JSON only. Do not provide the key that where not in the incompelte JSON.`
+//   const prompt = `Please correct this JSON object to be valid and fit the shape of an Ollama API Request Options Object: \n\n${advancedSettingsBuffer.value}. The expected TS type is Partial<{num_keep: number,seed: number,num_predict: number,top_k: number,top_p: number,tfs_z: number,typical_p: number,repeat_last_n: number,temperature: number,repeat_penalty: number,presence_penalty: number,frequency_penalty: number,mirostat: number,mirostat_tau: number,mirostat_eta: number,penalize_newline: boolean,stop: string[],numa: boolean,num_ctx: number,num_batch: number,num_gqa: number,num_gpu: number,main_gpu: number,low_vram: boolean,f16_kv: boolean,vocab_only: boolean,use_mmap: boolean,use_mlock: boolean,rope_frequency_base: number,rope_frequency_scale: number,num_thread: number}>. Responsd with JSON only. Do not provide the key that where not in the incompelte JSON.`
 
-  advancedSettingsBuffer.value = ''
-  await generateAIResponse(selectedModel.value, prompt, (message) => {
-    try {
-      advancedSettingsBuffer.value += message.message.content
-      advancedSettingsBuffer.value = JSON.stringify(JSON.parse(advancedSettingsBuffer.value), null, 2)
-    } catch (err) {
-      // Do Nothing
-    }
-  }).catch(() => {
-    Notify.create({
-      message: 'Failed to generate AI response',
-      color: 'negative',
-      position: 'top-right',
-      icon: 'error'
-    })
-  })
-}
+//   advancedSettingsBuffer.value = ''
+//   await generateAIResponse(selectedModel.value, prompt, (message) => {
+//     try {
+//       advancedSettingsBuffer.value += message.message.content
+//       advancedSettingsBuffer.value = JSON.stringify(JSON.parse(advancedSettingsBuffer.value), null, 2)
+//     } catch (err) {
+//       // Do Nothing
+//     }
+//   }).catch(() => {
+//     Notify.create({
+//       message: 'Failed to generate AI response',
+//       color: 'negative',
+//       position: 'top-right',
+//       icon: 'error'
+//     })
+//   })
+// }
 
 const handleTab = (event: KeyboardEvent) => {
   event.preventDefault();
