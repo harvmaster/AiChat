@@ -34,25 +34,18 @@ const useChatInput = () => {
 
     assistantMessage.modelId = model.id;
 
-    let shouldUpateMessage = true
-    const onToken = (message: ChatCompletionResponse) => {
-      if (shouldUpateMessage) assistantMessage.content.value.raw += message.message.content;
-    }
-
-    const cancelGenerating = () => {
-      shouldUpateMessage = false;
-      removeGeneratingItem(conversation.id, assistantMessage.id);
-      loading.value = false
-    }
-
     if (!chatHistory) chatHistory = conversation.getChatHistory();
     if (assistantMessage.content.value.raw.length) {
       addContinuePrompt(chatHistory);
     }
     
-    addGeneratingItem(conversation.id, assistantMessage.id, cancelGenerating);
-    await getChatResponse(model, chatHistory, onToken);
-    // if (shouldUpateMessage) assistantMessage.content.value.raw = response.message.content;
+    const onToken = (message: ChatCompletionResponse) => {
+      assistantMessage.content.value.raw += message.message.content;
+    }
+
+    const { response, abort } = await getChatResponse(model, chatHistory, onToken);
+    addGeneratingItem(conversation.id, assistantMessage.id, abort);
+    await response;
     removeGeneratingItem(conversation.id, assistantMessage.id);
   }
 

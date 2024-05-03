@@ -31,7 +31,7 @@ export default async function getConversationSummary(conversation: Conversation)
   const summaryPrompt = createSummaryPrompt(conversation)
 
   const summary = await getChatResponse(model, summaryPrompt)
-  conversation.summary = summary.message.content
+  conversation.summary = await summary.response.then(res => res.message.content)
 
   return conversation.summary
 }

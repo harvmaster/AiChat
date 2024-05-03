@@ -1,4 +1,4 @@
-import { ChatCompletionRequest, ChatCompletionResponse, OpenProvider, OpenModel, OllamaOptions, TextGenerationRequest } from '../types';
+import { ChatCompletionRequestOptions, ChatCompletionResponse, OpenProvider, OpenModel, OllamaOptions, TextGenerationRequest, ChatGenerationResponse } from '../types';
 import OllamaProvider from './Provider';
 
 export const defaultOptions: Partial<OllamaOptions> = {
@@ -58,22 +58,42 @@ class Ollama implements OpenModel {
     }
   }
 
-  async sendChat (request: ChatCompletionRequest, callback?: (response: ChatCompletionResponse) => void, options?: OllamaOptions): Promise<ChatCompletionResponse> {
-    const response = await fetch(`${this.provider.url}/api/chat`, {
+  sendChat (request: ChatCompletionRequestOptions, callback?: (response: ChatCompletionResponse) => void, options?: OllamaOptions): ChatGenerationResponse {
+    const controller = new AbortController()
+    const response = fetch(`${this.provider.url}/api/chat`, {
       method: 'POST',
-      body: JSON.stringify({ model: this.model, messages: request.messages, options: { ...this.advancedSettings, ...options } })
+      body: JSON.stringify({ model: this.model, messages: request.messages, options: { ...this.advancedSettings, ...options } }),
+      signal: controller.signal
     })
 
-    return await this.handleResponse(response, callback)
+    const handleError = (err: any) => {
+      if (err.name == 'AbortError') return err.response
+      throw err
+    }
+
+    return {
+      abort: () => response.then(() => controller.abort('Cancelled by user')).catch(handleError),
+      response: response.then(res => this.handleResponse(res, callback)).catch(handleError)
+    }
   }
 
-  async generateText (request: TextGenerationRequest, callback?: (response: ChatCompletionResponse) => void, options?: OllamaOptions): Promise<ChatCompletionResponse> {
-    const response = await fetch(`${this.provider.url}/api/generate`, {
+  generateText (request: TextGenerationRequest, callback?: (response: ChatCompletionResponse) => void, options?: OllamaOptions): ChatGenerationResponse {
+    const controller = new AbortController()
+    const response = fetch(`${this.provider.url}/api/generate`, {
       method: 'POST',
-      body: JSON.stringify({ model: this.model, prompt: request.prompt, format: 'json', options: { ...this.advancedSettings, ...options } })
+      body: JSON.stringify({ model: this.model, prompt: request.prompt, format: 'json', options: { ...this.advancedSettings, ...options } }),
+      signal: controller.signal
     })
+    
+    const handleError = (err: any) => {
+      if (err.name == 'AbortError') return err.response
+      throw err
+    }
 
-    return await this.handleResponse(response, callback)
+    return {
+      abort: () => response.then(() => controller.abort('Cancelled by user')).catch(handleError),
+      response: response.then(res => this.handleResponse(res, callback)).catch(handleError)
+    }
   }
 
   async handleResponse (response: Response, callback?: (res: ChatCompletionResponse) => void): Promise<ChatCompletionResponse> {
