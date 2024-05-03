@@ -1,4 +1,3 @@
-import { Ref } from 'vue';
 import { Model } from './services/models';
 import Message from './utils/App/Message';
 import { ChatMessage } from './services/models';
