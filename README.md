@@ -6,6 +6,8 @@ OpenAI models utilise an OpenAI developer key which allows you to pay per token.
 <br>
 Check out the demo [here](https://ai.chat.mc.hzuccon.com/#/)
 
+
+## Screenshots
 ![FullscreenDemo](./Docs/FullscreenShot.png)
 
 ![SettingsDemo](./Docs//SettingsShot.png)
