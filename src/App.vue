@@ -18,5 +18,5 @@ import 'prismjs/components/prism-sql';
 import 'prismjs/components/prism-typescript';
 import 'prismjs/components/prism-yaml';
 
-import { app } from 'boot/app'
+import 'boot/app'
 </script>

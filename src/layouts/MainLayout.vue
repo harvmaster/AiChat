@@ -122,9 +122,8 @@
 
 <script setup lang="ts">
 import Conversation from 'src/utils/App/Conversation';
-import Message from 'src/utils/App/Message';
 
-import { ComputedRef, computed, ref } from 'vue'
+import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router';
 import { app } from 'boot/app'
 
