@@ -8,7 +8,6 @@ export const useCurrentConversation = (): ComputedRef<Conversation | undefined> 
   const conversationId = computed(() => router.currentRoute.value.params.id as string)
 
   const conversation = computed(() => {
-    // console.log('conversationId', conversationId)
     return app.conversations.value.find(conversation => conversation.id == conversationId.value)
   })
   return conversation

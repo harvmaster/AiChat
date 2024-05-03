@@ -4,18 +4,30 @@
   >
     <div class="chat-message q-pa-md row">
       <div class="col-12 q-pb-md row">
+
+        <!-- Message header -> author, timestamp -->
         <div class="col row q-col-gutter-x-sm">
           <div class="col-12 self-center flat-line-height text-h6 text-weight-bold opacity-75">{{ props.message.author }}</div>
           <div class="col-12 self-end flat-line-height text-caption opacity-50">{{ timeAgo }}</div>
         </div>
+
+        <!-- Message header -> Regenerate button, Stop Button, DeleteButton -->
         <div class="col-auto row">
           <transition name="fade">
             <div class="q-mr-sm" v-if="!loading && isLastMessage && props.message.author != 'user'">
-              <!-- <q-btn flat round dense icon="play_arrow" color="green-3" @click="continueMessage">
+
+            <!-- 
+              Commented out due to being inconsistent with results. Need to explore prompts in order to activate again
+              Intended use: Continue generating the message from where the AI left off
+              should be able to call message.generateAssistantResponse with the same model and history. Maybe add extra system prompt onto the end
+            -->
+            <!-- 
+              <q-btn flat round dense icon="play_arrow" color="green-3" @click="continueMessage">
                 <q-tooltip class="bg-secondary text-weight-bold">
                   <div>Continue...</div>
                 </q-tooltip>
-              </q-btn> -->
+              </q-btn>
+            -->
               <q-btn flat round dense icon="refresh" color="green-3" @click="regenerateMessage">
                 <q-tooltip class="bg-secondary text-weight-bold">
                   <div>Regenerate...</div>
@@ -29,14 +41,20 @@
           </transition>
         </div>
       </div>
+
+      <!-- Message has renderable content -->
       <div v-if="message.content.value.chunks" class="col-12">
         <div class="" v-for="(chunk, index) of message.content.value.chunks" :key="chunk.raw" >
           <chat-message-chunk :type="chunk.type" :output="chunk.output" :raw="chunk.raw" :index="index" :parentLength="message.content.value.chunks.length"/>
         </div>
       </div>
+
+      <!-- Message has no content but is loading -->
       <div v-else-if="loading" class="col-12">
         <q-spinner-dots />
       </div>
+
+      <!-- Message is not loading and has no content -->
       <div v-else class="col-12 row">
         <div class="col-12 q-pb-md">Failed to load message</div>
         <q-btn outline color="red-4" label="Regenerate Mesasge" @click="regenerateMessage"/>

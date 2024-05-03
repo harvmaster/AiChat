@@ -14,7 +14,7 @@
       placeholder="Advanced Settings"
       @keydown.tab.prevent="handleTab"
       />
-      <!-- Fix with AI button. Commented out due to further complexity is explorable -->
+      <!-- Fix with AI button. Commented out due to complexity and robustness -->
       <!-- <div class="absolute-bottom-right button-container">
         <q-btn
           v-if="jsonError"

@@ -8,6 +8,8 @@
           :key="group[0].provider.id"
         >
           <div class="text-h6 text-white row">
+
+            <!-- Provider Header -->
             <div class="col-auto self-center q-pr-sm"> 
               {{ group[0].provider.name }}
             </div>
@@ -20,6 +22,7 @@
             </div>
           </div>
 
+          <!-- Models of a provider -->
           <transition-group name="slide-x" tag="div">
             <q-item
               v-for="model of group"
@@ -35,6 +38,7 @@
           </transition-group>
         </div>
         
+        <!-- Add Provider -->
         <div class="q-pa-md text-white text-bold row cursor-pointer" key="add-provider">
           <div class="col-auto self-center">
             Add Provider

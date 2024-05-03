@@ -57,6 +57,7 @@ watch([() => props.messages.length, () => props.messages.at(-1)?.content.value.r
   scrollToBottom()
 })
 
+// Scroll to bottom when the element gets bigger
 watch(props.messages, () => {
   if (ChatHistoryElement.value && ChatHistoryElement.value.scrollTop + ChatHistoryElement.value.clientHeight - ChatHistoryElement.value.scrollHeight > -200) {
     if (!preventScroll) {

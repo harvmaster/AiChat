@@ -1,4 +1,5 @@
 <template>
+  <!-- This may actually be a bad component... multiple components in the top level of the template? -->
   <br v-if="showGaps.top" />
   <div class="relative full-width row">
     <div v-html="markup" class="col-12" />

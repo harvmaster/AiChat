@@ -1,9 +1,11 @@
 <template>
   <div v-if="selectedModel && selectedModel.provider.isClosed" class="column align-start">
+    <!-- Name -->
     <div class="col-auto text-h6 text-white q-pb-sm">
       {{ selectedModel.name }}
     </div>
 
+    <!-- API token -->
     <div class="col-auto row items-start">
       <div class="fit-content q-py-sm">
         <div class="input-container">
@@ -12,6 +14,7 @@
       </div>
     </div>
 
+    <!-- Temperature. May add more in the future such as 'extended-context' for gpt-4-128k model or something -->
     <div class="col-auto row">
       <div class="row fit-content">
         <div class="col-12 text-white">Temperature</div>

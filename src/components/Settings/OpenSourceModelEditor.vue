@@ -1,6 +1,8 @@
 <template>
   <div v-if="selectedModel && !selectedModel.provider.isClosed" class="column align-start fit-content">
     <div class="text-white col-auto row q-pb-sm">
+
+      <!-- Model Name -->
       <div class="col-auto q-pr-sm">
         <q-btn flat round dense icon="edit" color="white" @click="focusOpenModelName" />
       </div>
@@ -10,6 +12,7 @@
       </div>
     </div>
 
+    <!-- Url -->
     <div class="col-auto row items-start">
       <div class="col-12 col-md-auto q-py-sm">
         <div class="input-container">
@@ -18,6 +21,7 @@
       </div>
     </div>
 
+    <!-- Temperature -->
     <div class="col-auto row">
       <div class="row fit-content q-py-sm">
         <div class="col-12 text-white">Temperature</div>
@@ -25,6 +29,7 @@
       </div>
     </div>
 
+    <!-- Advanced settings Dialog Toggle -->
     <div class="col-auto row q-py-sm">
       <div class="fit-content">
         <q-btn flat label="Advanced Settings" rounded color="blue-3" @click="toggleAdvanced"/>

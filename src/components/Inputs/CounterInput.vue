@@ -1,10 +1,10 @@
 <template>
   <div class="row">
+    <!-- Input which looks like -> (- | num | +)  -->
     <div class="col-3">
       <button class="counter-button counter-button--left relative" @click="decrement" v-ripple >-</button>
     </div>
     <div class="col-auto">
-      <!-- <input class="counter-input fit-content" type="number" v-model="model" :size="2" /> -->
       <div class="counter-input fit-content" @input="isNumber">{{ model }}</div>
     </div>
     <div class="col-3">

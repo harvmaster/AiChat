@@ -10,7 +10,10 @@ export class Message {
   public modelId: string;
   public createdAt: number;
 
+  // generating is actually ref<boolean> but it is set to boolean to avoid issues with the app parent holding it in a reactive. Further context down below
   public generating: boolean = ref(false) as unknown as boolean
+
+  // abort function is defined to the abort function of the model. This is used to stop the model from generating a response
   public abort: () => void = () => null
 
   constructor(props: MessageProps) {
@@ -65,11 +68,13 @@ export class Message {
     this.setGenerating(false)
   }
 
-  // This class is used in a reactive container. The reactive container removes the refs of its children.
-  // This method exists to set the generating property of the message.
-  // If this message is called from the Conversation class, the generating property is a ref<boolean>. This is because the conversation does not hold reference to it as a reactive element.
-  // If this message is called through the UI or something beyong the conversation, the generating property is a boolean.
-  public setGenerating (generating: boolean): void {
+  /* 
+    This class is used in a reactive container. The reactive container removes the refs of its children.
+    This method exists to set the generating property of the message.
+    If this message is called from the Conversation class, the generating property is a ref<boolean>. This is because the conversation does not hold reference to it as a reactive element.
+    If this message is called through the UI or something beyong the conversation, the generating property is a boolean.
+  */
+   public setGenerating (generating: boolean): void {
     if (typeof this.generating === 'boolean') {
       this.generating = generating
       return 
