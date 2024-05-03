@@ -1,6 +1,6 @@
 import type { ChatCompletionMessageParam } from 'openai/resources';
-import { Stream } from 'openai/streaming';
-import OpenAI from 'openai';
+// import { Stream } from 'openai/streaming';
+// import OpenAI from 'openai';
 
 
 export type ChatMessage = ChatCompletionMessageParam

@@ -84,6 +84,8 @@ class EasyIDB {
     return EasyIDB.dbInstance;
   }
 
+
+  // Dont think i need any of this???
   async addStore (storeName: string, schema: object) {
     this.db.createObjectStore(storeName, schema);
   }

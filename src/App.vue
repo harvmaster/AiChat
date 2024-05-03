@@ -19,10 +19,4 @@ import 'prismjs/components/prism-typescript';
 import 'prismjs/components/prism-yaml';
 
 import { app } from 'boot/app'
-
-const initApp = async () => {
-  await app.loadFromDatabase()
-  app.initListeners()
-}
-initApp()
 </script>

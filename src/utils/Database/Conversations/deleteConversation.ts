@@ -5,8 +5,6 @@ import deleteMessage from '../Messages/deleteMessage';
 
 export default async function deleteConversation(conversation: Conversation): Promise<void> {
   const db = await EasyIDB.getDB(settings.dbName, settings.dbVersion);
-
-  console.log(conversation.id)
   
   const messages = await getMessagesByConversationId(conversation.id);
   for (const message of messages) {

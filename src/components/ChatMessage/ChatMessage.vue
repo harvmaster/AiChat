@@ -69,7 +69,7 @@ p {
 
 <script setup lang="ts">
 import { app } from 'boot/app';
-import { computed, onMounted, ref, watch } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import Message from 'src/utils/App/Message';
 
 import useCurrentConversation from 'src/composeables/useCurrentConversation';

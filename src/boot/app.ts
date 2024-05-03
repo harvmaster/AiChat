@@ -72,4 +72,10 @@ class App {
 
 const app = new App();
 
+const initApp = async () => {
+  await app.loadFromDatabase()
+  app.initListeners()
+}
+initApp()
+
 export { app };

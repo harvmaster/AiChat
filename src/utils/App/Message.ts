@@ -1,7 +1,7 @@
 import { watch, reactive, ref, Ref } from 'vue';
 import getHighlightedChunks from '../HighlightMessage';
 import { ChatMessage, Model } from 'src/services/models';
-import { MessageProps, MessageContent, Database__Message, MessageI } from 'src/types';
+import { MessageProps, MessageContent, Database__Message } from 'src/types';
 
 export class Message {
   public id: string;
@@ -10,7 +10,7 @@ export class Message {
   public modelId: string;
   public createdAt: number;
 
-  public generating: Ref<boolean> | boolean = ref(false)
+  public generating: boolean = ref(false) as unknown as boolean
   public abort: () => void = () => null
 
   constructor(props: MessageProps) {
@@ -69,13 +69,13 @@ export class Message {
   // This method exists to set the generating property of the message.
   // If this message is called from the Conversation class, the generating property is a ref<boolean>. This is because the conversation does not hold reference to it as a reactive element.
   // If this message is called through the UI or something beyong the conversation, the generating property is a boolean.
-  private setGenerating (generating: boolean): void {
+  public setGenerating (generating: boolean): void {
     if (typeof this.generating === 'boolean') {
       this.generating = generating
       return 
     }
     
-    this.generating.value = generating
+    (this.generating as unknown as Ref<boolean>).value = generating
   }
 
 }

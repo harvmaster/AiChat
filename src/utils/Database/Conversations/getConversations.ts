@@ -16,9 +16,6 @@ export default async function getConversations(options?: GetConversationsOptions
 
   await tx.done;
 
-  // const formattedConversations = conversations.map((conversation) => {
-  //   return { ...conversation, messages: [] }
-  // })
   const formattedConversations = conversations.map((conversation) => {
     const conversationProps = { ...conversation, messages: [] }
     return new Conversation(conversationProps)

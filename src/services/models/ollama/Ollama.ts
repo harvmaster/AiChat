@@ -66,7 +66,7 @@ class Ollama implements OpenModel {
       signal: controller.signal
     })
 
-    const handleError = (err: any) => {
+    const handleError = (err: Error & { response: Response & ChatCompletionResponse }) => {
       if (err.name == 'AbortError') return err.response
       throw err
     }
@@ -85,7 +85,7 @@ class Ollama implements OpenModel {
       signal: controller.signal
     })
     
-    const handleError = (err: any) => {
+    const handleError = (err: Error & { response: Response & ChatCompletionResponse }) => {
       if (err.name == 'AbortError') return err.response
       throw err
     }
