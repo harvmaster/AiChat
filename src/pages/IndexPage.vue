@@ -80,6 +80,7 @@
 
 <script setup lang="ts">
 import { computed, nextTick, ref, watch } from 'vue';
+import { useRouter } from 'vue-router';
 import { app } from 'boot/app';
 
 import useCurrentConversation from 'src/composeables/useCurrentConversation';
@@ -87,10 +88,8 @@ import useCurrentConversation from 'src/composeables/useCurrentConversation';
 import ChatHistory from 'src/components/ChatMessage/ChatHistory.vue';
 import ChatInput from 'src/components/ChatInput/ChatInput.vue';
 import SettingsDialog from 'src/components/Settings/SettingsDialog.vue';
+import { Notify } from 'quasar';
 
-import useChatInput from 'src/composeables/useChatInput';
-import useGenerationList from 'src/composeables/useGenerationList';
-import { useRouter } from 'vue-router';
 
 const router = useRouter()
 
@@ -110,10 +109,8 @@ const toggleSettings = () => {
   SettingsDialogElement.value?.toggleVisible();
 }
 
-const { currentlyGenerating } = useGenerationList()
-const loading = computed(() => !!currentlyGenerating.value[currentConversation.value?.id ?? ''] ?? false)
+const loading = computed(() => currentConversation.value?.messages.some(message => message.generating) ?? false)
 
-const { addUserMessage, addAssisstantMessage } = useChatInput();
 const handleMessage = async (message: string): Promise<void> => {
   if (!currentConversation.value) {
     const conversation = app.createConversation()
@@ -123,7 +120,30 @@ const handleMessage = async (message: string): Promise<void> => {
     return
   }
 
-  await addUserMessage(currentConversation.value, message);
-  await addAssisstantMessage(currentConversation.value);
+  try {
+    const model = app.settings.value.selectedModel
+    if (!model) throw new Error('No model selected')
+
+    currentConversation.value.addUserMessage(message);
+    await currentConversation.value.addAssistantMessage(model);
+    currentConversation.value.getConversationSummary(model)
+  } catch (error) {
+    console.error(error)
+    
+    if (error instanceof Error && error.message == 'No model selected') {
+      createErrorMessage('No model selected')
+    } else {
+      createErrorMessage('An error occurred')
+    }
+  }
+}
+
+const createErrorMessage = (message: string) => {
+  Notify.create({
+    message,
+    color: 'negative',
+    position: 'top-right',
+    timeout: 2000
+  })
 }
 </script>

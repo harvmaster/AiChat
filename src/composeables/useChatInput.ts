@@ -43,7 +43,7 @@ const useChatInput = () => {
       assistantMessage.content.value.raw += message.message.content;
     }
 
-    const { response, abort } = await getChatResponse(model, chatHistory, onToken);
+    const { response, abort } = getChatResponse(model, chatHistory, onToken);
     addGeneratingItem(conversation.id, assistantMessage.id, abort);
     await response;
     removeGeneratingItem(conversation.id, assistantMessage.id);

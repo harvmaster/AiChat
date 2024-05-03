@@ -5,10 +5,10 @@ import { ref } from 'vue'
 export const useAIChat = () => {
   const loading = ref(false)
 
-  const getChatResponse = async (model: Model, messages: ChatHistory, callback?: (message: ChatCompletionResponse) => void) => {
+  const getChatResponse = (model: Model, messages: ChatHistory, callback?: (message: ChatCompletionResponse) => void) => {
     loading.value = true
     try {
-      const response = await model.sendChat({ messages, stream: true }, callback)
+      const response = model.sendChat({ messages, stream: true }, callback)
       loading.value = false;
 
       return response

@@ -1,9 +1,10 @@
-import { ChatHistory } from 'src/services/models';
+import { ChatHistory, Model } from 'src/services/models';
 import Message from './Message';
 import getMessagesByConversationId from '../Database/Messages/getMessages';
 import { ConversationProps, ConversationI, Database__Conversation } from 'src/types';
+import generateUUID from 'src/composeables/generateUUID';
 
-export class Conversation implements ConversationI{
+export class Conversation implements ConversationI {
   public id: string;
   public summary: string;
 
@@ -30,7 +31,54 @@ export class Conversation implements ConversationI{
   }
 
   public async loadMessages (): Promise<void> {
-    this.messages = await getMessagesByConversationId(this.id);
+    const messages = await getMessagesByConversationId(this.id);
+    this.messages = messages.sort((a, b) => a.createdAt - b.createdAt);
+  }
+
+  public addUserMessage (content: string): void {
+    const message = new Message({
+      id: generateUUID(),
+      author: 'user',
+      content: { raw: content }
+    });
+
+    this.messages.push(message);
+  }
+
+  public async addAssistantMessage (model: Model): Promise<Message> {
+    const assistantMessage = new Message({
+      id: generateUUID(),
+      author: 'assistant',
+      content: { raw: '' },
+      createdAt: Date.now() + 1 // Had issues where messages could not be sorted by date as they had the same time as the user message
+    });
+
+    this.messages.push(assistantMessage);
+    await assistantMessage.generateAssistantResponse(model, this.getChatHistory());
+
+    return assistantMessage;
+  }
+
+  public async getConversationSummary (model: Model): Promise<string> {
+    if (this.messages.length === 0) throw new Error('No messages yet')
+    if (this.summary) return this.summary;
+
+    const formattedMessages = this.getChatHistory();
+    const summaryPrompt: ChatHistory = [
+      {
+        role: 'system',
+        content: 'Summarise this conversation into 5 words or less'
+      },
+      {
+        role: 'user',
+        content: formattedMessages.map(m => m.content).join(' ')
+      }
+    ]
+
+    const response = await model.sendChat({ messages: summaryPrompt }).response;
+    this.summary = response.message.content;
+
+    return this.summary;
   }
 }
 

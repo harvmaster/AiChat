@@ -1,21 +1,24 @@
+import { Ref } from 'vue';
 import { Model } from './services/models';
+import Message from './utils/App/Message';
 import { ChatMessage } from './services/models';
 
 export interface ConversationI {
   id: string;
   summary: string;
-  messages: MessageI[];
+  messages: Message[];
   createdAt: number;
 
   getChatHistory: () => ChatMessage[];
   toDatabaseConversation: () => Database__Conversation;
   loadMessages: () => Promise<void>;
+  getConversationSummary: (model: Model) => Promise<string>;
 }
 
 export type ConversationProps = {
   id: string;
   summary: string;
-  messages: MessageI[];
+  messages: Message[];
   createdAt?: number;
 }
 
@@ -57,10 +60,14 @@ export interface MessageI {
   modelId: string;
   createdAt: number;
 
+  generating: boolean
+  abort: () => void;
+
   highlightMessage: () => Promise<void>;
   setContent: (content: string) => void;
   toDatabaseMessage: () => Database__Message;
   toChatMessage: () => ChatMessage;
+  generateAssistantResponse: (model: Model, chatHistory: ChatMessage[]) => Promise<void>;
 }
 
 export type Database__Message = {
