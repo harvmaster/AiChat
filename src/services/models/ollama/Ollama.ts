@@ -66,6 +66,7 @@ class Ollama implements OpenModel {
       signal: controller.signal
     })
 
+    // TS gave me an error when err was defined as 'any', response requires a response property. So i did this. I dont know how error handling works in TS
     const handleError = (err: Error & { response: Response & ChatCompletionResponse }) => {
       if (err.name == 'AbortError') return err.response
       throw err
