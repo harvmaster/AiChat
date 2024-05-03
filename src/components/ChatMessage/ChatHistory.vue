@@ -51,7 +51,8 @@ const props = defineProps<ChatHistoryProps>()
 
 const ChatHistoryElement = ref<HTMLElement | null>(null)
 
-watch(() => props.messages.length, () => {
+watch([() => props.messages.length, () => props.messages.at(-1)?.content.value.raw], () => {
+  if (props.messages.at(-1)?.content.value.raw != '') return
   preventScroll = false
   scrollToBottom()
 })
