@@ -6,9 +6,9 @@ OpenAI models utilise an OpenAI developer key which allows you to pay per token.
 <br>
 Check out the demo [here](https://ai.chat.mc.hzuccon.com/#/)
 
-[FullscreenDemo](./Docs/FullscreenShot.png)
+![FullscreenDemo](./Docs/FullscreenShot.png)
 
-[SettingsDemo](./Docs//SettingsShot.png)
+![SettingsDemo](./Docs//SettingsShot.png)
 
 ## To do
 - Fix multiple root elements in template (src/components/ChatMessage/ChatmessageChunk.vue)
