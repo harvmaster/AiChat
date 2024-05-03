@@ -50,7 +50,7 @@ export class Conversation implements ConversationI {
       id: generateUUID(),
       author: 'assistant',
       content: { raw: '' },
-      createdAt: Date.now() + 1 // Had issues where messages could not be sorted by date as they had the same time as the user message
+      createdAt: Date.now() + 1 // Had issues where messages could not be sorted by date as they had the same time as the user message. This caused user message to come after assistant message
     });
 
     this.messages.push(assistantMessage);
