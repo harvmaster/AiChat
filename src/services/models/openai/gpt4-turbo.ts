@@ -1,7 +1,7 @@
 import OpenAI from 'openai';
 import Provider from './Provider';
 
-import { ChatCompletionRequest, ChatCompletionResponse, ClosedModel, TextGenerationRequest } from '../types';
+import { ChatCompletionRequestOptions, ChatCompletionResponse, ChatGenerationResponse, ClosedModel, TextGenerationRequest } from '../types';
 import { Stream } from 'openai/streaming';
 
 export type OpenAIAdvancedOptions = {
@@ -19,18 +19,24 @@ class GPT4Turbo implements ClosedModel {
   provider = Provider;
   advancedSettings: OpenAIAdvancedOptions = {...defaultAdvancedOptions};
 
-  async sendChat (request: ChatCompletionRequest, callback?: (response: ChatCompletionResponse) => void, options?: OpenAIAdvancedOptions): Promise<ChatCompletionResponse> {
+  sendChat (request: ChatCompletionRequestOptions, callback?: (response: ChatCompletionResponse) => void, options?: OpenAIAdvancedOptions): ChatGenerationResponse {
     const openai = new OpenAI({ apiKey: Provider.token, dangerouslyAllowBrowser: true });
-    const stream = await openai.chat.completions.create({ model: 'gpt-4-turbo', messages: request.messages, stream: true, ...options });
+    const stream = openai.chat.completions.create({ model: 'gpt-4-turbo', messages: request.messages, stream: true, ...options });
 
-    return await this.handleResponse(stream, callback);
+    return {
+      abort: () => stream.then(s => s.controller.abort()),
+      response: stream.then(s => this.handleResponse(s, callback))
+    } 
   }
 
-  async generateText (request: TextGenerationRequest, callback?: (response: ChatCompletionResponse) => void, options?: OpenAIAdvancedOptions): Promise<ChatCompletionResponse> {
+  generateText (request: TextGenerationRequest, callback?: (response: ChatCompletionResponse) => void, options?: OpenAIAdvancedOptions): ChatGenerationResponse {
     const openai = new OpenAI({ apiKey: Provider.token, dangerouslyAllowBrowser: true });
-    const stream = await openai.chat.completions.create({ model: 'gpt-4-turbo', messages: [{ content: request.prompt, role: 'user' }], stream: true, ...options });
+    const stream = openai.chat.completions.create({ model: 'gpt-4-turbo', messages: [{ content: request.prompt, role: 'user' }], stream: true, ...options });
   
-    return await this.handleResponse(stream, callback);  
+    return {
+      abort: () => stream.then(s => s.controller.abort()),
+      response: stream.then(s => this.handleResponse(s, callback))
+    } 
   }
 
   async handleResponse (stream: Stream<OpenAI.Chat.Completions.ChatCompletionChunk>, callback?: (res: ChatCompletionResponse) => void): Promise<ChatCompletionResponse> {

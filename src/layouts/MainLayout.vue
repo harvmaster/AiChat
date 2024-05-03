@@ -124,7 +124,7 @@
 import Conversation from 'src/utils/App/Conversation';
 import Message from 'src/utils/App/Message';
 
-import { computed, ref } from 'vue'
+import { ComputedRef, computed, ref } from 'vue'
 import { useRouter } from 'vue-router';
 import { app } from 'boot/app'
 
@@ -143,11 +143,11 @@ const createConversation = () => {
 
 const deleteConversation = async (conversation: Conversation) => {
   await deleteConversationFromDatabase(conversation)
-  app.conversations.value = app.conversations.value.filter((c: Conversation) => c.id !== conversation.id)
+  app.conversations.value = app.conversations.value.filter((c) => c.id !== conversation.id)
 }
 
-const sortedConversation = computed(() => {
-  return [...app.conversations.value].sort((a, b) => b.messages.sort((c: Message, d: Message) => c.createdAt - d.createdAt)[0]?.createdAt - a.messages.sort((c: Message, d: Message) => c.createdAt - d.createdAt)[0]?.createdAt)
+const sortedConversation = computed<Conversation[]>(() => {
+  return [...app.conversations.value].sort((a, b) => b.messages.sort((c, d) => c.createdAt - d.createdAt)[0]?.createdAt - a.messages.sort((c, d) => c.createdAt - d.createdAt)[0]?.createdAt)
 })
 const routeToConversation = (id: string) => {
   router.push(`/${id}`)

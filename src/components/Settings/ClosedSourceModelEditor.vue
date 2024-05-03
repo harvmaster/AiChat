@@ -15,7 +15,7 @@
     <div class="col-auto row">
       <div class="row fit-content">
         <div class="col-12 text-white">Temperature</div>
-        <counter-input class="col-auto" v-model="selectedModel.advancedSettings.temperature" :step="0.1" @update:model-value="clampTemperature"/>
+        <counter-input class="col-auto" v-model="selectedModel.advancedSettings.temperature!" :step="0.1" @update:model-value="clampTemperature"/>
       </div>
     </div>
   </div>
@@ -43,7 +43,11 @@ const selectedModel = computed(() => app.settings.value.selectedModel)
 
 const clampTemperature = () => {
   if (!selectedModel.value) return
-  let temperature = parseFloat(parseFloat(selectedModel.value.advancedSettings.temperature.toString()).toFixed(2))
+  if (!selectedModel.value.advancedSettings) return selectedModel.value.advancedSettings = { temperature: 1 }
+  if (!selectedModel.value.advancedSettings.temperature && isNaN(selectedModel.value.advancedSettings.temperature as number)) return selectedModel.value.advancedSettings.temperature = 1
+  
+  let temperature = parseFloat(parseFloat(selectedModel.value.advancedSettings.temperature?.toString() as string).toFixed(2))
+  if (isNaN(temperature)) temperature = 1
   if (temperature > 2) temperature = 2
   if (temperature < 0) temperature = 0
   selectedModel.value.advancedSettings.temperature = temperature

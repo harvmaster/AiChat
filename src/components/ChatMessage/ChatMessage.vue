@@ -10,7 +10,7 @@
         </div>
         <div class="col-auto row">
           <transition name="fade">
-            <div class="q-mr-sm" v-if="!loading && isLastMessage">
+            <div class="q-mr-sm" v-if="!loading && isLastMessage && props.message.author != 'user'">
               <!-- <q-btn flat round dense icon="play_arrow" color="green-3" @click="continueMessage">
                 <q-tooltip class="bg-secondary text-weight-bold">
                   <div>Continue...</div>
@@ -68,16 +68,14 @@ p {
 </style>
 
 <script setup lang="ts">
-import Message from 'src/utils/App/Message';
-
+import { app } from 'boot/app';
 import { computed, onMounted, ref } from 'vue';
+import Message from 'src/utils/App/Message';
 
 import useCurrentConversation from 'src/composeables/useCurrentConversation';
 import deleteMessageFromDatabase from 'src/utils/Database/Messages/deleteMessage';
 
 import ChatMessageChunk from './ChatMessageChunk.vue';
-import useGenerationList from 'src/composeables/useGenerationList';
-import useChatInput from 'src/composeables/useChatInput';
 
 export type ChatMessageProps = {
   message: Message;
@@ -86,9 +84,7 @@ export type ChatMessageProps = {
 const props = defineProps<ChatMessageProps>()
 
 const currentConveration = useCurrentConversation()
-
-const { currentlyGenerating } = useGenerationList()
-const loading = computed(() => !!currentlyGenerating.value[currentConveration.value?.id || '']?.messages[props.message.id])
+const loading = computed(() => props.message.generating)
 
 const isLastMessage = computed(() => {
   if (!currentConveration.value) return false
@@ -137,17 +133,12 @@ const deleteMessage = () => {
 }
 
 const stopGeneration = () => {
-  currentlyGenerating.value[currentConveration.value?.id || '']?.messages[props.message.id]?.()
+  props.message.abort()
 }
 
-const { generateAssisstantResponse } = useChatInput()
 const regenerateMessage = () => {
-  if (!currentConveration.value) return
+  if (!currentConveration.value || !app.settings.value.selectedModel) return
   props.message.setContent('')
-  generateAssisstantResponse(currentConveration.value, props.message)
-}
-const continueMessage = () => {
-  if (!currentConveration.value) return
-  generateAssisstantResponse(currentConveration.value, props.message)
+  props.message.generateAssistantResponse(app.settings.value.selectedModel, currentConveration.value.getChatHistory())
 }
 </script>

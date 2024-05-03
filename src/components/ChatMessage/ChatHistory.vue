@@ -37,10 +37,10 @@
 </style>
 
 <script setup lang="ts">
-import Message from 'src/utils/App/Message'
+import { app } from 'boot/app'
 import { watch, ref, nextTick } from 'vue'
+import Message from 'src/utils/App/Message'
 import ChatMessage from './ChatMessage.vue'
-import useChatInput from 'src/composeables/useChatInput'
 import useCurrentConversation from 'src/composeables/useCurrentConversation'
 
 export type ChatHistoryProps = {
@@ -51,7 +51,8 @@ const props = defineProps<ChatHistoryProps>()
 
 const ChatHistoryElement = ref<HTMLElement | null>(null)
 
-watch(() => props.messages.length, () => {
+watch([() => props.messages.length, () => props.messages.at(-1)?.content.value.raw], () => {
+  if (props.messages.at(-1)?.content.value.raw != '') return
   preventScroll = false
   scrollToBottom()
 })
@@ -96,10 +97,9 @@ const handleScroll = (event: Event) => {
 }
 
 const currentConversation = useCurrentConversation()
-const { addAssisstantMessage } = useChatInput();
 const regenerateResponse = () => {
-  if (currentConversation.value) {
-    addAssisstantMessage(currentConversation.value)
+  if (currentConversation.value && app.settings.value.selectedModel) {
+    currentConversation.value.addAssistantMessage(app.settings.value.selectedModel)
   }
 }
 

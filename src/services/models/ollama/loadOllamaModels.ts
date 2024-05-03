@@ -2,6 +2,7 @@ import { OllamaModel, OllamaProvider } from '.';
 import { getModels, getProviders } from '../../../utils/Database';
 import { defaultOptions } from './Ollama';
 
+// Hard coded model for demo purposes
 const defaultOllamaModels = [
   new OllamaModel('917320fa-5bd3-486a-88d1-850404e21759', new OllamaProvider('1c56f141-54ec-479d-a7cf-52aa0077a099', 'AI Chat', 'https://ai.ollama.mc.hzuccon.com', 1714182389701), 1714182389701, JSON.stringify(defaultOptions), 'phi3'),
 ]

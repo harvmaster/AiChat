@@ -1,13 +1,13 @@
 import type { ChatCompletionMessageParam } from 'openai/resources';
-import { Stream } from 'openai/streaming';
-import OpenAI from 'openai';
+// import { Stream } from 'openai/streaming';
+// import OpenAI from 'openai';
 
 
 export type ChatMessage = ChatCompletionMessageParam
 
 export type ChatHistory = ChatMessage[];
 
-export type ChatCompletionRequest = {
+export type ChatCompletionRequestOptions = {
   messages: ChatHistory;
   stream?: boolean;
 }
@@ -19,12 +19,13 @@ export type ChatCompletionResponse = {
   }
 }
 
-export type ChatCompletionRequestOptions = {
-  stream: boolean;
-}
-
 export type TextGenerationRequest = {
   prompt: string;
+}
+
+export type ChatGenerationResponse = {
+  abort: () => void;
+  response: Promise<ChatCompletionResponse>;
 }
 
 export interface BaseModel {
@@ -33,8 +34,8 @@ export interface BaseModel {
   model: string;
   createdAt?: number;
   provider: Provider;
-  sendChat(request: ChatCompletionRequest, callback?: (result: ChatCompletionResponse) => void,): Promise<ChatCompletionResponse>;
-  generateText(request: TextGenerationRequest, callback?: (result: ChatCompletionResponse) => void,): Promise<ChatCompletionResponse>;
+  sendChat(request: ChatCompletionRequestOptions, callback?: (result: ChatCompletionResponse) => void,): ChatGenerationResponse;
+  generateText(request: TextGenerationRequest, callback?: (result: ChatCompletionResponse) => void,): ChatGenerationResponse;
 }
 
 export interface BaseProvider {
@@ -47,7 +48,7 @@ export interface BaseProvider {
 export interface ClosedModel extends BaseModel {
   provider: ClosedProvider
   advancedSettings: Partial<OllamaOptions>;
-  handleResponse(response: Stream<OpenAI.Chat.Completions.ChatCompletionChunk>, callback?: (result: ChatCompletionResponse) => void): Promise<ChatCompletionResponse>;
+  // handleResponse(response: Stream<OpenAI.Chat.Completions.ChatCompletionChunk>, callback?: (result: ChatCompletionResponse) => void): Promise<ChatCompletionResponse>;
 }
 export interface ClosedProvider extends BaseProvider {
   token: string;
@@ -57,7 +58,7 @@ export interface ClosedProvider extends BaseProvider {
 export interface OpenModel extends BaseModel  {
   provider: OpenProvider
   advancedSettings: Partial<OllamaOptions>;
-  handleResponse(response: Response, callback?: (result: ChatCompletionResponse) => void): Promise<ChatCompletionResponse>;
+  // handleResponse(response: Response, callback?: (result: ChatCompletionResponse) => void): Promise<ChatCompletionResponse>;
 }
 export interface OpenProvider extends BaseProvider {
   url: string;
