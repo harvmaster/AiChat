@@ -12,9 +12,11 @@
 .image-preview {
   border-radius: 10%;
   overflow: hidden;
+  transition: transform 0.3s;
 }
 .image-preview:hover {
   cursor: pointer;
+  transform: translateY(-0.25em);
   --show-fab: 100;
 }
 .image-fab {

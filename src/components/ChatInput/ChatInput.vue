@@ -37,41 +37,7 @@
 </template>
 
 <style lang="scss" scoped>
-.image-preview-container {
-  // Keep on single line
-  max-width: 100%;
-  overflow-x: scroll;
-  white-space: nowrap;
-  flex-wrap: nowrap;
 
-  // Scroll bar secondary color
-  &::-webkit-scrollbar {
-    height: 0.5em;
-  }
-  &::-webkit-scrollbar-thumb {
-    background-color: $secondary;
-    border-radius: 1em;
-  }
-  &::-webkit-scrollbar-track {
-    background-color: $primary;
-  }
-
-}
-.image-preview {
-  border-radius: 10%;
-  overflow: hidden;
-  // margin-right: 1em;
-}
-.image-preview:hover {
-  cursor: pointer;
-  --show-fab: 100;
-}
-.image-fab {
-  transition: opacity 0.3s;
-  opacity: var(--show-fab, 0);
-  border-radius: 20%;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-}
 </style>
 
 <script setup lang="ts">
@@ -79,7 +45,7 @@ import { ref, computed, nextTick, defineEmits } from 'vue'
 
 import isInCodeBlock from 'src/composeables/isInCodeblock'
 
-import ImagePreviewList, { ImagePreviewListProps } from './ImagePreviewList.vue'
+import ImagePreviewList from './ImagePreviewList.vue'
 import { ImagePreviewProps } from './ImagePreview.vue';
 
 const input = ref('')

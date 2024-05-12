@@ -1,6 +1,6 @@
 <template>
   <div class="image-preview-list row q-pb-sm">
-    <div class="col-auto limit-10em q-pa-sm" v-for="image in props.images" :key="image.src" >
+    <div class="col-auto image-preview-item q-pa-sm" v-for="image in props.images" :key="image.src" >
       <ImagePreview class="" :src="image.src" />
     </div>
   </div>
@@ -27,10 +27,18 @@
   }
 }
 
-.limit-10em {
-  width: 33.33%;
+@media screen and (max-width: 600px) {
+  .image-preview-item {
+    width: 33.33%;
+    max-width: 10em;
+  }
+}
+
+.image-preview-item {
+  width: 45%;
   max-width: 10em;
 }
+
 </style>
 
 <script setup lang="ts">
