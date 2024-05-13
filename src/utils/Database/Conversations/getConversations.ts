@@ -18,7 +18,9 @@ export default async function getConversations(options?: GetConversationsOptions
 
   const formattedConversations = conversations.map((conversation) => {
     const conversationProps = { ...conversation, messages: [] }
-    return new Conversation(conversationProps)
+    const cObj = new Conversation(conversationProps)
+    if (!cObj.summary) cObj.loadMessages(1)
+    return cObj
   })
 
   if (options?.getMessages) {

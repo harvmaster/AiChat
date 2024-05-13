@@ -52,6 +52,7 @@ export type MessageProps = {
   modelId?: string;
   createdAt?: number;
 
+  images: string[];
 }
 
 export interface MessageI {
@@ -76,6 +77,7 @@ export type Database__Message = {
   author: string;
   content: string;
   modelId: string;
+  images: string[];
   createdAt: number;
 }
 

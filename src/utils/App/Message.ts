@@ -3,12 +3,16 @@ import getHighlightedChunks from '../HighlightMessage';
 import { ChatMessage, Model } from 'src/services/models';
 import { MessageProps, MessageContent, Database__Message } from 'src/types';
 
+import MessageImage from './MessageImage';
+
 export class Message {
   public id: string;
   public author: string;
   readonly content = reactive<{ value: MessageContent }>({ value: { raw: '' } });
   public modelId: string;
   public createdAt: number;
+
+  public images: MessageImage[]
 
   // generating is actually ref<boolean> but it is set to boolean to avoid issues with the app parent holding it in a reactive. Further context down below
   public generating: boolean = ref(false) as unknown as boolean
@@ -27,6 +31,8 @@ export class Message {
     this.content.value = props.content;
     this.modelId = props.modelId || '';
     this.createdAt = props.createdAt || Date.now();
+
+    this.images = props.images.map(image => new MessageImage(image))
   }
   
   public async highlightMessage (): Promise<void> {

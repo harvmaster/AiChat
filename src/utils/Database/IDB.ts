@@ -12,6 +12,7 @@ interface DatabaseSchema {
     author: string;
     conversationId: string;
     content: string;
+    images: string;
 
     modelId?: string;
     createdAt: number;

@@ -35,8 +35,8 @@ export class Conversation implements ConversationI {
     this.messages = [this.messages[0]];
   }
 
-  public async loadMessages (): Promise<void> {
-    const messages = await getMessagesByConversationId(this.id);
+  public async loadMessages (limit?: number): Promise<void> {
+    const messages = await getMessagesByConversationId(this.id, limit);
     this.messages = messages.sort((a, b) => a.createdAt - b.createdAt);
   }
 
