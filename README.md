@@ -6,6 +6,12 @@ OpenAI models utilise an OpenAI developer key which allows you to pay per token.
 <br>
 Check out the demo [here](https://ai.chat.mc.hzuccon.com/#/)
 
+## Features
+ - Code highlighting on input and reponse
+ - LLAVA model support (vision models)
+ - Completely local. All your converations are stored on your browser, not on some server
+ - Custom model settings
+ - PWA for lightweight installation on mobile and desktop
 
 ## Screenshots
 ![FullscreenDemo](./Docs/FullscreenShot.png)
