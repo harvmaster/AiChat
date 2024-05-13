@@ -33,8 +33,6 @@ export default async function getMessagesByConversationId (conversationId: strin
       const from = Math.max(Math.min(sub.from < 0 ? keys.length + sub.from : sub.from, keys.length), 0);
       const to = Math.max(Math.min(sub.to < 0 ? keys.length + sub.to : sub.to), 0);
 
-      console.log(from, to, keys.length, keys.slice(from, to))
-
       const subKeys = keys.slice(from, to);
       return subKeys
     }).flat()
