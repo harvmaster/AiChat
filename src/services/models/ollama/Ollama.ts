@@ -69,7 +69,6 @@ class Ollama implements OpenModel {
         images: message.images?.map(image => image.split(',')[1]) || []
       }
     })
-    console.log(request.messages)
 
     const response = fetch(`${this.provider.url}/api/chat`, {
       method: 'POST',
