@@ -8,6 +8,9 @@
       </div>
       <input ref="openModelName" class="my-input text-white my-number-input text-h6 col" v-model="selectedModel.model" />
       <div class="col-auto">
+        <q-btn flat round dense icon="content_copy" color="blue-4" @click="copyModelLink" />
+      </div>
+      <div class="col-auto">
         <q-btn flat round dense icon="delete" color="red-4" @click="deleteModel" />
       </div>
     </div>
@@ -59,6 +62,7 @@ import CounterInput from '../Inputs/CounterInput.vue';
 
 import deleteModelFromDatabase from 'src/utils/Database/Models/deleteModel'
 import { OpenModel } from 'src/services/models';
+import { Notify, copyToClipboard } from 'quasar';
 
 const selectedModel = computed<OpenModel | undefined>(() => app.settings.value.selectedModel as OpenModel)
 
@@ -78,6 +82,19 @@ const openModelName = ref<HTMLInputElement | null>(null)
 const focusOpenModelName = () => {
   if (!selectedModel.value) return
   openModelName.value?.focus()
+}
+
+const copyModelLink = () => {
+  if (!selectedModel.value) return
+  if (!selectedModel.value.createShareableURL) return
+
+  copyToClipboard(selectedModel.value.createShareableURL())
+  Notify.create({
+    message: 'Model link copied to clipboard',
+    color: 'green-4',
+    position: 'bottom',
+    timeout: 2000
+  })
 }
 
 const deleteModel = () => {

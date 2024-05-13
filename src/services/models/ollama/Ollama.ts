@@ -143,6 +143,10 @@ class Ollama implements OpenModel {
       }
     }
   }
+
+  createShareableURL () {
+    return `${window.location.origin}/#/?model=${JSON.stringify({id: this.id, model: this.model, provider: {id: this.provider.id, name: this.provider.name, url: this.provider.url}})}`;
+  }
 }
 
 export default Ollama;

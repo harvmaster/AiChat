@@ -32,6 +32,13 @@ export type ChatGenerationResponse = {
   response: Promise<ChatCompletionResponse>;
 }
 
+export type ModelURL = {
+  id: string;
+  name: string;
+  model: string;
+  provider: OpenProvider;
+}
+
 export interface BaseModel {
   id: string;
   name: string;
@@ -62,6 +69,7 @@ export interface ClosedProvider extends BaseProvider {
 export interface OpenModel extends BaseModel  {
   provider: OpenProvider
   advancedSettings: Partial<OllamaOptions>;
+  createShareableURL(): string;
   // handleResponse(response: Response, callback?: (result: ChatCompletionResponse) => void): Promise<ChatCompletionResponse>;
 }
 export interface OpenProvider extends BaseProvider {

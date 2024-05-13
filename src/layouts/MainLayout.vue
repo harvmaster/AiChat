@@ -129,7 +129,11 @@ import { app } from 'boot/app'
 
 import deleteConversationFromDatabase from 'src/utils/Database/Conversations/deleteConversation';
 
+import useModelFromURL from 'src/composeables/useModelFromURL';
+
 const router = useRouter()
+
+useModelFromURL()
 
 const drawer = ref(false)
 const toggleDrawer = () => {
