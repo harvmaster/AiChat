@@ -1,6 +1,6 @@
 import { ChatHistory, Model } from 'src/services/models';
 import Message from './Message';
-import getMessagesByConversationId from '../Database/Messages/getMessages';
+import getMessagesByConversationId, { MessageQueryOptions } from '../Database/Messages/getMessages';
 import { ConversationProps, ConversationI, Database__Conversation, UserMessageInput } from 'src/types';
 import generateUUID from 'src/composeables/generateUUID';
 
@@ -30,13 +30,13 @@ export class Conversation implements ConversationI {
     }
   }
 
-  // Keep one message so we can still have a summary
+  // Keep first and last message so we can still have a summary and last message timestamp
   public async unloadMessages (): Promise<void> {
-    this.messages = [this.messages[0]];
+    this.messages = [this.messages[0], this.messages[this.messages.length - 1]];
   }
 
-  public async loadMessages (limit?: number): Promise<void> {
-    const messages = await getMessagesByConversationId(this.id, limit);
+  public async loadMessages (options?: MessageQueryOptions): Promise<void> {
+    const messages = await getMessagesByConversationId(this.id, options);
     this.messages = messages.sort((a, b) => a.createdAt - b.createdAt);
   }
 

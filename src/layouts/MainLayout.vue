@@ -8,6 +8,9 @@
         <div class="rainbow-text col-auto">
           AI Chat
         </div>
+        <div class="col-auto">
+          <q-btn flat round dense icon="refresh" color="accent" @click="printConversations" />
+        </div>
       </div>
     </q-header>
 
@@ -174,10 +177,22 @@ const routeToConversation = async (id: string) => {
     router.push(`/${id}`)
 }
 
+const printConversations = () => {
+  const cs = app.conversations.value.map(conversation => {
+    return {
+      lastMessage: conversation.messages.at(-1)?.createdAt,
+      summary: conversation.summary
+    }
+  })
+
+  console.log(cs)
+}
+
 onMounted(() => {
   const currentConversation = app.conversations.value.find((c) => c.id === router.currentRoute.value.params.id)
   if (currentConversation) {
     loadConverstionMessages(currentConversation)
   }
+
 })
 </script>
