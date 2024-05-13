@@ -9,6 +9,7 @@ Check out the demo [here](https://ai.chat.mc.hzuccon.com/#/)
 ## Features
  - Code highlighting on input and reponse
  - LLAVA model support (vision models)
+ - Easy to share a model with just a link
  - Completely local. All your converations are stored on your browser, not on some server
  - Custom model settings
  - PWA for lightweight installation on mobile and desktop
