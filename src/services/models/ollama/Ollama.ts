@@ -60,6 +60,16 @@ class Ollama implements OpenModel {
 
   sendChat (request: ChatCompletionRequestOptions, callback?: (response: ChatCompletionResponse) => void, options?: OllamaOptions): ChatGenerationResponse {
     const controller = new AbortController()
+
+    request.messages = request.messages.map(message => {
+      return {
+        role: message.role,
+        content: message.content,
+        images: message.images?.map(image => image.split(',')[1]) || []
+      }
+    })
+    console.log(request.messages)
+
     const response = fetch(`${this.provider.url}/api/chat`, {
       method: 'POST',
       body: JSON.stringify({ model: this.model, messages: request.messages, options: { ...this.advancedSettings, ...options } }),
