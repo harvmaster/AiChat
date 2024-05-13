@@ -43,24 +43,30 @@
 <script setup lang="ts">
 import { ref, computed, nextTick, defineEmits } from 'vue'
 
+import useInput from 'src/composeables/useInput'
 import isInCodeBlock from 'src/composeables/isInCodeblock'
 
 import ImagePreviewList from './ImagePreviewList.vue'
 import { ImagePreviewProps } from './ImagePreview.vue';
 
-const input = ref('')
-const images = ref<ImagePreviewProps[]>([
+const { input, setInput, images, setImages } = useInput()
+
+setImages([
   {
-    src: 'https://media.istockphoto.com/id/1480959448/photo/data-in-cage-big-data-cloud-computing-blockchain-and-artificial-intelligence-concept.jpg?s=2048x2048&w=is&k=20&c=alXcIWxmpRMk1vqDjG6MWIwNO896rWnayfj3Ewh9vsk='
+    src: 'https://media.istockphoto.com/id/1480959448/photo/data-in-cage-big-data-cloud-computing-blockchain-and-artificial-intelligence-concept.jpg?s=2048x2048&w=is&k=20&c=alXcIWxmpRMk1vqDjG6MWIwNO896rWnayfj3Ewh9vsk=',
+    base64: ''
   },
   {
-    src: 'https://media.istockphoto.com/id/1480959448/photo/data-in-cage-big-data-cloud-computing-blockchain-and-artificial-intelligence-concept.jpg?s=2048x2048&w=is&k=20&c=alXcIWxmpRMk1vqDjG6MWIwNO896rWnayfj3Ewh9vsk='
+    src: 'https://media.istockphoto.com/id/1480959448/photo/data-in-cage-big-data-cloud-computing-blockchain-and-artificial-intelligence-concept.jpg?s=2048x2048&w=is&k=20&c=alXcIWxmpRMk1vqDjG6MWIwNO896rWnayfj3Ewh9vsk=',
+    base64: ''
   },
   {
-    src: 'https://media.istockphoto.com/id/1480959448/photo/data-in-cage-big-data-cloud-computing-blockchain-and-artificial-intelligence-concept.jpg?s=2048x2048&w=is&k=20&c=alXcIWxmpRMk1vqDjG6MWIwNO896rWnayfj3Ewh9vsk='
+    src: 'https://media.istockphoto.com/id/1480959448/photo/data-in-cage-big-data-cloud-computing-blockchain-and-artificial-intelligence-concept.jpg?s=2048x2048&w=is&k=20&c=alXcIWxmpRMk1vqDjG6MWIwNO896rWnayfj3Ewh9vsk=',
+    base64: ''
   },
   {
-    src: 'https://media.istockphoto.com/id/1480959448/photo/data-in-cage-big-data-cloud-computing-blockchain-and-artificial-intelligence-concept.jpg?s=2048x2048&w=is&k=20&c=alXcIWxmpRMk1vqDjG6MWIwNO896rWnayfj3Ewh9vsk='
+    src: 'https://media.istockphoto.com/id/1480959448/photo/data-in-cage-big-data-cloud-computing-blockchain-and-artificial-intelligence-concept.jpg?s=2048x2048&w=is&k=20&c=alXcIWxmpRMk1vqDjG6MWIwNO896rWnayfj3Ewh9vsk=',
+    base64: ''
   }
 ])
 
@@ -125,7 +131,11 @@ const openImageBrowser = () => {
       reader.onload = (e) => {
         const data = e.target?.result;
         if (typeof data === 'string') {
-          emits('message', data);
+          console.log(data)
+          images.value.push({
+            src: data,
+            base64: data
+          });
         }
       };
       reader.readAsDataURL(file);
