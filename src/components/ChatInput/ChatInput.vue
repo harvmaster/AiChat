@@ -81,6 +81,7 @@ const sendMessage = async (event?: KeyboardEvent) => {
     images: downscaledImages
   })
   input.value = ''
+  images.value = []
   return
 }
 
