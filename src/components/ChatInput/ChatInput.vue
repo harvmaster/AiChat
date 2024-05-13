@@ -41,41 +41,23 @@
 </style>
 
 <script setup lang="ts">
-import { ref, computed, nextTick, defineEmits } from 'vue'
+import { computed, nextTick, defineEmits } from 'vue'
 
 import useInput from 'src/composeables/useInput'
 import isInCodeBlock from 'src/composeables/isInCodeblock'
 
 import ImagePreviewList from './ImagePreviewList.vue'
-import { ImagePreviewProps } from './ImagePreview.vue';
+import MessageImage from 'src/utils/App/MessageImage';
+import { UserMessageInput } from 'src/types';
 
-const { input, setInput, images, setImages } = useInput()
-
-// setImages([
-//   {
-//     src: 'https://media.istockphoto.com/id/1480959448/photo/data-in-cage-big-data-cloud-computing-blockchain-and-artificial-intelligence-concept.jpg?s=2048x2048&w=is&k=20&c=alXcIWxmpRMk1vqDjG6MWIwNO896rWnayfj3Ewh9vsk=',
-//     base64: ''
-//   },
-//   {
-//     src: 'https://media.istockphoto.com/id/1480959448/photo/data-in-cage-big-data-cloud-computing-blockchain-and-artificial-intelligence-concept.jpg?s=2048x2048&w=is&k=20&c=alXcIWxmpRMk1vqDjG6MWIwNO896rWnayfj3Ewh9vsk=',
-//     base64: ''
-//   },
-//   {
-//     src: 'https://media.istockphoto.com/id/1480959448/photo/data-in-cage-big-data-cloud-computing-blockchain-and-artificial-intelligence-concept.jpg?s=2048x2048&w=is&k=20&c=alXcIWxmpRMk1vqDjG6MWIwNO896rWnayfj3Ewh9vsk=',
-//     base64: ''
-//   },
-//   {
-//     src: 'https://media.istockphoto.com/id/1480959448/photo/data-in-cage-big-data-cloud-computing-blockchain-and-artificial-intelligence-concept.jpg?s=2048x2048&w=is&k=20&c=alXcIWxmpRMk1vqDjG6MWIwNO896rWnayfj3Ewh9vsk=',
-//     base64: ''
-//   }
-// ])
+const { input, images } = useInput()
 
 defineProps<{
   loading: boolean
 }>()
 
 const emits = defineEmits<{
-  message: [message: string]
+  message: [message: UserMessageInput]
 }>()
 
 const sendMessage = async (event?: KeyboardEvent) => {
@@ -92,7 +74,12 @@ const sendMessage = async (event?: KeyboardEvent) => {
   // prevent enter from being appended
   event?.preventDefault()
 
-  emits('message', input.value)
+  const downscaledImages = await Promise.all(images.value.map((img) => img.downscale(2048, 2048)))
+
+  emits('message', {
+    content: input.value,
+    images: downscaledImages
+  })
   input.value = ''
   return
 }
@@ -137,10 +124,8 @@ const openImageBrowser = () => {
       reader.onload = (e) => {
         const data = e.target?.result;
         if (typeof data === 'string') {
-          images.value.push({
-            src: data,
-            base64: data
-          });
+          const img = new MessageImage(data);
+          images.value.push(img);
         }
       };
       reader.readAsDataURL(file);

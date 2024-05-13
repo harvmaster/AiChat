@@ -1,12 +1,9 @@
+import MessageImage from 'src/utils/App/MessageImage';
 import { ref }  from 'vue'
 
-export type Image = {
-  src: string;
-  base64: string;
-}
 
 const input = ref('')
-const images = ref<Image[]>([])
+const images = ref<MessageImage[]>([])
 
 export const useInput = () => {
 
@@ -14,7 +11,7 @@ export const useInput = () => {
     input.value = value
   }
 
-  const setImages = (value: Image[]) => {
+  const setImages = (value: MessageImage[]) => {
     images.value = value
   }
 

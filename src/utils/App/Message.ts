@@ -58,6 +58,7 @@ export class Message {
 
   public toChatMessage (): ChatMessage {
     return {
+      images: this.images.map(image => image.src),
       content: this.content.value.raw,
       role: this.author === 'user' ? 'user' : 'assistant'
     }

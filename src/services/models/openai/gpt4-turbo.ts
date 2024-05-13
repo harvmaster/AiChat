@@ -1,14 +1,17 @@
 import OpenAI from 'openai';
 import Provider from './Provider';
 
-import { ChatCompletionRequestOptions, ChatCompletionResponse, ChatGenerationResponse, ClosedModel, TextGenerationRequest } from '../types';
+import { ChatCompletionRequestOptions, ChatCompletionResponse, ChatGenerationResponse, ChatHistory, ClosedModel, TextGenerationRequest } from '../types';
 import { Stream } from 'openai/streaming';
+import { ChatCompletionContentPart, ChatCompletionContentPartImage, ChatCompletionMessageParam } from 'openai/resources';
 
 export type OpenAIAdvancedOptions = {
+  image_detail: 'auto' | 'low' | 'high'
   temperature: number
 }
 
 export const defaultAdvancedOptions = {
+  image_detail: 'low' as const,
   temperature: 0.8
 }
 
@@ -21,7 +24,9 @@ class GPT4Turbo implements ClosedModel {
 
   sendChat (request: ChatCompletionRequestOptions, callback?: (response: ChatCompletionResponse) => void, options?: OpenAIAdvancedOptions): ChatGenerationResponse {
     const openai = new OpenAI({ apiKey: Provider.token, dangerouslyAllowBrowser: true });
-    const stream = openai.chat.completions.create({ model: 'gpt-4-turbo', messages: request.messages, stream: true, ...options });
+
+    const messages = this.formatChatHistory(request.messages)
+    const stream = openai.chat.completions.create({ model: 'gpt-4-turbo', messages, stream: true, ...options });
 
     return {
       abort: () => stream.then(s => s.controller.abort()),
@@ -53,6 +58,37 @@ class GPT4Turbo implements ClosedModel {
         content: result
       }
     }
+  }
+
+  // We need to format the chat history to match the OpenAI API. This needs to be done for Ollama too as it has a different api structure
+  formatChatHistory (chatHistory: ChatHistory): ChatCompletionMessageParam[] {
+    return chatHistory.map(message => {
+      if (message.images) {
+        return {
+          role: 'user' as const,
+          content: [
+            ...message.images.map(image => { 
+              return {
+                type: 'image_url' as const,
+                image_url: {
+                  url: image,
+                  detail: this.advancedSettings.image_detail
+                } 
+              } as ChatCompletionContentPartImage
+            }),
+            {
+              type: 'text' as const,
+              text: message.content
+            } as ChatCompletionContentPart
+          ]
+        }
+      }
+
+      return {
+        role: message.role,
+        content: message.content
+      } as ChatCompletionMessageParam
+    })
   }
 }
 

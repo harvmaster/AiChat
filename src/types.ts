@@ -45,6 +45,11 @@ export type HighlightedChunk = {
   highlighted?: string;
 }
 
+export type UserMessageInput = {
+  content: string;
+  images: string[];
+}
+
 export type MessageProps = {
   id: string;
   author: string;

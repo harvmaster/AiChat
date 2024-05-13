@@ -1,8 +1,10 @@
 <template>
   <div class="image-preview-list row q-pb-sm">
-    <div class="col-auto image-preview-item q-pa-sm" v-for="image in props.images" :key="image.src" >
-      <ImagePreview class="" :src="image.src" />
-    </div>
+    <transition-group name="fade" >  
+      <div class="col-auto image-preview-item q-pa-sm" v-for="image in props.images" :key="image.src" >
+        <ImagePreview class="" :src="image.src" />
+      </div>
+    </transition-group>
   </div>
 </template>
 

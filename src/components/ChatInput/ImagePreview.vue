@@ -2,7 +2,7 @@
   <div class="image-preview square">
     <q-img :src="props.src" class="square">
       <div class="absolute-top-right button-container bg-transparent">
-        <q-btn class="image-fab" icon="delete" round dense color="red-4" @click="() => log()" />
+        <q-btn class="image-fab" icon="delete" round dense color="red-4" @click="deleteImage" />
       </div>
     </q-img>
   </div>
@@ -31,7 +31,7 @@
 </style>
 
 <script setup lang="ts">
-
+import useInput from 'src/composeables/useInput';
 
 export type ImagePreviewProps = {
   src: string
@@ -41,5 +41,9 @@ const props = withDefaults(defineProps<ImagePreviewProps>(), {
   src: ''
 })
 
-const log = () => console.log('log')
+const { images } = useInput()
+
+const deleteImage = () => {
+  images.value = images.value.filter(image => image.src !== props.src)
+}
 </script>

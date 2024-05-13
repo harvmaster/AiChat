@@ -1,7 +1,7 @@
 import { ChatHistory, Model } from 'src/services/models';
 import Message from './Message';
 import getMessagesByConversationId from '../Database/Messages/getMessages';
-import { ConversationProps, ConversationI, Database__Conversation } from 'src/types';
+import { ConversationProps, ConversationI, Database__Conversation, UserMessageInput } from 'src/types';
 import generateUUID from 'src/composeables/generateUUID';
 
 export class Conversation implements ConversationI {
@@ -40,11 +40,12 @@ export class Conversation implements ConversationI {
     this.messages = messages.sort((a, b) => a.createdAt - b.createdAt);
   }
 
-  public addUserMessage (content: string): void {
+  public addUserMessage ({ content, images }: UserMessageInput): void {
     const message = new Message({
       id: generateUUID(),
       author: 'user',
-      content: { raw: content }
+      content: { raw: content },
+      images,
     });
 
     this.messages.push(message);
