@@ -61,6 +61,7 @@ class Ollama implements OpenModel {
   sendChat (request: ChatCompletionRequestOptions, callback?: (response: ChatCompletionResponse) => void, options?: OllamaOptions): ChatGenerationResponse {
     const controller = new AbortController()
 
+    // Remove the header information from the base64 image. (removed 'data: image/png;base64' or similar from the start of the string)
     request.messages = request.messages.map(message => {
       return {
         role: message.role,
