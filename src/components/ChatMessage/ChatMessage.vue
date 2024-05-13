@@ -48,9 +48,9 @@
           <chat-message-chunk :type="chunk.type" :output="chunk.output" :raw="chunk.raw" :index="index" :parentLength="message.content.value.chunks.length"/>
         </div>
 
-        <!-- Image Preview ROW -->
-        <div v-if="message.images.length" class="col-12 row q-pt-md">
-          <div class="col-4" v-for="image of message.images" :key="image.src">
+        <!-- Image Preview -->
+        <div v-if="message.images.length" class="col-12 row q-pt-sm">
+          <div class="col-4 q-pa-sm" v-for="image of message.images" :key="image.src">
             <q-img :src="image.src" class="full-width" style="border-radius: 10%; aspect-ratio: 1;"/>
           </div>
           <!-- <image-preview-list class="full-width" :images="message.images" /> -->
