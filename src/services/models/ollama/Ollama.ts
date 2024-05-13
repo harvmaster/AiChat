@@ -60,6 +60,16 @@ class Ollama implements OpenModel {
 
   sendChat (request: ChatCompletionRequestOptions, callback?: (response: ChatCompletionResponse) => void, options?: OllamaOptions): ChatGenerationResponse {
     const controller = new AbortController()
+
+    // Remove the header information from the base64 image. (removed 'data: image/png;base64' or similar from the start of the string)
+    request.messages = request.messages.map(message => {
+      return {
+        role: message.role,
+        content: message.content,
+        images: message.images?.map(image => image.split(',')[1]) || []
+      }
+    })
+
     const response = fetch(`${this.provider.url}/api/chat`, {
       method: 'POST',
       body: JSON.stringify({ model: this.model, messages: request.messages, options: { ...this.advancedSettings, ...options } }),

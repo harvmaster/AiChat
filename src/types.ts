@@ -10,6 +10,7 @@ export interface ConversationI {
 
   getChatHistory: () => ChatMessage[];
   toDatabaseConversation: () => Database__Conversation;
+  unloadMessages: () => Promise<void>;
   loadMessages: () => Promise<void>;
   getConversationSummary: (model: Model) => Promise<string>;
 }
@@ -44,10 +45,16 @@ export type HighlightedChunk = {
   highlighted?: string;
 }
 
+export type UserMessageInput = {
+  content: string;
+  images: string[];
+}
+
 export type MessageProps = {
   id: string;
   author: string;
   content: MessageContent;
+  images?: string[];
   modelId?: string;
   createdAt?: number;
 }
@@ -74,6 +81,7 @@ export type Database__Message = {
   author: string;
   content: string;
   modelId: string;
+  images: string[];
   createdAt: number;
 }
 

@@ -33,7 +33,7 @@ class App {
 
     this.models.value = [ ...formattedModels, ...openaiModels ];
 
-    const conversations = await getConversations({ getMessages: true });
+    const conversations = await getConversations({ getMessages: false });
     this.conversations.value = conversations;
 
     const databaseSettings = await getSettings();

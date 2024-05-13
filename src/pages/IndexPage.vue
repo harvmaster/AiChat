@@ -89,6 +89,7 @@ import ChatHistory from 'src/components/ChatMessage/ChatHistory.vue';
 import ChatInput from 'src/components/ChatInput/ChatInput.vue';
 import SettingsDialog from 'src/components/Settings/SettingsDialog.vue';
 import { Notify } from 'quasar';
+import { UserMessageInput } from 'src/types';
 
 
 const router = useRouter()
@@ -111,7 +112,7 @@ const toggleSettings = () => {
 
 const loading = computed(() => currentConversation.value?.messages.some(message => message.generating) ?? false)
 
-const handleMessage = async (message: string): Promise<void> => {
+const handleMessage = async (message: UserMessageInput): Promise<void> => {
   if (!currentConversation.value) {
     const conversation = app.createConversation()
     router.push(`/${conversation.id}`).then(() => {

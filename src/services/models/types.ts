@@ -3,7 +3,11 @@ import type { ChatCompletionMessageParam } from 'openai/resources';
 // import OpenAI from 'openai';
 
 
-export type ChatMessage = ChatCompletionMessageParam
+export type ChatMessage = {
+  content: string;
+  role: 'user' | 'assistant' | 'system';
+  images?: string[];
+}
 
 export type ChatHistory = ChatMessage[];
 

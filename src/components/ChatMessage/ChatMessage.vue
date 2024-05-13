@@ -43,9 +43,17 @@
       </div>
 
       <!-- Message has renderable content -->
-      <div v-if="message.content.value.chunks" class="col-12">
-        <div class="" v-for="(chunk, index) of message.content.value.chunks" :key="chunk.raw" >
+      <div v-if="message.content.value.chunks" class="col-12 row">
+        <div class="col-12" v-for="(chunk, index) of message.content.value.chunks" :key="chunk.raw" >
           <chat-message-chunk :type="chunk.type" :output="chunk.output" :raw="chunk.raw" :index="index" :parentLength="message.content.value.chunks.length"/>
+        </div>
+
+        <!-- Image Preview -->
+        <div v-if="message.images.length" class="col-12 row q-pt-sm">
+          <div class="col-4 q-pa-sm" v-for="image of message.images" :key="image.src">
+            <q-img :src="image.src" class="full-width" style="border-radius: 10%; aspect-ratio: 1;"/>
+          </div>
+          <!-- <image-preview-list class="full-width" :images="message.images" /> -->
         </div>
       </div>
 
@@ -94,6 +102,7 @@ import useCurrentConversation from 'src/composeables/useCurrentConversation';
 import deleteMessageFromDatabase from 'src/utils/Database/Messages/deleteMessage';
 
 import ChatMessageChunk from './ChatMessageChunk.vue';
+import ImagePreviewList from '../ChatInput/ImagePreviewList.vue';
 
 export type ChatMessageProps = {
   message: Message;
