@@ -30,6 +30,11 @@ export class Conversation implements ConversationI {
     }
   }
 
+  // Keep one message so we can still have a summary
+  public async unloadMessages (): Promise<void> {
+    this.messages = [this.messages[0]];
+  }
+
   public async loadMessages (): Promise<void> {
     const messages = await getMessagesByConversationId(this.id);
     this.messages = messages.sort((a, b) => a.createdAt - b.createdAt);

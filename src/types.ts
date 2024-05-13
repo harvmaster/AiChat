@@ -10,6 +10,7 @@ export interface ConversationI {
 
   getChatHistory: () => ChatMessage[];
   toDatabaseConversation: () => Database__Conversation;
+  unloadMessages: () => Promise<void>;
   loadMessages: () => Promise<void>;
   getConversationSummary: (model: Model) => Promise<string>;
 }
@@ -50,6 +51,7 @@ export type MessageProps = {
   content: MessageContent;
   modelId?: string;
   createdAt?: number;
+
 }
 
 export interface MessageI {

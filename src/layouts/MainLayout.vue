@@ -123,7 +123,7 @@
 <script setup lang="ts">
 import Conversation from 'src/utils/App/Conversation';
 
-import { computed, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router';
 import { app } from 'boot/app'
 
@@ -145,10 +145,39 @@ const deleteConversation = async (conversation: Conversation) => {
   app.conversations.value = app.conversations.value.filter((c) => c.id !== conversation.id)
 }
 
+const unloadCurrentConversation = () => {
+  const currentConversation = app.conversations.value.find((c) => c.id === router.currentRoute.value.params.id)
+  if (currentConversation) {
+    currentConversation.unloadMessages()
+  }
+}
+
+const loadConverstionMessages = async (conversation: Conversation) => {
+  await conversation.loadMessages()
+}
+
 const sortedConversation = computed<Conversation[]>(() => {
   return [...app.conversations.value].sort((a, b) => b.messages.sort((c, d) => c.createdAt - d.createdAt)[0]?.createdAt - a.messages.sort((c, d) => c.createdAt - d.createdAt)[0]?.createdAt)
 })
-const routeToConversation = (id: string) => {
-  router.push(`/${id}`)
+const routeToConversation = async (id: string) => {
+  const conversation = app.conversations.value.find((c) => c.id === id)
+  if (!conversation) {
+    return
+  }
+
+  if (router.currentRoute.value.params.id === id) {
+    return
+  }
+
+  unloadCurrentConversation()
+  loadConverstionMessages(conversation)
+    router.push(`/${id}`)
 }
+
+onMounted(() => {
+  const currentConversation = app.conversations.value.find((c) => c.id === router.currentRoute.value.params.id)
+  if (currentConversation) {
+    loadConverstionMessages(currentConversation)
+  }
+})
 </script>
