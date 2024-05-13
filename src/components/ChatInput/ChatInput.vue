@@ -2,7 +2,7 @@
   <div class="col-12 bg-primary q-pa-md rounded-borders input-border row">
 
     <!-- Image Preview ROW -->
-    <div class="col-12 q-pb-sm">
+    <div v-if="images.length" class="col-12 q-pb-sm">
       <image-preview-list class="full-width" :images="images" />
     </div>
 
@@ -51,24 +51,24 @@ import { ImagePreviewProps } from './ImagePreview.vue';
 
 const { input, setInput, images, setImages } = useInput()
 
-setImages([
-  {
-    src: 'https://media.istockphoto.com/id/1480959448/photo/data-in-cage-big-data-cloud-computing-blockchain-and-artificial-intelligence-concept.jpg?s=2048x2048&w=is&k=20&c=alXcIWxmpRMk1vqDjG6MWIwNO896rWnayfj3Ewh9vsk=',
-    base64: ''
-  },
-  {
-    src: 'https://media.istockphoto.com/id/1480959448/photo/data-in-cage-big-data-cloud-computing-blockchain-and-artificial-intelligence-concept.jpg?s=2048x2048&w=is&k=20&c=alXcIWxmpRMk1vqDjG6MWIwNO896rWnayfj3Ewh9vsk=',
-    base64: ''
-  },
-  {
-    src: 'https://media.istockphoto.com/id/1480959448/photo/data-in-cage-big-data-cloud-computing-blockchain-and-artificial-intelligence-concept.jpg?s=2048x2048&w=is&k=20&c=alXcIWxmpRMk1vqDjG6MWIwNO896rWnayfj3Ewh9vsk=',
-    base64: ''
-  },
-  {
-    src: 'https://media.istockphoto.com/id/1480959448/photo/data-in-cage-big-data-cloud-computing-blockchain-and-artificial-intelligence-concept.jpg?s=2048x2048&w=is&k=20&c=alXcIWxmpRMk1vqDjG6MWIwNO896rWnayfj3Ewh9vsk=',
-    base64: ''
-  }
-])
+// setImages([
+//   {
+//     src: 'https://media.istockphoto.com/id/1480959448/photo/data-in-cage-big-data-cloud-computing-blockchain-and-artificial-intelligence-concept.jpg?s=2048x2048&w=is&k=20&c=alXcIWxmpRMk1vqDjG6MWIwNO896rWnayfj3Ewh9vsk=',
+//     base64: ''
+//   },
+//   {
+//     src: 'https://media.istockphoto.com/id/1480959448/photo/data-in-cage-big-data-cloud-computing-blockchain-and-artificial-intelligence-concept.jpg?s=2048x2048&w=is&k=20&c=alXcIWxmpRMk1vqDjG6MWIwNO896rWnayfj3Ewh9vsk=',
+//     base64: ''
+//   },
+//   {
+//     src: 'https://media.istockphoto.com/id/1480959448/photo/data-in-cage-big-data-cloud-computing-blockchain-and-artificial-intelligence-concept.jpg?s=2048x2048&w=is&k=20&c=alXcIWxmpRMk1vqDjG6MWIwNO896rWnayfj3Ewh9vsk=',
+//     base64: ''
+//   },
+//   {
+//     src: 'https://media.istockphoto.com/id/1480959448/photo/data-in-cage-big-data-cloud-computing-blockchain-and-artificial-intelligence-concept.jpg?s=2048x2048&w=is&k=20&c=alXcIWxmpRMk1vqDjG6MWIwNO896rWnayfj3Ewh9vsk=',
+//     base64: ''
+//   }
+// ])
 
 defineProps<{
   loading: boolean
@@ -123,15 +123,20 @@ const openImageBrowser = () => {
   const input = document.createElement('input');
   input.type = 'file';
   input.accept = 'image/*';
+  input.multiple = true
   input.onchange = (event) => {
     const target = event.target as HTMLInputElement;
-    const file = target.files?.[0];
-    if (file) {
+    const files = target.files;
+    if (!files) {
+      return;
+    }
+
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
       const reader = new FileReader();
       reader.onload = (e) => {
         const data = e.target?.result;
         if (typeof data === 'string') {
-          console.log(data)
           images.value.push({
             src: data,
             base64: data

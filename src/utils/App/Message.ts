@@ -32,7 +32,7 @@ export class Message {
     this.modelId = props.modelId || '';
     this.createdAt = props.createdAt || Date.now();
 
-    this.images = props.images.map(image => new MessageImage(image))
+    this.images = props.images?.map(image => new MessageImage(image)) || []
   }
   
   public async highlightMessage (): Promise<void> {
@@ -51,6 +51,7 @@ export class Message {
       author: this.author,
       content: this.content.value.raw,
       modelId: this.modelId,
+      images: this.images.map(image => image.src),
       createdAt: this.createdAt
     }
   }

@@ -49,10 +49,9 @@ export type MessageProps = {
   id: string;
   author: string;
   content: MessageContent;
+  images?: string[];
   modelId?: string;
   createdAt?: number;
-
-  images: string[];
 }
 
 export interface MessageI {
