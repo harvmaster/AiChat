@@ -8,6 +8,7 @@ export default async function saveMessages(conversationId: string, messages: Mes
   const store = tx.objectStore('messages');
 
   for (const message of messages) {
+    // console.log('Saving message', message)
     const formatted = {
       ...message.toDatabaseMessage(),
       conversationId: conversationId,

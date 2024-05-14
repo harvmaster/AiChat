@@ -8,6 +8,9 @@
         <div class="rainbow-text col-auto">
           AI Chat
         </div>
+        <div class="col-auto">
+          <q-btn flat round dense icon="refresh" color="white" @click="printConversations" />
+        </div>
       </div>
     </q-header>
 
@@ -161,6 +164,9 @@ const loadConverstionMessages = async (conversation: Conversation) => {
 }
 
 const sortedConversation = computed<Conversation[]>(() => {
+  console.log('sorting')
+  console.table(app.conversations.value)
+  console.log(app.conversations.value)
   return [...app.conversations.value].sort((a, b) => b.messages.sort((c, d) => c.createdAt - d.createdAt)[0]?.createdAt - a.messages.sort((c, d) => c.createdAt - d.createdAt)[0]?.createdAt)
 })
 const routeToConversation = async (id: string) => {
@@ -178,16 +184,18 @@ const routeToConversation = async (id: string) => {
     router.push(`/${id}`)
 }
 
-// const printConversations = () => {
-//   const cs = app.conversations.value.map(conversation => {
-//     return {
-//       lastMessage: conversation.messages.at(-1)?.createdAt,
-//       summary: conversation.summary
-//     }
-//   })
+const printConversations = () => {
+  const cs = app.conversations.value.map(conversation => {
+    return {
+      // lastMessage: conversation.messages.at(-1)?.createdAt,
+      id: conversation.id,
+      messages: conversation.messages,
+      summary: conversation.summary
+    }
+  })
 
-//   console.log(cs)
-// }
+  console.log(cs)
+}
 
 onMounted(() => {
   const currentConversation = app.conversations.value.find((c) => c.id === router.currentRoute.value.params.id)

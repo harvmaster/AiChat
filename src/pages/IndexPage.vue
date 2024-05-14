@@ -114,6 +114,7 @@ const loading = computed(() => currentConversation.value?.messages.some(message 
 
 const handleMessage = async (message: UserMessageInput): Promise<void> => {
   if (!currentConversation.value) {
+    console.log('no conversation, creating one')
     const conversation = app.createConversation()
     router.push(`/${conversation.id}`).then(() => {
       handleMessage(message)
