@@ -27,12 +27,17 @@ export type ChatGenerationResponse = {
   response: Promise<ChatCompletionResponse>;
 }
 
+export type PortableEngine = EngineProps & {
+  id: string;
+}
+
 export type PortableModel = {
   id: string;
   name: string;
   model: string;
-  engine: EngineProps & { id: string };
+  engine: PortableEngine
   advancedSettings: Partial<ModelSettings>;
+  createdAt?: number;
 }
 
 export type ModelProps = {
@@ -57,6 +62,7 @@ export interface BaseModel {
   sendChat(request: ChatCompletionRequestOptions, callback?: (result: ChatCompletionResponse) => void,): ChatGenerationResponse;
   generateText(request: TextGenerationRequest, callback?: (result: ChatCompletionResponse) => void,): ChatGenerationResponse;
   createShareableURL(): string;
+  toPortableModel(): PortableModel;
 }
 
 export type BaseEngineProps = {

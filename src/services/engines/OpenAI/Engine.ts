@@ -46,6 +46,16 @@ export class OpenAIEngine implements OpenAIEngineI {
 
     throw new Error(`Model ${model.model} is not supported by OpenAI`);
   }
+
+  toPortableEngine () {
+    return {
+      id: this.id,
+      name: this.name,
+      type: this.type,
+      token: this.token,
+      createdAt: this.createdAt,
+    }
+  }
 }
 
 export default OpenAIEngine

@@ -4,7 +4,7 @@ import { Stream } from "openai/streaming";
 import { OpenAIEngine } from "../Engine";
 import OpenAIModel, { OpenAIModelProps } from "./Model";
 
-import { Capabilities, ChatCompletionRequestOptions, ChatCompletionResponse, ChatGenerationResponse, ChatHistory, ModelSettings, SupportLevel, TextGenerationRequest } from "../../types";
+import { Capabilities, ChatCompletionRequestOptions, ChatCompletionResponse, ChatGenerationResponse, ChatHistory, ModelSettings, PortableModel, SupportLevel, TextGenerationRequest } from "../../types";
 
 import generateUUID from "src/composeables/generateUUID";
 
@@ -75,6 +75,17 @@ export class GPT3_5Turbo implements GPT3_5TurboI {
 
   createShareableURL(): string {
     return `https://beta.openai.com/models/${this.model}`;
+  }
+
+  toPortableModel(): PortableModel {
+    return {
+      id: this.id,
+      name: this.name,
+      model: this.model,
+      engine: this.engine.toPortableEngine(),
+      advancedSettings: this.advancedSettings,
+      createdAt: this.createdAt,
+    }
   }
 }
 

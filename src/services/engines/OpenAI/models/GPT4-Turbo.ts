@@ -5,7 +5,7 @@ import { ChatCompletionContentPart, ChatCompletionContentPartImage, ChatCompleti
 import { OpenAIEngine } from "../Engine";
 import OpenAIModel, { OpenAIModelProps } from "./Model";
 
-import { Capabilities, ChatCompletionRequestOptions, ChatCompletionResponse, ChatGenerationResponse, ChatHistory, ModelSettings, SupportLevel, TextGenerationRequest } from "../../types";
+import { Capabilities, ChatCompletionRequestOptions, ChatCompletionResponse, ChatGenerationResponse, ChatHistory, ModelSettings, PortableModel, SupportLevel, TextGenerationRequest } from "../../types";
 
 import generateUUID from "src/composeables/generateUUID";
 
@@ -109,6 +109,17 @@ export class GPT4Turbo implements GPT4TurboI {
 
   createShareableURL(): string {
     return `${this.engine.id}/models/${this.id}`
+  }
+
+  toPortableModel(): PortableModel {
+    return {
+      id: this.id,
+      name: this.name,
+      model: this.model,
+      engine: this.engine.toPortableEngine(),
+      advancedSettings: this.advancedSettings,
+      createdAt: this.createdAt,
+    }
   }
 }
 
