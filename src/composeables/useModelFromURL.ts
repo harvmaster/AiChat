@@ -16,7 +16,8 @@ export const useModelFromURL = () => {
     // console.log(to.query.model)
     if (!to.query.model) return
 
-    const model = JSON.parse(to.query.model as string) as unknown as OpenModel
+    const modelString = atob(to.query.model as string)
+    const model = JSON.parse(modelString) as unknown as OpenModel
     if (!model) return
 
     // console.log(model)
