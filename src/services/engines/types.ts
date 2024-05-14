@@ -27,6 +27,14 @@ export type ChatGenerationResponse = {
   response: Promise<ChatCompletionResponse>;
 }
 
+export type PortableModel = {
+  id: string;
+  name: string;
+  model: string;
+  engine: EngineProps & { id: string };
+  advancedSettings: Partial<ModelSettings>;
+}
+
 export type ModelProps = {
   id?: string;
   name: string;
@@ -40,14 +48,18 @@ export interface BaseModel {
   name: string;
   model: string;
   createdAt?: number;
+  
   engine: Engine;
+
+  advancedSettings: Partial<ModelSettings>;
   capabilities: Capabilities;
+
   sendChat(request: ChatCompletionRequestOptions, callback?: (result: ChatCompletionResponse) => void,): ChatGenerationResponse;
   generateText(request: TextGenerationRequest, callback?: (result: ChatCompletionResponse) => void,): ChatGenerationResponse;
   createShareableURL(): string;
 }
 
-export type EngineProps = {
+export type BaseEngineProps = {
   id?: string;
   name: string;
   type: string;
@@ -64,10 +76,9 @@ export interface BaseEngine {
 
 export interface ClosedModel extends BaseModel {
   engine: ClosedEngine;
-  advancedSettings: Partial<ModelSettings>;
 }
 
-export type ClosedEngineProps = EngineProps & {
+export type ClosedEngineProps = BaseEngineProps & {
   token: string;
 }
 
@@ -78,10 +89,9 @@ export interface ClosedEngine extends BaseEngine {
 
 export interface OpenModel extends BaseModel {
   engine: OpenEngine;
-  advancedSettings: Partial<ModelSettings>;
 }
 
-export type OpenEngineProps = EngineProps & {
+export type OpenEngineProps = BaseEngineProps & {
   url: string;
 }
 
@@ -91,8 +101,8 @@ export interface OpenEngine extends BaseEngine {
 }
 
 export type Model = ClosedModel | OpenModel;
-
 export type Engine = ClosedEngine | OpenEngine;
+export type EngineProps = ClosedEngineProps | OpenEngineProps;
 
 export type ModelSettings = {
   num_keep: number,
