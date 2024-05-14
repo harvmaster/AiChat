@@ -68,6 +68,18 @@ class App {
     return newConversation;
   }
 
+  listeners: Record<string, ((...args: any[]) => void)[]> = {}
+  on (event: string, callback: (...args: any[]) => void) {
+    console.log('created listener', event, callback)
+    if (!this.listeners[event]) this.listeners[event] = []
+    this.listeners[event].push(callback)
+  }
+  emit (event: string, ...args: any[]) {
+    console.log('emitting', event, args)
+    if (!this.listeners[event]) return
+    this.listeners[event].forEach(listener => listener(...args))
+  }
+
 }
 
 const app = new App();
@@ -75,6 +87,9 @@ const app = new App();
 const initApp = async () => {
   await app.loadFromDatabase()
   app.initListeners()
+
+  console.log('loaded')
+  app.emit('app:loaded')
 }
 initApp()
 
