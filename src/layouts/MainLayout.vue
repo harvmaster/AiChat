@@ -32,7 +32,7 @@
         </div>
       </div>
       <q-separator class="bg-white"/>
-      <div class="drawer-item row q-col-gutter-x-sm" v-for="conversation of sortedConversation" :key="conversation.id" :conversation="conversation" @click="() => routeToConversation(conversation.id)">
+      <div class="drawer-item row q-col-gutter-x-sm" v-for="conversation of sortedConversations" :key="conversation.id" :conversation="conversation" @click="() => routeToConversation(conversation.id)">
         <!-- <div class="drawer-item-icon col-auto">
           <q-icon name="note" />
         </div> -->
@@ -164,9 +164,14 @@ const loadConverstionMessages = async (conversation: Conversation) => {
   await conversation.loadMessages()
 }
 
-const sortedConversation = computed<Conversation[]>(() => {
-  return app.conversations.value.toSorted((a, b) => b.messages.sort((c, d) => c.createdAt - d.createdAt)[0]?.createdAt - a.messages.sort((c, d) => c.createdAt - d.createdAt)[0]?.createdAt)
-})
+const sortedConversations = ref<Conversation[]>([])
+const sortConversations = () => {
+  sortedConversations.value = app.conversations.value.toSorted((a, b) => b.messages.sort((c, d) => c.createdAt - d.createdAt)[0]?.createdAt - a.messages.sort((c, d) => c.createdAt - d.createdAt)[0]?.createdAt)
+}
+
+// const sortedConversation = computed<Conversation[]>(() => {
+//   return app.conversations.value.toSorted((a, b) => b.messages.sort((c, d) => c.createdAt - d.createdAt)[0]?.createdAt - a.messages.sort((c, d) => c.createdAt - d.createdAt)[0]?.createdAt)
+// })
 const routeToConversation = async (id: string) => {
   const conversation = app.conversations.value.find((c) => c.id === id)
   if (!conversation) {
@@ -197,7 +202,9 @@ const printConversations = () => {
 
 app.on('app:loaded', () => {
   console.log('app loaded')
+  console.log('current conversation', currentConversation.value)
   currentConversation.value?.loadMessages()
+  sortConversations()
 })
 
 onMounted(() => {

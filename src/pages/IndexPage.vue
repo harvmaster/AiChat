@@ -117,6 +117,8 @@ const handleMessage = async (message: UserMessageInput): Promise<void> => {
   if (!conversation) {
     console.log('no conversation, creating one')
     conversation = app.createConversation()
+
+    // We get the conversation from the app as it is not reactive until we read it from the app
     conversation = app.conversations.value.find((c) => c.id === conversation!.id)!
     router.push(`/${conversation.id}`)
   }
