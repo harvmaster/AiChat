@@ -126,7 +126,7 @@
 <script setup lang="ts">
 import Conversation from 'src/utils/App/Conversation';
 
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router';
 import { app } from 'boot/app'
 
@@ -172,6 +172,7 @@ const sortConversations = () => {
 // const sortedConversation = computed<Conversation[]>(() => {
 //   return app.conversations.value.toSorted((a, b) => b.messages.sort((c, d) => c.createdAt - d.createdAt)[0]?.createdAt - a.messages.sort((c, d) => c.createdAt - d.createdAt)[0]?.createdAt)
 // })
+
 const routeToConversation = async (id: string) => {
   const conversation = app.conversations.value.find((c) => c.id === id)
   if (!conversation) {
@@ -196,7 +197,6 @@ const printConversations = () => {
       summary: conversation.summary
     }
   })
-
   console.log(cs)
 }
 
@@ -210,5 +210,8 @@ app.on('app:loaded', () => {
 onMounted(() => {
   console.log('mounted')
   currentConversation.value?.loadMessages()
+
 })
+
+sortConversations()
 </script>

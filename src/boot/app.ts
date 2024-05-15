@@ -90,6 +90,7 @@ const app = new App();
 const initApp = async () => {
   await app.loadFromDatabase()
   app.initListeners()
+  console.log('loaded')
   app.emit('app:loaded')
 }
 

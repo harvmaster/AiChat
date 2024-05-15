@@ -27,8 +27,8 @@ export default async function getConversations(options?: GetConversationsOptions
 
   // We need at least first and last message if the summary isnt set, so lets get that if we need it. Last message is needed to know when the conversation was last updated
   // Kind of want to update the input to be from and count. So you define the length of the outputted array.
-  formattedConversations.forEach(converstaion => {
-    converstaion.loadMessages({ subArrays: [
+  await Promise.all(formattedConversations.map(converstaion => {
+    return converstaion.loadMessages({ subArrays: [
       {
         from: 0,
         count: 1
@@ -38,7 +38,7 @@ export default async function getConversations(options?: GetConversationsOptions
         count: 1
       }
     ]})
-  })
+  }))
 
   return formattedConversations;
 }
