@@ -2,7 +2,7 @@ import { reactive, watch } from 'vue';
 
 import { ClosedModel, Model, Provider } from 'src/services/models';
 import { loadOllamaModels } from 'src/services/models/ollama';
-import { GPT3_5Turbo, GPT4Turbo, initOpenAIProvider } from 'src/services/models/openai';
+import { GPT3_5Turbo, GPT4Turbo, GPT4o, initOpenAIProvider } from 'src/services/models/openai';
 
 import { Settings } from 'src/types';
 import Conversation from 'src/utils/App/Conversation';
@@ -11,7 +11,6 @@ import {
   saveConversations, saveModels, saveSettings
  } from 'src/utils/Database';
 import generateUUID from 'src/composeables/generateUUID';
-import { emit } from 'process';
 
 class App {
   readonly conversations = reactive<{ value: Conversation[] }>({ value: []})
@@ -28,7 +27,8 @@ class App {
 
     const openaiModels: ClosedModel[] = [
       GPT3_5Turbo,
-      GPT4Turbo
+      GPT4Turbo,
+      GPT4o
     ]
     await initOpenAIProvider()
 
