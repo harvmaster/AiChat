@@ -30,3 +30,7 @@ export const validatePortableModel = (model: PortableModel) => {
     throw new Error('Model engine must have a createdAt')
   }
 }
+
+export const createShareableURL = (portableModel: PortableModel): string => {
+  return `${window.location.origin}/#/?${btoa(JSON.stringify(portableModel))}`
+}

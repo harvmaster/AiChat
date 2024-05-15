@@ -8,6 +8,7 @@ import OpenAIModel, { OpenAIModelProps } from "./Model";
 import { Capabilities, ChatCompletionRequestOptions, ChatCompletionResponse, ChatGenerationResponse, ChatHistory, ModelSettings, PortableModel, SupportLevel, TextGenerationRequest } from "../../types";
 
 import generateUUID from "src/composeables/generateUUID";
+import { createPortableModelURL } from "../../utils";
 
 export interface GPT4TurboI extends OpenAIModel {
   model: 'gpt-4-turbo';
@@ -107,8 +108,10 @@ export class GPT4Turbo implements GPT4TurboI {
     })
   }
 
-  createShareableURL(): string {
-    return `${window.location.origin}/?${btoa(JSON.stringify(this.toPortableModel()))}`
+  createShareableURL(portableModel?: PortableModel): string {
+    if (!portableModel) portableModel = this.toPortableModel()
+
+    return createPortableModelURL(portableModel)
   }
 
   toPortableModel(): PortableModel {

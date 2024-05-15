@@ -61,7 +61,7 @@ export interface BaseModel {
 
   sendChat(request: ChatCompletionRequestOptions, callback?: (result: ChatCompletionResponse) => void,): ChatGenerationResponse;
   generateText(request: TextGenerationRequest, callback?: (result: ChatCompletionResponse) => void,): ChatGenerationResponse;
-  createShareableURL(): string;
+  createShareableURL(portableModel?: PortableModel): string;
   toPortableModel(): PortableModel;
 }
 

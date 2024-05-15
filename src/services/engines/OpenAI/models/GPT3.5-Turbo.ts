@@ -73,8 +73,10 @@ export class GPT3_5Turbo implements GPT3_5TurboI {
     }
   }
 
-  createShareableURL(): string {
-    return `${window.location.origin}/#/?${btoa(JSON.stringify(this.toPortableModel()))}`
+  createShareableURL(portableModel?: PortableModel): string {
+    if (!portableModel) portableModel = this.toPortableModel()
+
+    return createPortableModelURL(portableModel)
   }
 
   toPortableModel(): PortableModel {

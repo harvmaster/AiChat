@@ -1,6 +1,7 @@
 import generateUUID from "src/composeables/generateUUID";
 import { Capabilities, ChatCompletionRequestOptions, ChatCompletionResponse, ChatGenerationResponse, ModelProps, ModelSettings, OpenModel, PortableModel, SupportLevel, TextGenerationRequest } from "../types";
 import OllamaEngine from "./Engine";
+import { createPortableModelURL } from "../utils";
 
 export interface OllamaModelI extends OpenModel {
   engine: OllamaEngine;
@@ -120,8 +121,10 @@ export class OllamaModel implements OllamaModelI {
     }
   }
 
-  createShareableURL(): string {
-    return `${window.location.origin}/#/?${btoa(JSON.stringify(this.toPortableModel()))}`
+  createShareableURL(portableModel?: PortableModel): string {
+    if (!portableModel) portableModel = this.toPortableModel()
+
+    return createPortableModelURL(portableModel)
   }
 
   toPortableModel(): PortableModel {
