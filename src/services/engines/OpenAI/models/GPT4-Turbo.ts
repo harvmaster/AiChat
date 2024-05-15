@@ -108,7 +108,7 @@ export class GPT4Turbo implements GPT4TurboI {
   }
 
   createShareableURL(): string {
-    return `${this.engine.id}/models/${this.id}`
+    return `${window.location.origin}/?${btoa(JSON.stringify(this.toPortableModel()))}`
   }
 
   toPortableModel(): PortableModel {

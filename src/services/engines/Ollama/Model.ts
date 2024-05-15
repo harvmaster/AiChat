@@ -1,5 +1,5 @@
 import generateUUID from "src/composeables/generateUUID";
-import { Capabilities, ChatCompletionRequestOptions, ChatCompletionResponse, ChatGenerationResponse, ModelProps, ModelSettings, OpenModel, SupportLevel, TextGenerationRequest } from "../types";
+import { Capabilities, ChatCompletionRequestOptions, ChatCompletionResponse, ChatGenerationResponse, ModelProps, ModelSettings, OpenModel, PortableModel, SupportLevel, TextGenerationRequest } from "../types";
 import OllamaEngine from "./Engine";
 
 export interface OllamaModelI extends OpenModel {
@@ -16,7 +16,7 @@ export class OllamaModel implements OllamaModelI {
   model: string;
   createdAt: number;
   engine: OllamaEngine;
-  
+
   advancedSettings: Partial<ModelSettings> = {
     temperature: 0.8
   };
@@ -120,8 +120,19 @@ export class OllamaModel implements OllamaModelI {
     }
   }
 
-  createShareableURL (): string {
-    return `${this.engine.url}/${this.id}`;
+  createShareableURL(): string {
+    return `${window.location.origin}/#/?${btoa(JSON.stringify(this.toPortableModel()))}`
+  }
+
+  toPortableModel(): PortableModel {
+    return {
+      id: this.id,
+      name: this.name,
+      model: this.model,
+      engine: this.engine.toPortableEngine(),
+      advancedSettings: this.advancedSettings,
+      createdAt: this.createdAt,
+    }
   }
 }
 

@@ -74,7 +74,7 @@ export class GPT3_5Turbo implements GPT3_5TurboI {
   }
 
   createShareableURL(): string {
-    return `https://beta.openai.com/models/${this.model}`;
+    return `${window.location.origin}/#/?${btoa(JSON.stringify(this.toPortableModel()))}`
   }
 
   toPortableModel(): PortableModel {
