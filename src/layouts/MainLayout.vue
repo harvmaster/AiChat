@@ -133,8 +133,10 @@ import { app } from 'boot/app'
 import deleteConversationFromDatabase from 'src/utils/Database/Conversations/deleteConversation';
 
 import useModelFromURL from 'src/composeables/useModelFromURL';
+import useCurrentConversation from 'src/composeables/useCurrentConversation';
 
 const router = useRouter()
+const currentConversation = useCurrentConversation()
 
 useModelFromURL()
 
@@ -153,9 +155,8 @@ const deleteConversation = async (conversation: Conversation) => {
 }
 
 const unloadCurrentConversation = () => {
-  const currentConversation = app.conversations.value.find((c) => c.id === router.currentRoute.value.params.id)
-  if (currentConversation) {
-    currentConversation.unloadMessages()
+  if (currentConversation.value) {
+    currentConversation.value.unloadMessages()
   }
 }
 
@@ -164,10 +165,7 @@ const loadConverstionMessages = async (conversation: Conversation) => {
 }
 
 const sortedConversation = computed<Conversation[]>(() => {
-  console.log('sorting')
-  console.table(app.conversations.value)
-  console.log(app.conversations.value)
-  return [...app.conversations.value].sort((a, b) => b.messages.sort((c, d) => c.createdAt - d.createdAt)[0]?.createdAt - a.messages.sort((c, d) => c.createdAt - d.createdAt)[0]?.createdAt)
+  return app.conversations.value.toSorted((a, b) => b.messages.sort((c, d) => c.createdAt - d.createdAt)[0]?.createdAt - a.messages.sort((c, d) => c.createdAt - d.createdAt)[0]?.createdAt)
 })
 const routeToConversation = async (id: string) => {
   const conversation = app.conversations.value.find((c) => c.id === id)
@@ -180,8 +178,8 @@ const routeToConversation = async (id: string) => {
   }
 
   unloadCurrentConversation()
-  loadConverstionMessages(conversation)
-    router.push(`/${id}`)
+  await loadConverstionMessages(conversation)
+  router.push(`/${id}`)
 }
 
 const printConversations = () => {
@@ -197,11 +195,13 @@ const printConversations = () => {
   console.log(cs)
 }
 
-onMounted(() => {
-  const currentConversation = app.conversations.value.find((c) => c.id === router.currentRoute.value.params.id)
-  if (currentConversation) {
-    loadConverstionMessages(currentConversation)
-  }
+app.on('app:loaded', () => {
+  console.log('app loaded')
+  currentConversation.value?.loadMessages()
+})
 
+onMounted(() => {
+  console.log('mounted')
+  currentConversation.value?.loadMessages()
 })
 </script>

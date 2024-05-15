@@ -113,22 +113,21 @@ const toggleSettings = () => {
 const loading = computed(() => currentConversation.value?.messages.some(message => message.generating) ?? false)
 
 const handleMessage = async (message: UserMessageInput): Promise<void> => {
-  if (!currentConversation.value) {
+  let conversation = currentConversation.value;
+  if (!conversation) {
     console.log('no conversation, creating one')
-    const conversation = app.createConversation()
-    router.push(`/${conversation.id}`).then(() => {
-      handleMessage(message)
-    })
-    return
+    conversation = app.createConversation()
+    conversation = app.conversations.value.find((c) => c.id === conversation!.id)!
+    router.push(`/${conversation.id}`)
   }
 
   try {
     const model = app.settings.value.selectedModel
     if (!model) throw new Error('No model selected')
 
-    currentConversation.value.addUserMessage(message);
-    await currentConversation.value.addAssistantMessage(model);
-    currentConversation.value.getConversationSummary(model)
+    conversation.addUserMessage(message);
+    await conversation.addAssistantMessage(model);
+    conversation.getConversationSummary(model)
   } catch (error) {
     console.error(error)
     

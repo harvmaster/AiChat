@@ -9,7 +9,7 @@ type GetConversationsOptions = {
 export default async function getConversations(options?: GetConversationsOptions): Promise<Conversation[]> {
   const db = await EasyIDB.getDB(settings.dbName, settings.dbVersion);
 
-  const tx = db.db.transaction('conversations', 'readonly');
+  const tx = db.db.transaction('conversations', 'readwrite');
   const store = tx.objectStore('conversations');
 
   const conversations = await store.getAll();
@@ -31,11 +31,11 @@ export default async function getConversations(options?: GetConversationsOptions
     converstaion.loadMessages({ subArrays: [
       {
         from: 0,
-        to: 1
+        count: 1
       },
       {
-        from: -2,
-        to: -1
+        from: -1,
+        count: 1
       }
     ]})
   })

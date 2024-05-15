@@ -20,14 +20,20 @@ const currentConvsation = ref<Conversation | undefined>(undefined)
 let watcher: WatchStopHandle | undefined
 export const useCurrentConversation = (): Ref<Conversation | undefined> => {
   const router = useRouter()
+
+  currentConvsation.value = getConversationFromId(router.currentRoute.value.params.id as string)
   
   if (!watcher) {
     watcher = watch(() => router.currentRoute.value.params.id, (id) => {
-      currentConvsation.value = app.conversations.value.find(conversation => conversation.id == id)
+      currentConvsation.value = getConversationFromId(id as string)
     })
   }
 
   return currentConvsation
+}
+
+const getConversationFromId = (id: string): Conversation | undefined => {
+  return app.conversations.value.find(conversation => conversation.id == id)
 }
 
 export default useCurrentConversation 

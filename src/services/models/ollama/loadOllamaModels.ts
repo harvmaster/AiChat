@@ -8,8 +8,11 @@ const defaultOllamaModels = [
 ]
 
 export const loadOllamaModels = async () => {
+  console.log('loading ollama models')
   const providers = await getProviders();
+  console.log('loaded providers')
   const models = await getModels();
+  console.log('loaded models')
 
   const formattedModels = models.map((model) => {
     const provider_db = providers.find((provider) => provider.id === model.providerId);
