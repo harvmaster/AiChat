@@ -164,6 +164,10 @@ const loadConverstionMessages = async (conversation: Conversation) => {
   await conversation.loadMessages()
 }
 
+watch(app.conversations.value, () => {
+  // console.log('conversations changed, start sorting')
+  sortConversations()
+})
 const sortedConversations = ref<Conversation[]>([])
 const sortConversations = () => {
   sortedConversations.value = app.conversations.value.toSorted((a, b) => b.messages.sort((c, d) => c.createdAt - d.createdAt)[0]?.createdAt - a.messages.sort((c, d) => c.createdAt - d.createdAt)[0]?.createdAt)
@@ -172,7 +176,6 @@ const sortConversations = () => {
 // const sortedConversation = computed<Conversation[]>(() => {
 //   return app.conversations.value.toSorted((a, b) => b.messages.sort((c, d) => c.createdAt - d.createdAt)[0]?.createdAt - a.messages.sort((c, d) => c.createdAt - d.createdAt)[0]?.createdAt)
 // })
-
 const routeToConversation = async (id: string) => {
   const conversation = app.conversations.value.find((c) => c.id === id)
   if (!conversation) {
@@ -197,6 +200,7 @@ const printConversations = () => {
       summary: conversation.summary
     }
   })
+
   console.log(cs)
 }
 
@@ -210,8 +214,6 @@ app.on('app:loaded', () => {
 onMounted(() => {
   console.log('mounted')
   currentConversation.value?.loadMessages()
-
+  sortConversations()
 })
-
-sortConversations()
 </script>
