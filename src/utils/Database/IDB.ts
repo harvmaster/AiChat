@@ -59,6 +59,7 @@ class EasyIDB {
     if (!this.dbInstance) {
       EasyIDB.dbInstance = new EasyIDB(await openDB<DatabaseSchema>(dbName, version, {
         upgrade(db) {
+          console.log('upgrading')
           if (!db.objectStoreNames.contains('conversations')) {
             db.createObjectStore('conversations', { keyPath: 'id' });
           }
@@ -78,7 +79,14 @@ class EasyIDB {
         },
         blocked() {
           console.error('blocked')
+        },
+        blocking() {
+          console.error('blocking')
+        },
+        terminated() {
+          console.error('terminated')
         }
+
       }));
     }
 

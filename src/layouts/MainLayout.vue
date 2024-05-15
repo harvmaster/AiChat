@@ -8,6 +8,9 @@
         <div class="rainbow-text col-auto">
           AI Chat
         </div>
+        <div class="col-auto">
+          <q-btn flat round dense icon="refresh" color="white" @click="printConversations" />
+        </div>
       </div>
     </q-header>
 
@@ -133,13 +136,7 @@ import useModelFromURL from 'src/composeables/useModelFromURL';
 import useCurrentConversation from 'src/composeables/useCurrentConversation';
 
 const router = useRouter()
-// const currentConversation = useCurrentConversation()
-
-// watch(currentConversation, (oldVal, newVal) => {
-//   if (oldVal?.id !== newVal?.id && currentConversation.value) {
-//     loadConverstionMessages(currentConversation.value)
-//   }
-// })
+const currentConversation = useCurrentConversation()
 
 useModelFromURL()
 
@@ -158,9 +155,8 @@ const deleteConversation = async (conversation: Conversation) => {
 }
 
 const unloadCurrentConversation = () => {
-  const currentConversation = app.conversations.value.find((c) => c.id === router.currentRoute.value.params.id)
-  if (currentConversation) {
-    currentConversation.unloadMessages()
+  if (currentConversation.value) {
+    currentConversation.value.unloadMessages()
   }
 }
 
@@ -170,11 +166,11 @@ const loadConverstionMessages = async (conversation: Conversation) => {
 
 const sortedConversations = ref<Conversation[]>([])
 const sortConversations = () => {
-  sortedConversations.value = [...app.conversations.value].sort((a, b) => b.messages.sort((c, d) => c.createdAt - d.createdAt)[0]?.createdAt - a.messages.sort((c, d) => c.createdAt - d.createdAt)[0]?.createdAt)
+  sortedConversations.value = app.conversations.value.toSorted((a, b) => b.messages.sort((c, d) => c.createdAt - d.createdAt)[0]?.createdAt - a.messages.sort((c, d) => c.createdAt - d.createdAt)[0]?.createdAt)
 }
 
-// const sortedConversations = computed<Conversation[]>(() => {
-//   return [...app.conversations.value].sort((a, b) => b.messages.sort((c, d) => c.createdAt - d.createdAt)[0]?.createdAt - a.messages.sort((c, d) => c.createdAt - d.createdAt)[0]?.createdAt)
+// const sortedConversation = computed<Conversation[]>(() => {
+//   return app.conversations.value.toSorted((a, b) => b.messages.sort((c, d) => c.createdAt - d.createdAt)[0]?.createdAt - a.messages.sort((c, d) => c.createdAt - d.createdAt)[0]?.createdAt)
 // })
 
 const routeToConversation = async (id: string) => {
@@ -188,29 +184,33 @@ const routeToConversation = async (id: string) => {
   }
 
   unloadCurrentConversation()
-  loadConverstionMessages(conversation)
+  await loadConverstionMessages(conversation)
   router.push(`/${id}`)
 }
 
-// const printConversations = () => {
-//   const cs = app.conversations.value.map(conversation => {
-//     return {
-//       lastMessage: conversation.messages.at(-1)?.createdAt,
-//       summary: conversation.summary
-//     }
-//   })
-
-//   console.log(cs)
-// }
-app.on('app:loaded', () => {
-  if (router.currentRoute.value.params.id) {
-    const currentConversation = app.conversations.value.find((c) => c.id === router.currentRoute.value.params.id)
-    if (currentConversation) {
-      loadConverstionMessages(currentConversation)
+const printConversations = () => {
+  const cs = app.conversations.value.map(conversation => {
+    return {
+      // lastMessage: conversation.messages.at(-1)?.createdAt,
+      id: conversation.id,
+      messages: conversation.messages,
+      summary: conversation.summary
     }
-  }
+  })
+  console.log(cs)
+}
 
+app.on('app:loaded', () => {
+  console.log('app loaded')
+  console.log('current conversation', currentConversation.value)
+  currentConversation.value?.loadMessages()
   sortConversations()
+})
+
+onMounted(() => {
+  console.log('mounted')
+  currentConversation.value?.loadMessages()
+
 })
 
 sortConversations()

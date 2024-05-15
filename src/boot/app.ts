@@ -11,6 +11,7 @@ import {
   saveConversations, saveModels, saveSettings
  } from 'src/utils/Database';
 import generateUUID from 'src/composeables/generateUUID';
+import { emit } from 'process';
 
 class App {
   readonly conversations = reactive<{ value: Conversation[] }>({ value: []})
@@ -33,8 +34,10 @@ class App {
 
     this.models.value = [ ...formattedModels, ...openaiModels ];
 
+    console.log('getting conversations')
     const conversations = await getConversations({ getMessages: false });
     this.conversations.value = conversations;
+    console.log('got conversations')
 
     const databaseSettings = await getSettings();
     const formattedSettings = {
@@ -68,16 +71,16 @@ class App {
     return newConversation;
   }
 
-  listeners: Record<string, ((...args: any[]) => void)[]> = {}
-  on (event: string, callback: (...args: any[]) => void) {
-    console.log('created listener', event, callback)
-    if (!this.listeners[event]) this.listeners[event] = []
-    this.listeners[event].push(callback)
+  private listeners: { [key: string]: (() => void)[] } = {}
+  on (event: string, callback: () => void) {
+    if (!this.listeners[event]) this.listeners[event] = [];
+    this.listeners[event].push(callback);
   }
-  emit (event: string, ...args: any[]) {
-    console.log('emitting', event, args)
-    if (!this.listeners[event]) return
-    this.listeners[event].forEach(listener => listener(...args))
+  emit (event: string) {
+    if (!this.listeners[event]) return;
+    for (const listener of this.listeners[event]) {
+      listener();
+    }
   }
 
 }
@@ -87,10 +90,10 @@ const app = new App();
 const initApp = async () => {
   await app.loadFromDatabase()
   app.initListeners()
-
   console.log('loaded')
   app.emit('app:loaded')
 }
+
 initApp()
 
 export { app };
