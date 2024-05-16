@@ -8,9 +8,9 @@
         <div class="rainbow-text col-auto">
           AI Chat
         </div>
-        <div class="col-auto">
+        <!-- <div class="col-auto">
           <q-btn flat round dense icon="refresh" color="white" @click="printConversations" />
-        </div>
+        </div> -->
       </div>
     </q-header>
 
