@@ -7,6 +7,7 @@ import OpenAIModel, { OpenAIModelProps } from "./Model";
 import { Capabilities, ChatCompletionRequestOptions, ChatCompletionResponse, ChatGenerationResponse, ChatHistory, ModelSettings, PortableModel, SupportLevel, TextGenerationRequest } from "../../types";
 
 import generateUUID from "src/composeables/generateUUID";
+import { createPortableModelURL } from "../../utils";
 
 export interface GPT3_5TurboI extends OpenAIModel {
   model: 'gpt-3.5-turbo';

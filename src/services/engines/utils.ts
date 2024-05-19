@@ -31,6 +31,6 @@ export const validatePortableModel = (model: PortableModel) => {
   }
 }
 
-export const createShareableURL = (portableModel: PortableModel): string => {
+export const createPortableModelURL = (portableModel: PortableModel): string => {
   return `${window.location.origin}/#/?${btoa(JSON.stringify(portableModel))}`
 }
