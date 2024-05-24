@@ -28,9 +28,20 @@
                 </q-tooltip>
               </q-btn>
             -->
+              
+
               <q-btn flat round dense icon="refresh" color="green-3" @click="regenerateMessage">
                 <q-tooltip class="bg-secondary text-weight-bold">
                   <div>Regenerate...</div>
+                </q-tooltip>
+              </q-btn>
+            </div>
+          </transition>
+          <transition>
+            <div class="q-mr-sm" v-if="!loading">
+              <q-btn flat round dense icon="copy_all" color="blue-3" @click="copyRaw">
+                <q-tooltip class="bg-secondary text-weight-bold">
+                  <div>Copy Raw</div>
                 </q-tooltip>
               </q-btn>
             </div>
@@ -103,6 +114,7 @@ import deleteMessageFromDatabase from 'src/utils/Database/Messages/deleteMessage
 
 import ChatMessageChunk from './ChatMessageChunk.vue';
 import ImagePreviewList from '../ChatInput/ImagePreviewList.vue';
+import { Notify, copyToClipboard } from 'quasar';
 
 export type ChatMessageProps = {
   message: Message;
@@ -167,5 +179,15 @@ const regenerateMessage = () => {
   if (!currentConveration.value || !app.settings.value.selectedModel) return
   props.message.setContent('')
   props.message.generateAssistantResponse(app.settings.value.selectedModel, currentConveration.value.getChatHistory())
+}
+
+const copyRaw = async () => {
+  const raw = props.message.content.value.raw
+  await copyToClipboard(raw)
+  Notify.create({
+    message: 'Copied to clipboard',
+    color: 'green-3',
+    position: 'top-right'
+  })
 }
 </script>
