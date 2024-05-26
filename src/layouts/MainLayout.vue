@@ -168,6 +168,8 @@ watch(app.conversations.value, () => {
   // console.log('conversations changed, start sorting')
   sortConversations()
 })
+watch(() => app.conversations.value.length, () => sortConversations())
+
 const sortedConversations = ref<Conversation[]>([])
 const sortConversations = () => {
   sortedConversations.value = app.conversations.value.toSorted((a, b) => b.messages.sort((c, d) => c.createdAt - d.createdAt)[0]?.createdAt - a.messages.sort((c, d) => c.createdAt - d.createdAt)[0]?.createdAt)
