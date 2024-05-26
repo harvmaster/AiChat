@@ -126,7 +126,7 @@
 <script setup lang="ts">
 import Conversation from 'src/utils/App/Conversation';
 
-import { computed, onMounted, ref, watch } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router';
 import { app } from 'boot/app'
 
@@ -175,9 +175,6 @@ const sortConversations = () => {
   sortedConversations.value = app.conversations.value.toSorted((a, b) => b.messages.sort((c, d) => c.createdAt - d.createdAt)[0]?.createdAt - a.messages.sort((c, d) => c.createdAt - d.createdAt)[0]?.createdAt)
 }
 
-// const sortedConversation = computed<Conversation[]>(() => {
-//   return app.conversations.value.toSorted((a, b) => b.messages.sort((c, d) => c.createdAt - d.createdAt)[0]?.createdAt - a.messages.sort((c, d) => c.createdAt - d.createdAt)[0]?.createdAt)
-// })
 const routeToConversation = async (id: string) => {
   const conversation = app.conversations.value.find((c) => c.id === id)
   if (!conversation) {
@@ -193,18 +190,18 @@ const routeToConversation = async (id: string) => {
   router.push(`/${id}`)
 }
 
-const printConversations = () => {
-  const cs = app.conversations.value.map(conversation => {
-    return {
-      // lastMessage: conversation.messages.at(-1)?.createdAt,
-      id: conversation.id,
-      messages: conversation.messages,
-      summary: conversation.summary
-    }
-  })
+// const printConversations = () => {
+//   const cs = app.conversations.value.map(conversation => {
+//     return {
+//       // lastMessage: conversation.messages.at(-1)?.createdAt,
+//       id: conversation.id,
+//       messages: conversation.messages,
+//       summary: conversation.summary
+//     }
+//   })
 
-  console.log(cs)
-}
+//   console.log(cs)
+// }
 
 app.on('app:loaded', () => {
   console.log('app loaded')

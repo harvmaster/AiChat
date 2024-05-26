@@ -115,7 +115,6 @@ const loading = computed(() => currentConversation.value?.messages.some(message 
 const handleMessage = async (message: UserMessageInput): Promise<void> => {
   let conversation = currentConversation.value;
   if (!conversation) {
-    console.log('no conversation, creating one')
     conversation = app.createConversation()
 
     // We get the conversation from the app as it is not reactive until we read it from the app

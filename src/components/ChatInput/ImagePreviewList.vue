@@ -44,7 +44,7 @@
 </style>
 
 <script setup lang="ts">
-import { ref, defineProps } from 'vue'
+import { defineProps } from 'vue'
 
 import ImagePreview, { ImagePreviewProps } from './ImagePreview.vue';
 

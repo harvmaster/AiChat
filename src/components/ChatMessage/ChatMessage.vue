@@ -64,7 +64,6 @@
           <div class="col-4 q-pa-sm" v-for="image of message.images" :key="image.src">
             <q-img :src="image.src" class="full-width" style="border-radius: 10%; aspect-ratio: 1;"/>
           </div>
-          <!-- <image-preview-list class="full-width" :images="message.images" /> -->
         </div>
       </div>
 
@@ -113,7 +112,6 @@ import useCurrentConversation from 'src/composeables/useCurrentConversation';
 import deleteMessageFromDatabase from 'src/utils/Database/Messages/deleteMessage';
 
 import ChatMessageChunk from './ChatMessageChunk.vue';
-import ImagePreviewList from '../ChatInput/ImagePreviewList.vue';
 import { Notify, copyToClipboard } from 'quasar';
 
 export type ChatMessageProps = {

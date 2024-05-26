@@ -70,7 +70,7 @@ export default async function getMessagesByConversationId (conversationId: strin
   // Get the first message if limit is set. IndexedDB returns the messages from newest to oldest, so we have to get the last message from all the keys
   // If the result was given from oldest to newest, we could use:
   // `store.index('conversationId').getAllKeys(conversationId, limit)`
-  const { limit, subArrays } = options || {}
+  const { subArrays } = options || {}
   if (subArrays) {
     const keys = await store.index('conversationId').getAllKeys(conversationId);
     const messageKeys = subArrays.map(sub => {

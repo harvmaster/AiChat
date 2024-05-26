@@ -2,7 +2,7 @@ import { watch } from 'vue'
 import { useRoute } from 'vue-router'
 
 import { app } from 'boot/app'
-import { ModelURL, OpenModel } from 'src/services/models'
+import { OpenModel } from 'src/services/models'
 import { OllamaModel, OllamaProvider } from 'src/services/models/ollama'
 
 export const useModelFromURL = () => {
