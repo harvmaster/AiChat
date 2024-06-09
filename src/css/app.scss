@@ -80,3 +80,24 @@ pre {
 .flat-line-height {
   line-height: 1;
 }
+
+.ac-scrollbar {
+  &::-webkit-scrollbar {
+    width: 10px;
+    border-radius: 10px;
+
+    &-track {
+      background: $secondary;
+      border-radius: 10px;
+    }
+
+    &-thumb {
+      background: $accent;
+      border-radius: 10px;
+    }
+
+    &-thumb:hover {
+      background: $accent;
+    }
+  }
+}
