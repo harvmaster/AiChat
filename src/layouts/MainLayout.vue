@@ -18,7 +18,7 @@
       show-if-above
       v-model="drawer"
       side="left"
-      class="bg-secondary text-white q-pa-sm"
+      class="bg-secondary text-white q-pa-sm ac-scrollbar"
     >
       <div class="drawer-item row" clickable @click="createConversation">
         <div class="col-auto text-weight-bolder q-pl-md q-pr-lg rainbow-text">
@@ -152,6 +152,11 @@ const createConversation = () => {
 const deleteConversation = async (conversation: Conversation) => {
   await deleteConversationFromDatabase(conversation)
   app.conversations.value = app.conversations.value.filter((c) => c.id !== conversation.id)
+  sortConversations()
+
+  if (router.currentRoute.value.params.id === conversation.id) {
+    router.push('/')
+  }
 }
 
 const unloadCurrentConversation = () => {
