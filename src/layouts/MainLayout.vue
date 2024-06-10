@@ -18,9 +18,9 @@
       show-if-above
       v-model="drawer"
       side="left"
-      class="bg-secondary text-white ac-scrollbar"
+      class="bg-secondary text-white column"
     >
-      <div class="drawer-list q-pa-sm">
+      <div class="drawer-list q-pa-sm col ac-scrollbar">
         <div class="drawer-item row" clickable @click="createConversation">
           <div class="col-auto text-weight-bolder q-pl-md q-pr-lg rainbow-text">
             AI
@@ -46,7 +46,7 @@
           </div>
         </div>
       </div>
-      <div class="github-link row justify-start q-pa-sm bg-secondary">
+      <div class="github-link q-pa-sm bg-secondary col-auto">
         <q-btn flat round icon="img:/github-white.svg" target="_blank" href="https://github.com/harvmaster/AiChat" />
       </div>
     </q-drawer>
@@ -131,6 +131,12 @@
   position: sticky;
   bottom: 0;
   left: 0;
+}
+
+.drawer-list {
+  overflow-y: auto;
+  overflow-x: hidden;
+  max-width: 100%;
 }
 </style>
 
