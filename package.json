@@ -1,7 +1,7 @@
 {
   "name": "aichat",
   "version": "0.0.1",
-  "description": "A chat interface for interacting with Ollama and OpenAI Models",
+  "description": "An open-source chat interface for interacting with Ollama and OpenAI Models",
   "productName": "AI Chat",
   "author": "Harvey Zuccon <hzuccon@gmail.com>",
   "private": true,

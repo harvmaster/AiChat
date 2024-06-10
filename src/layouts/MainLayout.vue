@@ -138,7 +138,7 @@ import useCurrentConversation from 'src/composeables/useCurrentConversation';
 const router = useRouter()
 const currentConversation = useCurrentConversation()
 
-useModelFromURL()
+const { checkURLForModel } = useModelFromURL()
 
 const drawer = ref(false)
 const toggleDrawer = () => {
@@ -219,5 +219,6 @@ onMounted(() => {
   console.log('mounted')
   currentConversation.value?.loadMessages()
   sortConversations()
+  checkURLForModel()
 })
 </script>

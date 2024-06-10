@@ -13,14 +13,13 @@ export const useModelFromURL = () => {
   })
 
   const modelFromURL = () => {
-    // console.log(to.query.model)
     if (!to.query.model) return
-
+    
     const modelString = atob(to.query.model as string)
     const model = JSON.parse(modelString) as unknown as OpenModel
     if (!model) return
-
-    // console.log(model)
+    
+    console.log('Found model in URL', model)
 
     /*
       ?model={"id": "12nsaknd2ms", "name": "urlTest", "model": "test", "provider": {"id": "12nsfds32f213cs", "name": "urlTest", "url": "https://test.url.com" }}
@@ -46,7 +45,11 @@ export const useModelFromURL = () => {
     app.settings.value.selectedModel = app.models.value.find(m => m.id === model.id) || app.models.value[0]
   }
 
-  modelFromURL()
+  // modelFromURL()
+
+  return {
+    checkURLForModel: modelFromURL
+  }
 
 }
 
