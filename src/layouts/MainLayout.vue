@@ -18,30 +18,32 @@
       show-if-above
       v-model="drawer"
       side="left"
-      class="bg-secondary text-white q-pa-sm ac-scrollbar"
+      class="bg-secondary text-white ac-scrollbar"
     >
-      <div class="drawer-item row" clickable @click="createConversation">
-        <div class="col-auto text-weight-bolder q-pl-md q-pr-lg rainbow-text">
-          AI
+      <div class="drawer-list q-pa-sm">
+        <div class="drawer-item row" clickable @click="createConversation">
+          <div class="col-auto text-weight-bolder q-pl-md q-pr-lg rainbow-text">
+            AI
+          </div>
+          <div class="drawer-item-text col self-center">
+            <div class="text-weight-bold">New Chat</div>
+          </div>
+          <div class="drawer-item-icon col-auto q-px-md">
+            <q-icon name="library_add" />
+          </div>
         </div>
-        <div class="drawer-item-text col self-center">
-          <div class="text-weight-bold">New Chat</div>
-        </div>
-        <div class="drawer-item-icon col-auto q-px-md">
-          <q-icon name="library_add" />
-        </div>
-      </div>
-      <q-separator class="bg-white"/>
-      <div class="drawer-item row q-col-gutter-x-sm" v-for="conversation of sortedConversations" :key="conversation.id" :conversation="conversation" @click="() => routeToConversation(conversation.id)">
-        <!-- <div class="drawer-item-icon col-auto">
-          <q-icon name="note" />
-        </div> -->
-        <div class="drawer-item-text col self-center">
-          <div class="text-weight-bold">{{ conversation.summary || conversation.messages.at(0)?.content.value.raw.slice(0, 20) }}</div>
-        </div>
-
-        <div class="drawer-item-interactions col-auto row">
-          <q-btn class="self-center" flat round dense icon="delete" color="red-4" @click.stop.prevent="() => deleteConversation(conversation)" />
+        <q-separator class="bg-white"/>
+        <div class="drawer-item row q-col-gutter-x-sm" v-for="conversation of sortedConversations" :key="conversation.id" :conversation="conversation" @click="() => routeToConversation(conversation.id)">
+          <!-- <div class="drawer-item-icon col-auto">
+            <q-icon name="note" />
+          </div> -->
+          <div class="drawer-item-text col self-center">
+            <div class="text-weight-bold">{{ conversation.summary || conversation.messages.at(0)?.content.value.raw.slice(0, 20) }}</div>
+          </div>
+  
+          <div class="drawer-item-interactions col-auto row">
+            <q-btn class="self-center" flat round dense icon="delete" color="red-4" @click.stop.prevent="() => deleteConversation(conversation)" />
+          </div>
         </div>
       </div>
       <div class="github-link row justify-start q-pa-sm bg-secondary">
