@@ -44,6 +44,9 @@
           <q-btn class="self-center" flat round dense icon="delete" color="red-4" @click.stop.prevent="() => deleteConversation(conversation)" />
         </div>
       </div>
+      <div class="github-link row justify-start q-pa-sm bg-secondary">
+        <q-btn flat round icon="img:/github-white.svg" target="_blank" href="https://github.com/harvmaster/AiChat" />
+      </div>
     </q-drawer>
 
     <q-page-container>
@@ -120,6 +123,12 @@
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+}
+
+.github-link {
+  position: sticky;
+  bottom: 0;
+  left: 0;
 }
 </style>
 
