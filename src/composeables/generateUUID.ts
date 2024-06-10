@@ -20,15 +20,15 @@ export const generateUUID = () => {
 
 export default generateUUID
 
-// const ALPHABET = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'
-// const ID_LENGTH = 8
+const ALPHABET = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'
+const ID_LENGTH = 8
 
-// export const generateID = () => {
-//   let id = ''
-//   for (let i = 0; i < ID_LENGTH; i++) {
-//     id += ALPHABET.charAt(Math.floor(Math.random() * ALPHABET.length))
-//   }
-//   return id
-// }
+export const generateID = () => {
+  let id = ''
+  for (let i = 0; i < ID_LENGTH; i++) {
+    id += ALPHABET.charAt(Math.floor(Math.random() * ALPHABET.length))
+  }
+  return id
+}
 
-// export default generateID
+export default generateID

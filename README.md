@@ -19,6 +19,8 @@ Check out the demo [here](https://ai.chat.mc.hzuccon.com/#/)
 
 ![SettingsDemo](./Docs//SettingsShot.png)
 
+![CodeHighlighting](./Docs//Code-screenshot.png)
+
 ## To do
 - Fix multiple root elements in template (src/components/ChatMessage/ChatmessageChunk.vue)
 - Explore continue prompt (src/components/ChatMessage/ChatMessage.vue)
