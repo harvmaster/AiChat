@@ -14,8 +14,12 @@
     "build": "quasar build -m pwa"
 =======
     "build": "quasar build -m pwa",
+<<<<<<< HEAD
     "build_github": "BASE_PATH='/AiChat/' quasar build -m pwa"
 >>>>>>> 319d5ea (Added env var to github_build)
+=======
+    "build_github": "BASE_PATH='AiChat/' quasar build -m pwa"
+>>>>>>> 913f883 (Updated path of BASE_PATH in build_github)
   },
   "dependencies": {
     "@quasar/extras": "^1.16.4",
