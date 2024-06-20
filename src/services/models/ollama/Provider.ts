@@ -1,4 +1,4 @@
-import { OpenProvider, OllamaRunningModels } from '../types';
+import { OpenProvider, OllamaRunningModels, OllamaRunningModel } from '../types';
 
 class OllamaProvider implements OpenProvider {
   id = 'ollama';
@@ -25,6 +25,16 @@ class OllamaProvider implements OpenProvider {
     const data = await response.json();
 
     return data;
+  }
+
+  async getMemoryUsage(): Promise<number> {
+    const models = await this.getRunningModels();
+
+    const memoryUsage = models.models.reduce((acc: number, model: OllamaRunningModel) => {
+      return acc + model.size;
+    }, 0)
+
+    return memoryUsage;
   }
 }
 

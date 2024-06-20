@@ -145,12 +145,14 @@ class Ollama implements OpenModel {
 
     // Collect metrics
     const getMetrics = async () => {
-      const modelName = this.model.includes(':') ? this.model : `${this.model}:latest`
-      const modelList = await this.provider.getRunningModels()
-      const model = modelList.models.find(model => model.name === modelName)
-      if (!model) return
+      // const modelName = this.model.includes(':') ? this.model : `${this.model}:latest`
+      // const modelList = await this.provider.getRunningModels()
+      // const model = modelList.models.find(model => model.name === modelName)
+      // if (!model) return
 
-      const memUsage = model.size
+      // const memUsage = model.size
+
+      const memUsage = await this.provider.getMemoryUsage()
 
       const body = res[res.length - 1] as { message: { role: 'assistant', content: '' }, done_reason: 'stop', done: true, total_duration: number, load_duration: number, prompt_eval_duration: number, prompt_eval_count: number, eval_count: number, eval_duration: number }
       const metrics = {

@@ -86,6 +86,7 @@ export interface OpenProvider extends BaseProvider {
   url: string;
   isClosed: false;
   getRunningModels(): Promise<OllamaRunningModels>;
+  getMemoryUsage(): Promise<number>;
 }
 
 export type Model = ClosedModel | OpenModel;

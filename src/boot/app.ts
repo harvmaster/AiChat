@@ -67,6 +67,13 @@ class App {
 
     watch(this.settings, () => {
       saveSettings(this.settings.value).catch(err => console.error('Failed to save settings:', err));
+      if (!this.settings.value.selectedModel) return;
+      if (this.settings.value.selectedModel.provider.isClosed) return;
+
+      // get memory usage metric
+      this.settings.value.selectedModel.provider.getMemoryUsage().then(memoryUsage => {
+        this.metrics.value.memory_usage = memoryUsage;
+      })
     })
 
     watch(this.models, () => {
