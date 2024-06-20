@@ -177,7 +177,7 @@ class Ollama implements OpenModel {
   }
 
   createShareableURL () {
-    return `${window.location.origin}/#/?model=${btoa(JSON.stringify({id: this.id, model: this.model, provider: {id: this.provider.id, name: this.provider.name, url: this.provider.url, type: this.provider.type }}))}`;
+    return `${window.location.origin}/${process.env.BASE_PATH || ''}#/?model=${btoa(JSON.stringify({id: this.id, model: this.model, provider: {id: this.provider.id, name: this.provider.name, url: this.provider.url, type: this.provider.type }}))}`;
   }
 }
 
