@@ -67,7 +67,7 @@ module.exports = configure(function (/* ctx */) {
 
       // rebuildCache: true, // rebuilds Vite/linter/etc cache on startup
 
-      // publicPath: '/',
+      publicPath: `/${process.env.BASE_PATH}`,
       // analyze: true,
       // env: {},
       // rawDefine: {}
@@ -79,6 +79,7 @@ module.exports = configure(function (/* ctx */) {
       // extendViteConf (viteConf) {},
       // viteVuePluginOptions: {},
       extendViteConf (viteConf) {
+        console.log(process.env.BASE_PATH)
         // NOTE: Quasar expects us to extend the Vite Configuration by re-assigning the viteConf parameter.
         /* eslint-disable no-param-reassign */
 
