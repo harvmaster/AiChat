@@ -61,6 +61,9 @@ module.exports = configure(function (/* ctx */) {
       },
 
       vueRouterMode: 'hash', // available values: 'hash', 'history'
+      env: {
+        BASE_PATH: process.env.BASE_PATH,
+      },
       // vueRouterBase,
       // vueDevtools,
       // vueOptionsAPI: false,
