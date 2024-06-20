@@ -15,6 +15,7 @@
         <!-- List of models -->
         <div class="col-12 col-md-auto">
           <model-list />
+          <q-checkbox v-model="app.settings.value.showMetrics" label="Show Metrics" class="text-white text-weight-medium" />
         </div>
 
         <q-separator v-if="Platform.is.mobile" horizontal class="col-12 bg-accent text-accent q-pm-xs" style="background-color: white; height: 2px"/>

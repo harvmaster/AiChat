@@ -106,8 +106,10 @@ export type Database__Model = {
 
 export type Settings = {
   selectedModel?: Model;
+  showMetrics?: boolean;
 }
 
 export type Database__Settings = {
   selectedModel: string;
+  showMetrics: boolean;
 }

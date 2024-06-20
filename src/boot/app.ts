@@ -1,6 +1,6 @@
 import { reactive, ref, watch } from 'vue';
 
-import { ClosedModel, Model, Provider } from 'src/services/models';
+import { ClosedModel, Model, Provider, ChatGenerationMetrics } from 'src/services/models';
 import { loadOllamaModels } from 'src/services/models/ollama';
 import { GPT3_5Turbo, GPT4Turbo, GPT4o, initOpenAIProvider } from 'src/services/models/openai';
 
@@ -18,9 +18,20 @@ class App {
   readonly models = reactive<{ value: Model[] }>({ value: [] });
 
   readonly settings = reactive<{ value: Settings }>({ value: {
-      selectedModel: undefined
+      selectedModel: undefined,
+      showMetrics: false
     }
   })
+  readonly metrics = reactive<{ value: ChatGenerationMetrics }>({ value: {
+      token_count: 0,
+      token_time: 0,
+      prompt_count: 0,
+      prompt_time: 0,
+      tps: 0,
+      memory_usage: 0
+    }
+  })
+
   readonly version = ref('1.0.1')
 
   async loadFromDatabase () {
@@ -42,7 +53,8 @@ class App {
 
     const databaseSettings = await getSettings();
     const formattedSettings = {
-      selectedModel: this.models.value.find((model) => model.id === databaseSettings.selectedModel)
+      selectedModel: this.models.value.find((model) => model.id === databaseSettings.selectedModel),
+      showMetrics: databaseSettings.showMetrics
     }
     this.settings.value = formattedSettings
     if (!this.settings.value.selectedModel) this.settings.value.selectedModel = this.models.value[0];

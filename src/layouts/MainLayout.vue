@@ -60,6 +60,20 @@
     <q-page-container>
       <router-view />
     </q-page-container>
+
+    <q-footer class="bg-secondary text-grey-6 text-weight-medium q-pa-sm" v-if="app.settings.value.showMetrics && !app.settings.value.selectedModel?.provider.isClosed">
+      <div class="row q-col-gutter-md">
+        <div class="col-auto">
+          Tokens/s: {{ app.metrics.value.tps.toFixed(2) }}
+        </div>
+        <div class="col-auto">
+          Eval_tokens/s: {{ app.metrics.value.prompt_time ? (app.metrics.value.prompt_count / app.metrics.value.prompt_time * 10**9)?.toFixed(2) : 0 }}
+        </div>
+        <div class="col-auto">
+          Memory Usage: {{ (app.metrics.value.memory_usage / 1024 / 1024 / 1024).toFixed(2) }} GB
+        </div>
+      </div>
+    </q-footer>
   </q-layout>
 </template>
 

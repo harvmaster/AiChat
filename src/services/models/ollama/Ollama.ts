@@ -1,6 +1,8 @@
 import { ChatCompletionRequestOptions, ChatCompletionResponse, OpenProvider, OpenModel, OllamaOptions, TextGenerationRequest, ChatGenerationResponse } from '../types';
 import OllamaProvider from './Provider';
 
+import { app } from 'boot/app'
+
 export const defaultOptions: Partial<OllamaOptions> = {
   // num_keep: 5,
   // seed: 42,
@@ -114,17 +116,22 @@ class Ollama implements OpenModel {
     let result = ''
     const decoder = new TextDecoder()
     const reader = response.body.getReader();
+
+    const res: unknown[] = []
     
     while (true) {
       const { done, value } = await reader.read();
   
-      if (done) break;
+      if (done) {
+        break;
+      }
   
       const text = decoder.decode(value, { stream: true });
       const textChunks = text.match(/{(.*)}\n/g);
       const chunks = textChunks?.map(chunk => JSON.parse(chunk)) || [];
-  
+      
       for (const chunk of chunks) {
+        res.push(chunk)
         if (chunk.message?.content) {
           if (callback) await callback({ message: { finished: chunk.done, content: chunk.message.content } });
           result += chunk.message.content;
@@ -135,6 +142,29 @@ class Ollama implements OpenModel {
         }
       }
     }
+
+    // Collect metrics
+    const getMetrics = async () => {
+      const modelName = this.model.includes(':') ? this.model : `${this.model}:latest`
+      const modelList = await this.provider.getRunningModels()
+      const model = modelList.models.find(model => model.name === modelName)
+      if (!model) return
+
+      const memUsage = model.size
+
+      const body = res[res.length - 1] as { message: { role: 'assistant', content: '' }, done_reason: 'stop', done: true, total_duration: number, load_duration: number, prompt_eval_duration: number, prompt_eval_count: number, eval_count: number, eval_duration: number }
+      const metrics = {
+        token_count: body.eval_count,
+        token_time: body.eval_duration,
+        prompt_count: body.prompt_eval_count,
+        prompt_time: body.prompt_eval_duration,
+        tps: body.eval_count / body.eval_duration * 10**9,
+        memory_usage: memUsage
+      }
+  
+      app.metrics.value = metrics
+    }
+    getMetrics()
 
     return {
       message: {

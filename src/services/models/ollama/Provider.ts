@@ -1,4 +1,4 @@
-import { OpenProvider } from '../types';
+import { OpenProvider, OllamaRunningModels } from '../types';
 
 class OllamaProvider implements OpenProvider {
   id = 'ollama';
@@ -18,6 +18,13 @@ class OllamaProvider implements OpenProvider {
     if (createdAt) {
       this.createdAt = createdAt;
     }
+  }
+
+  async getRunningModels(): Promise<OllamaRunningModels> {
+    const response = await fetch(`${this.url}/api/ps`);
+    const data = await response.json();
+
+    return data;
   }
 }
 

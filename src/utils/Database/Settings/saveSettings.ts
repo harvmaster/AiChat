@@ -12,6 +12,7 @@ export default async function saveSettings(settings: SettingsType): Promise<void
   const formattedSettings = {
     id: settingsId,
     selectedModel: settings.selectedModel?.id,
+    showMetrics: settings.showMetrics
   }
 
   store.put(formattedSettings);

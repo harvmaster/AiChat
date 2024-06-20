@@ -20,7 +20,17 @@ export type ChatCompletionResponse = {
   message: {
     finished: boolean;
     content: string
-  }
+  },
+  metrics?: ChatGenerationMetrics
+}
+
+export type ChatGenerationMetrics = {
+  token_count: number;
+  token_time: number;
+  prompt_count: number;
+  prompt_time: number;
+  tps: number;
+  memory_usage: number;
 }
 
 export type TextGenerationRequest = {
@@ -75,6 +85,7 @@ export interface OpenModel extends BaseModel  {
 export interface OpenProvider extends BaseProvider {
   url: string;
   isClosed: false;
+  getRunningModels(): Promise<OllamaRunningModels>;
 }
 
 export type Model = ClosedModel | OpenModel;
@@ -113,4 +124,25 @@ export type OllamaOptions = {
   rope_frequency_base: number,
   rope_frequency_scale: number,
   num_thread: number
+}
+
+export type OllamaRunningModel = {
+  name: string;
+  model: string;
+  size: number;
+  digest: string;
+  details: {
+    parent_model: string;
+    format: string;
+    family: string;
+    families: string[];
+    parameter_size: string;
+    quantization_level: string;
+  };
+  expires_at: string;
+  size_vram: number;
+}
+
+export type OllamaRunningModels = {
+  models: OllamaRunningModel[];
 }
