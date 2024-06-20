@@ -4,7 +4,7 @@ A chat interface for OpenAI and Ollama models featuring chat streaming, local ca
 <br>
 OpenAI models utilise an OpenAI developer key which allows you to pay per token.
 <br>
-Check out the demo [here](https://ai.chat.mc.hzuccon.com/#/)
+Check out the demo [here](https://harvmaster.github.io/AiChat)
 
 ## Features
  - Code highlighting on input and reponse
