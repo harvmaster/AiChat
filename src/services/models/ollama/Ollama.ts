@@ -177,11 +177,11 @@ class Ollama implements OpenModel {
   }
 
   createShareableURL () {
-    const baseURL = `${window.location.origin}/${process.env.BASE_PATH || ''}/#/`
-    const model = { id: this.id, model: this.model, provider: { id: this.provider.id, name: this.provider.name, url: this.provider.url, type: this.provider.type } }
-    const provider = { id: this.provider.id, name: this.provider.name, url: this.provider.url, type: this.provider.type }
+  //   const baseURL = `${window.location.origin}/${process.env.BASE_PATH || ''}/#/`
+  //   const model = { id: this.id, model: this.model, provider: { id: this.provider.id, name: this.provider.name, url: this.provider.url, type: this.provider.type } }
+  //   const provider = { id: this.provider.id, name: this.provider.name, url: this.provider.url, type: this.provider.type }
 
-    return `${window.location.origin}/${import.meta.env.BASE_PATH || ''}#/?model=${btoa(JSON.stringify({id: this.id, model: this.model, provider: {id: this.provider.id, name: this.provider.name, url: this.provider.url, type: this.provider.type }}))}`;
+    return `${window.location.origin}/${process.env.BASE_PATH || ''}#/?model=${btoa(JSON.stringify({id: this.id, model: this.model, provider: {id: this.provider.id, name: this.provider.name, url: this.provider.url, type: this.provider.type }}))}`;
   }
 }
 
