@@ -46,8 +46,14 @@
           </div>
         </div>
       </div>
-      <div class="github-link q-pa-sm bg-secondary col-auto">
-        <q-btn flat round icon="img:/github-white.svg" target="_blank" href="https://github.com/harvmaster/AiChat" />
+      <div class="drawer-footer row q-pa-sm bg-secondary items-center">
+        <div class="github-link col-auto">
+          <q-btn flat round icon="img:/github-white.svg" target="_blank" href="https://github.com/harvmaster/AiChat" />
+        </div>
+
+        <div class="col text-grey-6 text-weight-bolder text-">
+          Version: {{ app.version.value }}
+        </div>
       </div>
     </q-drawer>
 

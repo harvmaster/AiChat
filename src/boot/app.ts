@@ -1,4 +1,4 @@
-import { reactive, watch } from 'vue';
+import { reactive, ref, watch } from 'vue';
 
 import { ClosedModel, Model, Provider } from 'src/services/models';
 import { loadOllamaModels } from 'src/services/models/ollama';
@@ -21,6 +21,7 @@ class App {
       selectedModel: undefined
     }
   })
+  readonly version = ref('1.0.1')
 
   async loadFromDatabase () {
     const formattedModels = await loadOllamaModels();
