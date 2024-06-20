@@ -21,6 +21,10 @@ Check out the demo [here](https://ai.chat.mc.hzuccon.com/#/)
 
 ![CodeHighlighting](./Docs//Code-screenshot.png)
 
+# Troubleshooting
+### Can't connect to self-hosted Ollama
+Ollama requires you to allow outside connections by setting the OLLAMA_ORIGINS env variable. I've been testing with `*`, but setting it to `ai.chat.mc.hzuccon.com` (or if youre self-hosting, your domain should work). For more information [see here](https://github.com/ollama/ollama/blob/main/docs/faq.md#how-can-i-allow-additional-web-origins-to-access-ollama)
+
 ## To do
 - Fix multiple root elements in template (src/components/ChatMessage/ChatmessageChunk.vue)
 - Explore continue prompt (src/components/ChatMessage/ChatMessage.vue)
