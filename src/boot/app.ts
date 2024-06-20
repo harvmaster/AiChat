@@ -32,7 +32,7 @@ class App {
     }
   })
 
-  readonly version = ref('1.0.1')
+  readonly version = ref('1.1.0')
 
   async loadFromDatabase () {
     const formattedModels = await loadOllamaModels();
