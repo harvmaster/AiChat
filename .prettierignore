@@ -1,0 +1,7 @@
+# generated files
+.vscode/
+.quasar/
+coverage/
+dist/
+node_modules/
+package-lock.json
