@@ -151,12 +151,6 @@ export type ModelSettings = {
   image_detail: 'auto' | 'low' | 'high';
 };
 
-// export type SupportLevel = {
-//   'UNSUPPORTED': 0
-//   'SUPPORTED': 1
-//   'UNKNOWN': 2
-// }
-
 export const SupportLevelEnum = {
   0: 'UNSUPPORTED',
   1: 'SUPPORTED',
@@ -170,10 +164,6 @@ export const SupportLevel = {
 } as const;
 
 export type SupportLevel = (typeof SupportLevel)[keyof typeof SupportLevel];
-
-// export type SupportLevel = keyof typeof SupportLevel;
-
-// export type SupportLevel = typeof SupportLevelEnum[keyof typeof SupportLevelEnum];
 
 export type Capabilities = {
   text: SupportLevel;
