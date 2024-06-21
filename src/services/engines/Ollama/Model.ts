@@ -10,6 +10,7 @@ import {
   PortableModel,
   SupportLevel,
   TextGenerationRequest,
+  ChatGenerationMetrics
 } from '../types';
 import OllamaEngine from './Engine';
 import { createPortableModelURL } from '../utils';
@@ -21,6 +22,33 @@ export interface OllamaModelI extends OpenModel {
 export type OllamaModelProps = ModelProps & {
   engine: OllamaEngine;
 };
+
+export type OllamaResponseStreamingChunk = {
+  model: string;
+  message: {
+    role: 'assistant';
+    content: string;
+  };
+  done: false;
+  created_at: string;
+};
+
+export type OllamaResponseFinalChunk = {
+  message: {
+    role: 'assistant';
+    content: '';
+  };
+  done_reason: 'stop';
+  done: true;
+  total_duration: number;
+  load_duration: number;
+  prompt_eval_duration: number;
+  prompt_eval_count: number;
+  eval_count: number;
+  eval_duration: number;
+}
+
+export type OllamaResponseChunk = OllamaResponseStreamingChunk | OllamaResponseFinalChunk;
 
 export class OllamaModel implements OllamaModelI {
   readonly id: string;
@@ -123,6 +151,9 @@ export class OllamaModel implements OllamaModelI {
     const decoder = new TextDecoder();
     const reader = response.body.getReader();
 
+    // This is used to get the metrics
+    const responseChunks: OllamaResponseChunk[] = []
+
     while (true) {
       const { done, value } = await reader.read();
 
@@ -130,21 +161,28 @@ export class OllamaModel implements OllamaModelI {
 
       const text = decoder.decode(value, { stream: true });
       const textChunks = text.match(/{(.*)}\n/g);
-      const chunks = textChunks?.map((chunk) => JSON.parse(chunk)) || [];
+      const chunks: OllamaResponseChunk[] = textChunks?.map((chunk) => JSON.parse(chunk)) || [];
 
       for (const chunk of chunks) {
+        responseChunks.push(chunk);
+
         if (chunk.message?.content) {
           if (callback)
             await callback({ message: { finished: chunk.done, content: chunk.message.content } });
           result += chunk.message.content;
         }
-        if (chunk.response) {
-          if (callback)
-            await callback({ message: { finished: chunk.done, content: chunk.response } });
-          result += chunk.response;
-        }
+
+        // I dont know what .response is for. So im commenting it out for now
+        // if (chunk.response) {
+        //   if (callback)
+        //     await callback({ message: { finished: chunk.done, content: chunk.response } });
+        //   result += chunk.response;
+        // }
       }
     }
+
+    // Collect metrics
+
 
     return {
       message: {
@@ -169,6 +207,19 @@ export class OllamaModel implements OllamaModelI {
       advancedSettings: this.advancedSettings,
       createdAt: this.createdAt,
     };
+  }
+
+  async parseMetrics(metrics: OllamaResponseFinalChunk): Promise<ChatGenerationMetrics> {
+    const memUsage = await this.engine.getMemoryUsage();
+
+    return {
+      token_count: metrics.eval_count,
+      token_time: metrics.eval_duration,
+      prompt_count: metrics.prompt_eval_count,
+      prompt_time: metrics.prompt_eval_duration,
+      tps: metrics.eval_count / metrics.eval_duration,
+      memory_usage: memUsage,
+    }
   }
 }
 
