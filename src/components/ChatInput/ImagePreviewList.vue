@@ -1,7 +1,11 @@
 <template>
   <div class="image-preview-list row q-pb-sm">
-    <transition-group name="fade" >  
-      <div class="col-auto image-preview-item q-pa-sm" v-for="image in props.images" :key="image.src" >
+    <transition-group name="fade">
+      <div
+        class="col-auto image-preview-item q-pa-sm"
+        v-for="image in props.images"
+        :key="image.src"
+      >
         <ImagePreview class="" :src="image.src" />
       </div>
     </transition-group>
@@ -40,19 +44,18 @@
   width: 45%;
   max-width: 10em;
 }
-
 </style>
 
 <script setup lang="ts">
-import { defineProps } from 'vue'
+import { defineProps } from 'vue';
 
 import ImagePreview, { ImagePreviewProps } from './ImagePreview.vue';
 
 export type ImagePreviewListProps = {
-  images: ImagePreviewProps[]
-}
+  images: ImagePreviewProps[];
+};
 
 const props = withDefaults(defineProps<ImagePreviewListProps>(), {
-  images: () => []
-})
+  images: () => [],
+});
 </script>

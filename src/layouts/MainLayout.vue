@@ -4,27 +4,20 @@
       <div class="col-auto visible-on-small self-center">
         <q-btn flat round dense icon="menu" color="white" @click="toggleDrawer" />
       </div>
-      <div class="col col-md-12 header-background text-h3 text-weight-bold q-pa-md row justify-center">
-        <div class="rainbow-text col-auto">
-          AI Chat
-        </div>
+      <div
+        class="col col-md-12 header-background text-h3 text-weight-bold q-pa-md row justify-center"
+      >
+        <div class="rainbow-text col-auto">AI Chat</div>
         <!-- <div class="col-auto">
           <q-btn flat round dense icon="refresh" color="white" @click="printConversations" />
         </div> -->
       </div>
     </q-header>
 
-    <q-drawer 
-      show-if-above
-      v-model="drawer"
-      side="left"
-      class="bg-secondary text-white column"
-    >
+    <q-drawer show-if-above v-model="drawer" side="left" class="bg-secondary text-white column">
       <div class="drawer-list q-pa-sm col ac-scrollbar">
         <div class="drawer-item row" clickable @click="createConversation">
-          <div class="col-auto text-weight-bolder q-pl-md q-pr-lg rainbow-text">
-            AI
-          </div>
+          <div class="col-auto text-weight-bolder q-pl-md q-pr-lg rainbow-text">AI</div>
           <div class="drawer-item-text col self-center">
             <div class="text-weight-bold">New Chat</div>
           </div>
@@ -32,28 +25,50 @@
             <q-icon name="library_add" />
           </div>
         </div>
-        <q-separator class="bg-white"/>
-        <div class="drawer-item row q-col-gutter-x-sm" v-for="conversation of sortedConversations" :key="conversation.id" :conversation="conversation" @click="() => routeToConversation(conversation.id)">
+        <q-separator class="bg-white" />
+        <div
+          class="drawer-item row q-col-gutter-x-sm"
+          v-for="conversation of sortedConversations"
+          :key="conversation.id"
+          :conversation="conversation"
+          @click="() => routeToConversation(conversation.id)"
+        >
           <!-- <div class="drawer-item-icon col-auto">
             <q-icon name="note" />
           </div> -->
           <div class="drawer-item-text col self-center">
-            <div class="text-weight-bold">{{ conversation.summary || conversation.messages.at(0)?.content.value.raw.slice(0, 20) }}</div>
+            <div class="text-weight-bold">
+              {{
+                conversation.summary || conversation.messages.at(0)?.content.value.raw.slice(0, 20)
+              }}
+            </div>
           </div>
-  
+
           <div class="drawer-item-interactions col-auto row">
-            <q-btn class="self-center" flat round dense icon="delete" color="red-4" @click.stop.prevent="() => deleteConversation(conversation)" />
+            <q-btn
+              class="self-center"
+              flat
+              round
+              dense
+              icon="delete"
+              color="red-4"
+              @click.stop.prevent="() => deleteConversation(conversation)"
+            />
           </div>
         </div>
       </div>
       <div class="drawer-footer row q-pa-sm bg-secondary items-center">
         <div class="github-link col-auto">
-          <q-btn flat round icon="img:github-white.svg" target="_blank" href="https://github.com/harvmaster/AiChat" />
+          <q-btn
+            flat
+            round
+            icon="img:github-white.svg"
+            target="_blank"
+            href="https://github.com/harvmaster/AiChat"
+          />
         </div>
 
-        <div class="col text-grey-6 text-weight-bolder text-">
-          Version: {{ app.version.value }}
-        </div>
+        <div class="col text-grey-6 text-weight-bolder text-">Version: {{ app.version.value }}</div>
       </div>
     </q-drawer>
 
@@ -61,13 +76,22 @@
       <router-view />
     </q-page-container>
 
-    <q-footer class="bg-secondary text-grey-6 text-weight-medium q-pa-sm" v-if="app.settings.value.showMetrics && !app.settings.value.selectedModel?.provider.isClosed">
+    <q-footer
+      class="bg-secondary text-grey-6 text-weight-medium q-pa-sm"
+      v-if="app.settings.value.showMetrics && !app.settings.value.selectedModel?.provider.isClosed"
+    >
       <div class="row q-col-gutter-md">
+        <div class="col-auto">Tokens/s: {{ app.metrics.value.tps.toFixed(2) }}</div>
         <div class="col-auto">
-          Tokens/s: {{ app.metrics.value.tps.toFixed(2) }}
-        </div>
-        <div class="col-auto">
-          Eval_tokens/s: {{ app.metrics.value.prompt_time ? (app.metrics.value.prompt_count / app.metrics.value.prompt_time * 10**9)?.toFixed(2) : 0 }}
+          Eval_tokens/s:
+          {{
+            app.metrics.value.prompt_time
+              ? (
+                  (app.metrics.value.prompt_count / app.metrics.value.prompt_time) *
+                  10 ** 9
+                )?.toFixed(2)
+              : 0
+          }}
         </div>
         <div class="col-auto">
           Memory Usage: {{ (app.metrics.value.memory_usage / 1024 / 1024 / 1024).toFixed(2) }} GB
@@ -83,7 +107,12 @@
 }
 
 .header-background {
-  background-image: linear-gradient(0deg, hsla(0%, 0%, 8%, 0%), hsla(0%, 0%, 8%, 100%), hsla(0%, 0%, 8%, 100%));
+  background-image: linear-gradient(
+    0deg,
+    hsla(0%, 0%, 8%, 0%),
+    hsla(0%, 0%, 8%, 100%),
+    hsla(0%, 0%, 8%, 100%)
+  );
 }
 
 .input-border {
@@ -163,74 +192,81 @@
 <script setup lang="ts">
 import Conversation from 'src/utils/App/Conversation';
 
-import { onMounted, ref, watch } from 'vue'
+import { onMounted, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
-import { app } from 'boot/app'
+import { app } from 'boot/app';
 
 import deleteConversationFromDatabase from 'src/utils/Database/Conversations/deleteConversation';
 
 import useModelFromURL from 'src/composeables/useModelFromURL';
 import useCurrentConversation from 'src/composeables/useCurrentConversation';
 
-const router = useRouter()
-const currentConversation = useCurrentConversation()
+const router = useRouter();
+const currentConversation = useCurrentConversation();
 
-const { checkURLForModel } = useModelFromURL()
+const { checkURLForModel } = useModelFromURL();
 
-const drawer = ref(false)
+const drawer = ref(false);
 const toggleDrawer = () => {
-  drawer.value = !drawer.value
-}
+  drawer.value = !drawer.value;
+};
 
 const createConversation = () => {
-  router.push('/')
-}
+  router.push('/');
+};
 
 const deleteConversation = async (conversation: Conversation) => {
-  await deleteConversationFromDatabase(conversation)
-  app.conversations.value = app.conversations.value.filter((c) => c.id !== conversation.id)
-  sortConversations()
+  await deleteConversationFromDatabase(conversation);
+  app.conversations.value = app.conversations.value.filter((c) => c.id !== conversation.id);
+  sortConversations();
 
   if (router.currentRoute.value.params.id === conversation.id) {
-    router.push('/')
+    router.push('/');
   }
-}
+};
 
 const unloadCurrentConversation = () => {
   if (currentConversation.value) {
-    currentConversation.value.unloadMessages()
+    currentConversation.value.unloadMessages();
   }
-}
+};
 
 const loadConverstionMessages = async (conversation: Conversation) => {
-  await conversation.loadMessages()
-}
+  await conversation.loadMessages();
+};
 
 watch(app.conversations.value, () => {
   // console.log('conversations changed, start sorting')
-  sortConversations()
-})
-watch(() => app.conversations.value.length, () => sortConversations())
+  sortConversations();
+});
+watch(
+  () => app.conversations.value.length,
+  () => sortConversations()
+);
 
-const sortedConversations = ref<Conversation[]>([])
+const sortedConversations = ref<Conversation[]>([]);
 const sortConversations = () => {
-  sortedConversations.value = app.conversations.value.toSorted((a, b) => b.messages.sort((c, d) => c.createdAt - d.createdAt)[0]?.createdAt - a.messages.sort((c, d) => c.createdAt - d.createdAt)[0]?.createdAt)
-}
+  sortedConversations.value = app.conversations.value.toSorted(
+    (a, b) =>
+      b.messages.sort((c, d) => c.createdAt - d.createdAt)[0]?.createdAt -
+      a.messages.sort((c, d) => c.createdAt - d.createdAt)[0]?.createdAt
+  );
+};
 
 const routeToConversation = async (id: string) => {
-  const conversation = app.conversations.value.find((c) => c.id === id)
+  const conversation = app.conversations.value.find((c) => c.id === id);
   if (!conversation) {
-    return
+    return;
   }
 
   if (router.currentRoute.value.params.id === id) {
-    return
+    return;
   }
 
-  unloadCurrentConversation()
-  await loadConverstionMessages(conversation)
-  router.push(`/${id}`)
-}
+  unloadCurrentConversation();
+  await loadConverstionMessages(conversation);
+  router.push(`/${id}`);
+};
 
 // const printConversations = () => {
 //   const cs = app.conversations.value.map(conversation => {
@@ -246,16 +282,16 @@ const routeToConversation = async (id: string) => {
 // }
 
 app.on('app:loaded', () => {
-  console.log('app loaded')
-  console.log('current conversation', currentConversation.value)
-  currentConversation.value?.loadMessages()
-  sortConversations()
-})
+  console.log('app loaded');
+  console.log('current conversation', currentConversation.value);
+  currentConversation.value?.loadMessages();
+  sortConversations();
+});
 
 onMounted(() => {
-  console.log('mounted')
-  currentConversation.value?.loadMessages()
-  sortConversations()
-  checkURLForModel()
-})
+  console.log('mounted');
+  currentConversation.value?.loadMessages();
+  sortConversations();
+  checkURLForModel();
+});
 </script>

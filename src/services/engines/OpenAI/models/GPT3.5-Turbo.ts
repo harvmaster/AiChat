@@ -1,13 +1,23 @@
-import OpenAI from "openai";
-import { Stream } from "openai/streaming";
+import OpenAI from 'openai';
+import { Stream } from 'openai/streaming';
 
-import { OpenAIEngine } from "../Engine";
-import OpenAIModel, { OpenAIModelProps } from "./Model";
+import { OpenAIEngine } from '../Engine';
+import OpenAIModel, { OpenAIModelProps } from './Model';
 
-import { Capabilities, ChatCompletionRequestOptions, ChatCompletionResponse, ChatGenerationResponse, ChatHistory, ModelSettings, PortableModel, SupportLevel, TextGenerationRequest } from "../../types";
+import {
+  Capabilities,
+  ChatCompletionRequestOptions,
+  ChatCompletionResponse,
+  ChatGenerationResponse,
+  ChatHistory,
+  ModelSettings,
+  PortableModel,
+  SupportLevel,
+  TextGenerationRequest,
+} from '../../types';
 
-import generateUUID from "src/composeables/generateUUID";
-import { createPortableModelURL } from "../../utils";
+import generateUUID from 'src/composeables/generateUUID';
+import { createPortableModelURL } from '../../utils';
 
 export interface GPT3_5TurboI extends OpenAIModel {
   model: 'gpt-3.5-turbo';
@@ -27,57 +37,79 @@ export class GPT3_5Turbo implements GPT3_5TurboI {
   capabilities: Capabilities = {
     text: SupportLevel.SUPPORTED,
     image: SupportLevel.SUPPORTED,
-  }
+  };
 
-  constructor (props: OpenAIModelProps) {
+  constructor(props: OpenAIModelProps) {
     this.id = props.id || generateUUID();
     this.name = props.name;
-    this.engine = props.engine
+    this.engine = props.engine;
 
     this.createdAt = props.createdAt || Date.now();
     this.advancedSettings = props.advancedSettings || this.advancedSettings;
   }
 
-  sendChat (request: ChatCompletionRequestOptions, callback?: (response: ChatCompletionResponse) => void, options?: Partial<ModelSettings>): ChatGenerationResponse {
+  sendChat(
+    request: ChatCompletionRequestOptions,
+    callback?: (response: ChatCompletionResponse) => void,
+    options?: Partial<ModelSettings>
+  ): ChatGenerationResponse {
     const openai = new OpenAI({ apiKey: this.engine.token, dangerouslyAllowBrowser: true });
-    const stream = openai.chat.completions.create({ model: 'gpt-3.5-turbo', messages: request.messages, stream: true, ...options });
+    const stream = openai.chat.completions.create({
+      model: 'gpt-3.5-turbo',
+      messages: request.messages,
+      stream: true,
+      ...options,
+    });
 
     return {
-      abort: () => stream.then(s => s.controller.abort()),
-      response: stream.then(s => this.handleResponse(s, callback))
-    } 
+      abort: () => stream.then((s) => s.controller.abort()),
+      response: stream.then((s) => this.handleResponse(s, callback)),
+    };
   }
 
-  generateText (request: TextGenerationRequest, callback?: (response: ChatCompletionResponse) => void, options?: Partial<ModelSettings>): ChatGenerationResponse {
+  generateText(
+    request: TextGenerationRequest,
+    callback?: (response: ChatCompletionResponse) => void,
+    options?: Partial<ModelSettings>
+  ): ChatGenerationResponse {
     const openai = new OpenAI({ apiKey: this.engine.token, dangerouslyAllowBrowser: true });
-    const stream = openai.chat.completions.create({ model: 'gpt-3.5-turbo', messages: [{ content: request.prompt, role: 'user' }], stream: true, ...options });
+    const stream = openai.chat.completions.create({
+      model: 'gpt-3.5-turbo',
+      messages: [{ content: request.prompt, role: 'user' }],
+      stream: true,
+      ...options,
+    });
 
     return {
-      abort: () => stream.then(s => s.controller.abort()),
-      response: stream.then(s => this.handleResponse(s, callback))
-    } 
+      abort: () => stream.then((s) => s.controller.abort()),
+      response: stream.then((s) => this.handleResponse(s, callback)),
+    };
   }
 
-  async handleResponse (stream: Stream<OpenAI.Chat.Completions.ChatCompletionChunk>, callback?: (res: ChatCompletionResponse) => void): Promise<ChatCompletionResponse> {
-    let result = ''
+  async handleResponse(
+    stream: Stream<OpenAI.Chat.Completions.ChatCompletionChunk>,
+    callback?: (res: ChatCompletionResponse) => void
+  ): Promise<ChatCompletionResponse> {
+    let result = '';
     for await (const chunk of stream) {
       if (chunk.choices[0]?.delta?.content) {
-        if (callback) callback({ message: { finished: false, content: chunk.choices[0].delta.content } });
+        if (callback)
+          callback({ message: { finished: false, content: chunk.choices[0].delta.content } });
         result += chunk.choices[0].delta.content;
       }
     }
     return {
       message: {
         finished: true,
-        content: result
-      }
-    }
+        content: result,
+      },
+    };
   }
 
   createShareableURL(portableModel?: PortableModel): string {
-    if (!portableModel) portableModel = this.toPortableModel()
+    if (!portableModel) portableModel = this.toPortableModel();
 
-    return createPortableModelURL(portableModel)
+    return createPortableModelURL(portableModel);
   }
 
   toPortableModel(): PortableModel {
@@ -88,7 +120,7 @@ export class GPT3_5Turbo implements GPT3_5TurboI {
       engine: this.engine.toPortableEngine(),
       advancedSettings: this.advancedSettings,
       createdAt: this.createdAt,
-    }
+    };
   }
 }
 

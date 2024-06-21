@@ -3,7 +3,12 @@
     <div class="col-12 col-md-8 col-lg-6 column">
       <!-- Chat history -->
       <div class="col relative full-width">
-        <chat-history ref="ChatHistoryElement" v-if="currentConversation" class="row q-pb-md scrollable q-pr-sm" :messages="currentConversation.messages" />
+        <chat-history
+          ref="ChatHistoryElement"
+          v-if="currentConversation"
+          class="row q-pb-md scrollable q-pr-sm"
+          :messages="currentConversation.messages"
+        />
       </div>
 
       <!-- Chat input -->
@@ -11,7 +16,11 @@
         <chat-input class="col-12" :loading="loading" @message="handleMessage" />
 
         <div class="col-auto row q-pt-md justify-center">
-          <div class="row pill model-settings-button cursor-pointer" @click="toggleSettings" :class="app.settings.value.selectedModel?.provider.isClosed ? 'q-pa-md' : 'q-pa-sm'">
+          <div
+            class="row pill model-settings-button cursor-pointer"
+            @click="toggleSettings"
+            :class="app.settings.value.selectedModel?.provider.isClosed ? 'q-pa-md' : 'q-pa-sm'"
+          >
             <div class="col-auto text-blue-2 text-h6 text-center">
               {{ app.settings.value.selectedModel?.provider.name }}
               ({{ app.settings.value.selectedModel?.model }})
@@ -62,7 +71,6 @@
       background: $accent;
     }
   }
-
 }
 .model-settings-button {
   background-color: $primary;
@@ -91,8 +99,7 @@ import SettingsDialog from 'src/components/Settings/SettingsDialog.vue';
 import { Notify } from 'quasar';
 import { UserMessageInput } from 'src/types';
 
-
-const router = useRouter()
+const router = useRouter();
 
 const currentConversation = useCurrentConversation();
 
@@ -104,48 +111,50 @@ watch(currentConversation, (oldConversation, newConversation) => {
   if (ChatHistoryElement.value) {
     nextTick(() => ChatHistoryElement.value?.scrollToBottom(true, 'smooth'));
   }
-})
+});
 
 const toggleSettings = () => {
   SettingsDialogElement.value?.toggleVisible();
-}
+};
 
-const loading = computed(() => currentConversation.value?.messages.some(message => message.generating) ?? false)
+const loading = computed(
+  () => currentConversation.value?.messages.some((message) => message.generating) ?? false
+);
 
 const handleMessage = async (message: UserMessageInput): Promise<void> => {
   let conversation = currentConversation.value;
   if (!conversation) {
-    conversation = app.createConversation()
+    conversation = app.createConversation();
 
     // We get the conversation from the app as it is not reactive until we read it from the app
-    conversation = app.conversations.value.find((c) => c.id === conversation!.id)!
-    router.push(`/${conversation.id}`)
+    conversation = app.conversations.value.find((c) => c.id === conversation!.id)!;
+    router.push(`/${conversation.id}`);
   }
 
   try {
-    const model = app.settings.value.selectedModel
-    if (!model) throw new Error('No model selected')
+    const model = app.settings.value.selectedModel;
+    if (!model) throw new Error('No model selected');
 
     conversation.addUserMessage(message);
     await conversation.addAssistantMessage(model);
-    conversation.getConversationSummary(model)
+    conversation.getConversationSummary(model);
   } catch (error) {
-    console.error(error)
-    
+    console.error(error);
+
     if (error instanceof Error && error.message == 'No model selected') {
-      createErrorMessage('No model selected')
+      createErrorMessage('No model selected');
     } else {
-      createErrorMessage('An error occurred')
+      createErrorMessage('An error occurred');
     }
   }
-}
+};
 
 const createErrorMessage = (message: string) => {
   Notify.create({
     message,
     color: 'negative',
     position: 'top-right',
-    timeout: 2000
-  })
-}
+    timeout: 2000,
+  });
+};
 </script>

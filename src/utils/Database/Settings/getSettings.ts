@@ -15,8 +15,8 @@ export default async function getSettings(): Promise<Database__Settings> {
   if (!settings) {
     return {
       selectedModel: '',
-      showMetrics: true
-    }
+      showMetrics: true,
+    };
   }
   return settings;
 }

@@ -2,18 +2,22 @@
   <div class="row">
     <!-- Input which looks like -> (- | num | +)  -->
     <div class="col-3">
-      <button class="counter-button counter-button--left relative" @click="decrement" v-ripple >-</button>
+      <button class="counter-button counter-button--left relative" @click="decrement" v-ripple>
+        -
+      </button>
     </div>
     <div class="col-auto">
       <div class="counter-input fit-content" @input="isNumber">{{ model }}</div>
     </div>
     <div class="col-3">
-      <button class="counter-button counter-button--right relative" @click="increment" v-ripple >+</button>
+      <button class="counter-button counter-button--right relative" @click="increment" v-ripple>
+        +
+      </button>
     </div>
   </div>
 </template>
 
-<style lang="scss"  scoped>
+<style lang="scss" scoped>
 .fit-content {
   min-width: 3.5rem;
   width: fit-content;
@@ -74,53 +78,50 @@
 </style>
 
 <script lang="ts" setup>
-import { defineModel, ref } from 'vue'
+import { defineModel, ref } from 'vue';
 
 export type CounterInputProps = {
   step?: number;
   min?: number;
   max?: number;
-}
+};
 
 const props = withDefaults(defineProps<CounterInputProps>(), {
-  step: 1
-})
+  step: 1,
+});
 
-const model = defineModel<number>({ required: true })
+const model = defineModel<number>({ required: true });
 if (isNaN(model.value)) {
-  model.value = 0
+  model.value = 0;
 }
 
 const increment = () => {
-  model.value += props.step
-}
+  model.value += props.step;
+};
 
 const decrement = () => {
-  model.value -= props.step
-}
+  model.value -= props.step;
+};
 
-const debounceTimer = ref<NodeJS.Timeout | null>(null)
+const debounceTimer = ref<NodeJS.Timeout | null>(null);
 const isNumber = (event: Event) => {
-  const target = event.target as HTMLDivElement
-  const value = target.innerText
+  const target = event.target as HTMLDivElement;
+  const value = target.innerText;
   if (!isNaN(Number(value))) {
     if (props.min && Number(value) < props.min) {
-      model.value = props.min
+      model.value = props.min;
     } else if (props.max && Number(value) > props.max) {
-      model.value = props.max
+      model.value = props.max;
     } else {
-      model.value = Number(value)
+      model.value = Number(value);
     }
   }
 
   if (debounceTimer.value) {
-    clearTimeout(debounceTimer.value)
+    clearTimeout(debounceTimer.value);
   }
   debounceTimer.value = setTimeout(() => {
-    target.innerText = model.value.toString()
-  }, 250)
-}
-
-
-
+    target.innerText = model.value.toString();
+  }, 250);
+};
 </script>

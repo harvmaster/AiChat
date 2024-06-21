@@ -1,6 +1,6 @@
-import generateUUID from "src/composeables/generateUUID";
-import { OpenEngine, ModelProps, OpenEngineProps, PortableEngine } from "../types";
-import OllamaModel from './Model'
+import generateUUID from 'src/composeables/generateUUID';
+import { OpenEngine, ModelProps, OpenEngineProps, PortableEngine } from '../types';
+import OllamaModel from './Model';
 
 export interface OllamaEngineI extends OpenEngine {
   type: 'ollama';
@@ -16,31 +16,31 @@ export class OllamaEngine implements OllamaEngineI {
   url: string;
   createdAt: number;
 
-  constructor (props: OpenEngineProps) {
+  constructor(props: OpenEngineProps) {
     this.id = props.id || generateUUID();
     this.name = props.name;
     this.url = props.url;
     this.createdAt = props.createdAt || Date.now();
   }
 
-  createModel (model: ModelProps): OllamaModel {
+  createModel(model: ModelProps): OllamaModel {
     const newModel = new OllamaModel({
       ...model,
       engine: this,
     });
 
-    return newModel
+    return newModel;
   }
 
-  toPortableEngine (): PortableEngine {
+  toPortableEngine(): PortableEngine {
     return {
       id: this.id,
       name: this.name,
       type: this.type,
       url: this.url,
       createdAt: this.createdAt,
-    }
+    };
   }
 }
 
-export default OllamaEngine
+export default OllamaEngine;

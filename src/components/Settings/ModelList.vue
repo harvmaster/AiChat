@@ -2,22 +2,23 @@
   <div class="col-12 scroll-area">
     <q-list class="fit">
       <transition-group name="slide-x" tag="div">
-
-        <div
-          v-for="group of groupedModels"
-          :key="group[0].provider.id"
-        >
+        <div v-for="group of groupedModels" :key="group[0].provider.id">
           <div class="text-h6 text-white row">
-
             <!-- Provider Header -->
-            <div class="col-auto self-center q-pr-sm"> 
+            <div class="col-auto self-center q-pr-sm">
               {{ group[0].provider.name }}
             </div>
             <div v-if="!group[0].provider.isClosed" class="col-auto">
-              <q-btn class="text-bold " outline color="white" flat icon="add" round @click="() => addModel(group[0].provider.id)">
-                <q-tooltip>
-                  Add Model
-                </q-tooltip>
+              <q-btn
+                class="text-bold"
+                outline
+                color="white"
+                flat
+                icon="add"
+                round
+                @click="() => addModel(group[0].provider.id)"
+              >
+                <q-tooltip> Add Model </q-tooltip>
               </q-btn>
             </div>
           </div>
@@ -32,26 +33,36 @@
               @click="() => selectModel(model)"
             >
               <q-item-section>
-                <q-item-label class="text-white model-list-item" :class="selectedModel?.id == model.id ? 'selected-item' : ''">{{ model.model }}</q-item-label>
+                <q-item-label
+                  class="text-white model-list-item"
+                  :class="selectedModel?.id == model.id ? 'selected-item' : ''"
+                  >{{ model.model }}</q-item-label
+                >
               </q-item-section>
             </q-item>
           </transition-group>
         </div>
-        
+
         <!-- Add Provider -->
         <div class="q-pa-md text-white text-bold row cursor-pointer" key="add-provider">
-          <div class="col-auto self-center">
-            Add Provider
-          </div>
-          <div class="col-auto self-center text-h6 q-px-md">
-            +
-          </div>
-          
-          <q-popup-edit ref="addProviderPopup" v-model="newProvider" label="Provider" class="bg-accent" >
-            <input v-model="newProvider" autofocus class="my-input text-white text-h6" placeholder="Provider Name" @keydown.enter="createProvider"/>
+          <div class="col-auto self-center">Add Provider</div>
+          <div class="col-auto self-center text-h6 q-px-md">+</div>
+
+          <q-popup-edit
+            ref="addProviderPopup"
+            v-model="newProvider"
+            label="Provider"
+            class="bg-accent"
+          >
+            <input
+              v-model="newProvider"
+              autofocus
+              class="my-input text-white text-h6"
+              placeholder="Provider Name"
+              @keydown.enter="createProvider"
+            />
           </q-popup-edit>
         </div>
-    
       </transition-group>
     </q-list>
   </div>
@@ -105,11 +116,13 @@
   }
 }
 
-.slide-x-move, 
-.slide-x-enter-active, .slide-x-leave-active {
+.slide-x-move,
+.slide-x-enter-active,
+.slide-x-leave-active {
   transition: all 0.5s;
 }
-.slide-x-enter-from, .slide-x-leave-to {
+.slide-x-enter-from,
+.slide-x-leave-to {
   transform: translateX(-100%);
   opacity: 0;
 }
@@ -119,56 +132,72 @@
 </style>
 
 <script lang="ts" setup>
-import { ref, computed, nextTick } from 'vue'
-import { app } from 'boot/app'
-import generateUUID from 'src/composeables/generateUUID'
+import { ref, computed, nextTick } from 'vue';
+import { app } from 'boot/app';
+import generateUUID from 'src/composeables/generateUUID';
 
-import { QPopupEdit } from 'quasar'
+import { QPopupEdit } from 'quasar';
 
-import {  OllamaModel, OllamaProvider } from 'src/services/models/ollama'
-import { Model } from 'src/services/models'
+import { OllamaModel, OllamaProvider } from 'src/services/models/ollama';
+import { Model } from 'src/services/models';
 
-const newProvider = ref('')
+const newProvider = ref('');
 
 type ModelGroups = {
-  [key: string]: Model[]
-}
+  [key: string]: Model[];
+};
 const groupedModels = computed(() => {
-  const grouped: ModelGroups = {}
-  app.models.value.forEach(model => {
+  const grouped: ModelGroups = {};
+  app.models.value.forEach((model) => {
     if (!grouped[model.provider.id]) {
-      grouped[model.provider.id] = []
+      grouped[model.provider.id] = [];
     }
-    grouped[model.provider.id].push(model)
-  })
-  const groupedArray = Object.values(grouped)
-  return groupedArray.sort((a: Model[], b: Model[]) => b[0].provider.createdAt - a[0].provider.createdAt)
-})
+    grouped[model.provider.id].push(model);
+  });
+  const groupedArray = Object.values(grouped);
+  return groupedArray.sort(
+    (a: Model[], b: Model[]) => b[0].provider.createdAt - a[0].provider.createdAt
+  );
+});
 
-const selectedModel = computed(() => app.settings.value.selectedModel)
+const selectedModel = computed(() => app.settings.value.selectedModel);
 const selectModel = (model: Model) => {
-  app.settings.value.selectedModel = model
-}
+  app.settings.value.selectedModel = model;
+};
 
-const addProviderPopup = ref<QPopupEdit | null>(null)
+const addProviderPopup = ref<QPopupEdit | null>(null);
 const createProvider = (event: KeyboardEvent) => {
   if (event.key === 'Enter') {
-    app.models.value.push(new OllamaModel(generateUUID(), new OllamaProvider(generateUUID(), newProvider.value, ''), Date.now(), '{ "temperature": 0.8 }', 'Example model'))
-    addProviderPopup.value?.hide()
-    newProvider.value = ''
+    app.models.value.push(
+      new OllamaModel(
+        generateUUID(),
+        new OllamaProvider(generateUUID(), newProvider.value, ''),
+        Date.now(),
+        '{ "temperature": 0.8 }',
+        'Example model'
+      )
+    );
+    addProviderPopup.value?.hide();
+    newProvider.value = '';
   }
-}
+};
 
 const addModel = (providerId: string) => {
-  const provider = app.models.value.find(model => model.provider.id === providerId)?.provider
-  if (!provider) return
+  const provider = app.models.value.find((model) => model.provider.id === providerId)?.provider;
+  if (!provider) return;
   if (provider.isClosed) {
-    return
+    return;
   }
 
-  const model = new OllamaModel(generateUUID(), provider, Date.now(), '{ "temperature": 0.8 }', 'Example model')
-  app.models.value.push(model)
+  const model = new OllamaModel(
+    generateUUID(),
+    provider,
+    Date.now(),
+    '{ "temperature": 0.8 }',
+    'Example model'
+  );
+  app.models.value.push(model);
 
-  nextTick(() => selectModel(model))
-}
+  nextTick(() => selectModel(model));
+};
 </script>

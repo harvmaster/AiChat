@@ -1,13 +1,11 @@
-
-
 export class MessageImage {
   public src: string;
 
-  constructor (src: string) {
+  constructor(src: string) {
     this.src = src;
   }
 
-  public getDimensions (): Promise<{ width: number, height: number }> {
+  public getDimensions(): Promise<{ width: number; height: number }> {
     return new Promise((resolve, reject) => {
       const img = new Image();
       img.onload = () => resolve({ width: img.width, height: img.height });
@@ -16,8 +14,7 @@ export class MessageImage {
     });
   }
 
-
-  public downscale (maxWidth: number, maxHeight: number): Promise<string> {
+  public downscale(maxWidth: number, maxHeight: number): Promise<string> {
     return new Promise((resolve, reject) => {
       const img = new Image();
       img.onload = () => {
@@ -52,4 +49,4 @@ export class MessageImage {
   }
 }
 
-export default MessageImage
+export default MessageImage;
