@@ -44,6 +44,13 @@ export class OpenAIEngine implements OpenAIEngineI {
       });
     }
 
+    if (model.model === 'gpt-4o') {
+      return new Models.GPT4Omni({
+        ...model,
+        engine: this,
+      });
+    }
+
     throw new Error(`Model ${model.model} is not supported by OpenAI`);
   }
 
