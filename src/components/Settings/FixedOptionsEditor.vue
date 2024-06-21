@@ -1,18 +1,16 @@
 <template>
   <div class="options-container">
-    <div class="text-h6 text-white q-px-md q-pb-sm">
-      Advanced Settings
-    </div>
+    <div class="text-h6 text-white q-px-md q-pb-sm">Advanced Settings</div>
     <form autocorrect="off">
-      <textarea 
-      v-if="selectedModel" 
-      v-model="advancedSettingsBuffer"
-      :style="inputStyles" 
-      class="json-editor text-white text-h6 bg-primary" 
-      autocorrect="off" 
-      spellcheck="false"
-      placeholder="Advanced Settings"
-      @keydown.tab.prevent="handleTab"
+      <textarea
+        v-if="selectedModel"
+        v-model="advancedSettingsBuffer"
+        :style="inputStyles"
+        class="json-editor text-white text-h6 bg-primary"
+        autocorrect="off"
+        spellcheck="false"
+        placeholder="Advanced Settings"
+        @keydown.tab.prevent="handleTab"
       />
       <!-- Fix with AI button. Commented out due to complexity and robustness -->
       <!-- <div class="absolute-bottom-right button-container">
@@ -49,7 +47,6 @@
 
 .fix-button {
   border-radius: 0.5em 0.5em 1em 0.5em;
-  
 }
 
 .json-editor {
@@ -58,7 +55,7 @@
   width: 100%;
   height: 70vh;
   background-color: $primary;
-  
+
   border-radius: 1em;
   padding: 1em;
 
@@ -93,20 +90,19 @@
 </style>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, watch, nextTick } from 'vue'
-import { app } from 'boot/app'
+import { ref, computed, onMounted, watch, nextTick } from 'vue';
+import { app } from 'boot/app';
 import { Model } from 'src/services/models';
 
-const selectedModel = computed<Model | undefined>(() => app.settings.value.selectedModel)
-const advancedSettingsBuffer = ref<string>('')
-const jsonError = ref<boolean>(false)
+const selectedModel = computed<Model | undefined>(() => app.settings.value.selectedModel);
+const advancedSettingsBuffer = ref<string>('');
+const jsonError = ref<boolean>(false);
 
 const inputStyles = computed(() => {
   return {
     border: jsonError.value ? '1px solid red' : '1px solid transparent',
-  }
-})
-
+  };
+});
 
 // const fixWithAI = async () => {
 //   if (!selectedModel.value) return
@@ -134,39 +130,39 @@ const inputStyles = computed(() => {
 const handleTab = (event: KeyboardEvent) => {
   event.preventDefault();
   const target = event.target as HTMLTextAreaElement;
-  const cursorPosition = target?.selectionStart
+  const cursorPosition = target?.selectionStart;
 
   advancedSettingsBuffer.value =
-  advancedSettingsBuffer.value.substring(0, cursorPosition) +
+    advancedSettingsBuffer.value.substring(0, cursorPosition) +
     '  ' +
     advancedSettingsBuffer.value.substring(cursorPosition);
-  nextTick(() => {  
+  nextTick(() => {
     const target = event.target as HTMLTextAreaElement;
     target.selectionStart = target.selectionEnd = cursorPosition + 2;
   });
-}
+};
 
 watch(app.settings, () => {
-  advancedSettingsBuffer.value = JSON.stringify(selectedModel.value?.advancedSettings, null, 2)
-})
+  advancedSettingsBuffer.value = JSON.stringify(selectedModel.value?.advancedSettings, null, 2);
+});
 
 watch(advancedSettingsBuffer, (newValue) => {
   try {
-    const parsed = JSON.parse(newValue)
+    const parsed = JSON.parse(newValue);
     if (JSON.stringify(parsed) === JSON.stringify(selectedModel.value?.advancedSettings)) {
-      jsonError.value = false
-      return
+      jsonError.value = false;
+      return;
     }
-    if (!selectedModel.value) return
-    
-    selectedModel.value.advancedSettings = JSON.parse(newValue)
-    jsonError.value = false
+    if (!selectedModel.value) return;
+
+    selectedModel.value.advancedSettings = JSON.parse(newValue);
+    jsonError.value = false;
   } catch (e) {
-    jsonError.value = true
+    jsonError.value = true;
   }
-})
+});
 
 onMounted(() => {
-  advancedSettingsBuffer.value = JSON.stringify(selectedModel.value?.advancedSettings, null, 2)
-})
+  advancedSettingsBuffer.value = JSON.stringify(selectedModel.value?.advancedSettings, null, 2);
+});
 </script>

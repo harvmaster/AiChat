@@ -4,8 +4,7 @@
  * quasar.config.js > pwa > workboxMode is set to "injectManifest"
  */
 
-declare const self: ServiceWorkerGlobalScope &
-  typeof globalThis & { skipWaiting: () => void };
+declare const self: ServiceWorkerGlobalScope & typeof globalThis & { skipWaiting: () => void };
 
 import { clientsClaim } from 'workbox-core';
 import {
@@ -27,9 +26,8 @@ cleanupOutdatedCaches();
 // Production SSR fallback to offline.html (except for dev)
 if (process.env.MODE !== 'ssr' || process.env.PROD) {
   registerRoute(
-    new NavigationRoute(
-      createHandlerBoundToURL(process.env.PWA_FALLBACK_HTML),
-      { denylist: [/sw\.js$/, /workbox-(.)*\.js$/] }
-    )
+    new NavigationRoute(createHandlerBoundToURL(process.env.PWA_FALLBACK_HTML), {
+      denylist: [/sw\.js$/, /workbox-(.)*\.js$/],
+    })
   );
 }

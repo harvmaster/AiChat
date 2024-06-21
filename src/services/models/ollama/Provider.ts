@@ -9,7 +9,7 @@ class OllamaProvider implements OpenProvider {
   url = 'https://ollama.com';
   createdAt = Date.now();
 
-  constructor (id: string, name: string, url?: string, createdAt?: number ) {
+  constructor(id: string, name: string, url?: string, createdAt?: number) {
     this.id = id;
     this.name = name;
     if (url) {
@@ -32,7 +32,7 @@ class OllamaProvider implements OpenProvider {
 
     const memoryUsage = models.models.reduce((acc: number, model: OllamaRunningModel) => {
       return acc + model.size;
-    }, 0)
+    }, 0);
 
     return memoryUsage;
   }

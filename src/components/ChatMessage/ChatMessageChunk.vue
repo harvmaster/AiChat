@@ -3,14 +3,14 @@
   <br v-if="showGaps.top" />
   <div class="relative full-width row">
     <div v-html="markup" class="col-12" />
-    <button v-if="props.type == 'code'" class="absolute-top-right text-white my-button" @click="copy">
-      <transition
-        name="fade"
-        mode="out-in"
-        :duration="250"
-      >
+    <button
+      v-if="props.type == 'code'"
+      class="absolute-top-right text-white my-button"
+      @click="copy"
+    >
+      <transition name="fade" mode="out-in" :duration="250">
         <q-icon v-if="!copyAnimation" key="copy" name="content_copy" />
-        <q-icon v-else key="copy-done" name="done" color="green-4"/>
+        <q-icon v-else key="copy-done" name="done" color="green-4" />
         <!-- <p v-if="copyAnimation" class="text-caption">Copied!</p> -->
       </transition>
     </button>
@@ -28,7 +28,10 @@ ol {
 ul {
   margin: 0;
 }
-h1, h2, h3, h4 {
+h1,
+h2,
+h3,
+h4 {
   word-break: break-all;
 }
 .relative {
@@ -58,62 +61,64 @@ h1, h2, h3, h4 {
   transform: translate(-0.5em, 0.5em) scale(1);
 }
 
-.fade-enter-active, .fade-leave-active {
+.fade-enter-active,
+.fade-leave-active {
   transition: opacity 0.25s;
 }
-.fade-enter, .fade-leave-to {
+.fade-enter,
+.fade-leave-to {
   opacity: 0;
 }
 </style>
 
 <script lang="ts" setup>
 import { computed, ref } from 'vue';
-import { copyToClipboard } from 'quasar'
+import { copyToClipboard } from 'quasar';
 
-import { Chunk } from 'src/types'
+import { Chunk } from 'src/types';
 
 export type ChatMessageChunkProps = Chunk & {
   index: number;
   parentLength: number;
-}
+};
 
-const props = defineProps<ChatMessageChunkProps>()
+const props = defineProps<ChatMessageChunkProps>();
 
 const markup = computed(() => {
-  if (props.type == 'code') return props.output.highlighted || props.output.markup
-  
-  let markup = props.output.markup
-  if (markup.endsWith('<br>')) markup = markup.slice(0, -4)
+  if (props.type == 'code') return props.output.highlighted || props.output.markup;
 
-  return markup
-})
+  let markup = props.output.markup;
+  if (markup.endsWith('<br>')) markup = markup.slice(0, -4);
+
+  return markup;
+});
 
 const showGaps = computed(() => {
-  const showTopGap = (props.type == 'code') && (props.index != 0)
-  const showBottomGap = (props.type == 'code') && (props.index != props.parentLength - 1)
+  const showTopGap = props.type == 'code' && props.index != 0;
+  const showBottomGap = props.type == 'code' && props.index != props.parentLength - 1;
   return {
     top: showTopGap,
-    bottom: showBottomGap
-  }
-})
+    bottom: showBottomGap,
+  };
+});
 
-const copyAnimation = ref(false)
-const copyAnimationTimer = ref<NodeJS.Timeout | null>(null)
+const copyAnimation = ref(false);
+const copyAnimationTimer = ref<NodeJS.Timeout | null>(null);
 
 const getFirstGroup = (regexp: RegExp, str: string) => {
   const array = [...str.matchAll(regexp)];
-  return array.map(m => m[1]);
-}
+  return array.map((m) => m[1]);
+};
 
 const copy = () => {
-  const code = getFirstGroup(/(?:^```.*?\n)([^]*.*)(?:```)/gmi, props.raw)
+  const code = getFirstGroup(/(?:^```.*?\n)([^]*.*)(?:```)/gim, props.raw);
 
-  if (code) copyToClipboard(code.join(''))
+  if (code) copyToClipboard(code.join(''));
 
-  copyAnimation.value = true
-  if (copyAnimationTimer.value) clearTimeout(copyAnimationTimer.value)
+  copyAnimation.value = true;
+  if (copyAnimationTimer.value) clearTimeout(copyAnimationTimer.value);
   copyAnimationTimer.value = setTimeout(() => {
-    copyAnimation.value = false
-  }, 1000)
-}
+    copyAnimation.value = false;
+  }, 1000);
+};
 </script>

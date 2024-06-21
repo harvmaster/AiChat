@@ -3,14 +3,19 @@
     <transition-group name="list" tag="div" class="row col-12" mode="out-in">
       <chat-message
         class="col-12"
-
         v-for="message in props.messages"
         :key="message.id"
-
         :message="message"
       />
       <div class="col-12 row justify-center q-pa-sm" v-if="messages.at(-1)?.author == 'user'">
-        <q-btn class="col-auto" btn outline color="blue-2" label="regenerate response"  @click="regenerateResponse" />
+        <q-btn
+          class="col-auto"
+          btn
+          outline
+          color="blue-2"
+          label="regenerate response"
+          @click="regenerateResponse"
+        />
       </div>
     </transition-group>
   </div>
@@ -37,34 +42,40 @@
 </style>
 
 <script setup lang="ts">
-import { app } from 'boot/app'
-import { watch, ref, nextTick } from 'vue'
-import Message from 'src/utils/App/Message'
-import ChatMessage from './ChatMessage.vue'
-import useCurrentConversation from 'src/composeables/useCurrentConversation'
+import { app } from 'boot/app';
+import { watch, ref, nextTick } from 'vue';
+import Message from 'src/utils/App/Message';
+import ChatMessage from './ChatMessage.vue';
+import useCurrentConversation from 'src/composeables/useCurrentConversation';
 
 export type ChatHistoryProps = {
   messages: Message[];
-}
+};
 
-const props = defineProps<ChatHistoryProps>()
+const props = defineProps<ChatHistoryProps>();
 
-const ChatHistoryElement = ref<HTMLElement | null>(null)
+const ChatHistoryElement = ref<HTMLElement | null>(null);
 
 watch([() => props.messages.length, () => props.messages.at(-1)?.content.value.raw], () => {
-  if (props.messages.at(-1)?.content.value.raw != '') return
-  preventScroll = false
-  scrollToBottom()
-})
+  if (props.messages.at(-1)?.content.value.raw != '') return;
+  preventScroll = false;
+  scrollToBottom();
+});
 
 // Scroll to bottom when the element gets bigger
 watch(props.messages, () => {
-  if (ChatHistoryElement.value && ChatHistoryElement.value.scrollTop + ChatHistoryElement.value.clientHeight - ChatHistoryElement.value.scrollHeight > -200) {
+  if (
+    ChatHistoryElement.value &&
+    ChatHistoryElement.value.scrollTop +
+      ChatHistoryElement.value.clientHeight -
+      ChatHistoryElement.value.scrollHeight >
+      -200
+  ) {
     if (!preventScroll) {
-      scrollToBottom()
+      scrollToBottom();
     }
   }
-})
+});
 
 const scrollToBottom = (resetLock?: boolean, behavior?: 'smooth' | 'instant') => {
   nextTick(() => {
@@ -72,39 +83,39 @@ const scrollToBottom = (resetLock?: boolean, behavior?: 'smooth' | 'instant') =>
       ChatHistoryElement.value.scrollTo({
         top: ChatHistoryElement.value.scrollHeight,
         behavior: behavior || 'instant',
-      })
+      });
     }
-  })
+  });
 
   if (resetLock) {
-    preventScroll = false
+    preventScroll = false;
   }
-}
+};
 
-let lastScroll = 0
-let preventScroll = false
+let lastScroll = 0;
+let preventScroll = false;
 const handleScroll = (event: Event) => {
-  const element = event.target as HTMLElement
-  const currentPosition = element.scrollTop + element.clientHeight
+  const element = event.target as HTMLElement;
+  const currentPosition = element.scrollTop + element.clientHeight;
 
-  const direction = currentPosition >= lastScroll ? 'down' : 'up'
-  if  (direction == 'down') {
-    preventScroll = false
+  const direction = currentPosition >= lastScroll ? 'down' : 'up';
+  if (direction == 'down') {
+    preventScroll = false;
   } else {
-    preventScroll = true
+    preventScroll = true;
   }
 
-  lastScroll = currentPosition
-}
+  lastScroll = currentPosition;
+};
 
-const currentConversation = useCurrentConversation()
+const currentConversation = useCurrentConversation();
 const regenerateResponse = () => {
   if (currentConversation.value && app.settings.value.selectedModel) {
-    currentConversation.value.addAssistantMessage(app.settings.value.selectedModel)
+    currentConversation.value.addAssistantMessage(app.settings.value.selectedModel);
   }
-}
+};
 
 defineExpose({
-  scrollToBottom
-})
+  scrollToBottom,
+});
 </script>

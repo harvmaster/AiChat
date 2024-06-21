@@ -9,6 +9,6 @@ export interface OpenAIModel extends ClosedModel {
 
 export type OpenAIModelProps = ModelProps & {
   engine: OpenAIEngine;
-}
+};
 
-export default OpenAIModel
+export default OpenAIModel;

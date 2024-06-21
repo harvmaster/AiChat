@@ -9,7 +9,7 @@ const openAIProvider: ClosedProvider = {
 
   token: '',
   createdAt: Date.now(),
-}
+};
 
 export const initOpenAIProvider = async () => {
   const providers = await getProviders();
@@ -18,6 +18,6 @@ export const initOpenAIProvider = async () => {
     openAIProvider.token = provider.token;
     openAIProvider.createdAt = provider.createdAt;
   }
-}
+};
 
 export default openAIProvider;

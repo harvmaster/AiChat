@@ -9,7 +9,11 @@
     <div class="col-auto row items-start">
       <div class="fit-content q-py-sm">
         <div class="input-container">
-          <input class="my-input text-white text-h6" v-model="selectedModel.provider.token" placeholder="API Token"/>
+          <input
+            class="my-input text-white text-h6"
+            v-model="selectedModel.provider.token"
+            placeholder="API Token"
+          />
         </div>
       </div>
     </div>
@@ -18,7 +22,12 @@
     <div class="col-auto row">
       <div class="row fit-content">
         <div class="col-12 text-white">Temperature</div>
-        <counter-input class="col-auto" v-model="selectedModel.advancedSettings.temperature!" :step="0.1" @update:model-value="clampTemperature"/>
+        <counter-input
+          class="col-auto"
+          v-model="selectedModel.advancedSettings.temperature!"
+          :step="0.1"
+          @update:model-value="clampTemperature"
+        />
       </div>
     </div>
   </div>
@@ -37,23 +46,29 @@
 </style>
 
 <script lang="ts" setup>
-import { computed } from 'vue'
-import { app } from 'boot/app'
+import { computed } from 'vue';
+import { app } from 'boot/app';
 
 import CounterInput from '../Inputs/CounterInput.vue';
 
-const selectedModel = computed(() => app.settings.value.selectedModel)
+const selectedModel = computed(() => app.settings.value.selectedModel);
 
 const clampTemperature = () => {
-  if (!selectedModel.value) return
-  if (!selectedModel.value.advancedSettings) return selectedModel.value.advancedSettings = { temperature: 1 }
-  if (!selectedModel.value.advancedSettings.temperature && isNaN(selectedModel.value.advancedSettings.temperature as number)) return selectedModel.value.advancedSettings.temperature = 1
-  
-  let temperature = parseFloat(parseFloat(selectedModel.value.advancedSettings.temperature?.toString() as string).toFixed(2))
-  if (isNaN(temperature)) temperature = 1
-  if (temperature > 2) temperature = 2
-  if (temperature < 0) temperature = 0
-  selectedModel.value.advancedSettings.temperature = temperature
-}
-</script>
+  if (!selectedModel.value) return;
+  if (!selectedModel.value.advancedSettings)
+    return (selectedModel.value.advancedSettings = { temperature: 1 });
+  if (
+    !selectedModel.value.advancedSettings.temperature &&
+    isNaN(selectedModel.value.advancedSettings.temperature as number)
+  )
+    return (selectedModel.value.advancedSettings.temperature = 1);
 
+  let temperature = parseFloat(
+    parseFloat(selectedModel.value.advancedSettings.temperature?.toString() as string).toFixed(2)
+  );
+  if (isNaN(temperature)) temperature = 1;
+  if (temperature > 2) temperature = 2;
+  if (temperature < 0) temperature = 0;
+  selectedModel.value.advancedSettings.temperature = temperature;
+};
+</script>

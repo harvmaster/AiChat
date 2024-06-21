@@ -5,36 +5,42 @@ import { Database__Message } from 'src/types';
 export type MessageQuerySubArrayByCount = {
   from: number;
   count: number;
-}
+};
 
 export type MessageQuerySubArrayByDestination = {
   from: number;
   to: number;
-}
+};
 
-export type MessageQuerySubArray = MessageQuerySubArrayByCount | MessageQuerySubArrayByDestination
+export type MessageQuerySubArray = MessageQuerySubArrayByCount | MessageQuerySubArrayByDestination;
 
 export type MessageQueryOptions = {
   limit?: number;
   subArrays?: MessageQuerySubArray[];
-}
+};
 
 const getKeysSubArray = (keys: IDBValidKey[], subArray: MessageQuerySubArray): IDBValidKey[] => {
   if ('count' in subArray) {
-    const from = Math.max(Math.min(subArray.from < 0 ? keys.length + subArray.from : subArray.from, keys.length), 0);
+    const from = Math.max(
+      Math.min(subArray.from < 0 ? keys.length + subArray.from : subArray.from, keys.length),
+      0
+    );
     const to = Math.max(Math.min(from + subArray.count, keys.length), 0);
 
     const subKeys = keys.slice(from, to);
-    return subKeys
+    return subKeys;
   } else {
-    const from = Math.max(Math.min(subArray.from < 0 ? keys.length + subArray.from : subArray.from, keys.length), 0);
+    const from = Math.max(
+      Math.min(subArray.from < 0 ? keys.length + subArray.from : subArray.from, keys.length),
+      0
+    );
     let to = Math.max(Math.min(subArray.to < 0 ? keys.length + subArray.to : subArray.to), 0);
 
-    if (subArray.to < 0) to += 1
+    if (subArray.to < 0) to += 1;
     const subKeys = keys.slice(from, to);
-    return subKeys
+    return subKeys;
   }
-}
+};
 
 // const testGetKeysSubArray = () => {
 //   const keys = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
@@ -48,19 +54,19 @@ const getKeysSubArray = (keys: IDBValidKey[], subArray: MessageQuerySubArray): I
 //   const subArrayByDestination2 = getKeysSubArray(keys, { from: -3, to: 2 })
 //   console.log(subArrayByDestination2)
 
-
 //   const subArrayByCount3 = getKeysSubArray(keys, { from: -1, count: 2 })
 //   console.log(subArrayByCount3)
 
 // }
 // testGetKeysSubArray()
 
-export default async function getMessagesByConversationId (conversationId: string, options?: MessageQueryOptions): Promise<Message[]> {
+export default async function getMessagesByConversationId(
+  conversationId: string,
+  options?: MessageQueryOptions
+): Promise<Message[]> {
   const db = await EasyIDB.getDB(settings.dbName, settings.dbVersion);
 
-  
-
-  if (!conversationId) return []
+  if (!conversationId) return [];
 
   const tx = db.db.transaction('messages', 'readonly');
   const store = tx.objectStore('messages');
@@ -70,34 +76,38 @@ export default async function getMessagesByConversationId (conversationId: strin
   // Get the first message if limit is set. IndexedDB returns the messages from newest to oldest, so we have to get the last message from all the keys
   // If the result was given from oldest to newest, we could use:
   // `store.index('conversationId').getAllKeys(conversationId, limit)`
-  const { subArrays } = options || {}
+  const { subArrays } = options || {};
   if (subArrays) {
     const keys = await store.index('conversationId').getAllKeys(conversationId);
-    const messageKeys = subArrays.map(sub => {
-      return getKeysSubArray(keys, sub)
-    }).flat()
+    const messageKeys = subArrays
+      .map((sub) => {
+        return getKeysSubArray(keys, sub);
+      })
+      .flat();
 
-    messages = await Promise.all(messageKeys.map(async keys => {
-      const message: Database__Message = await store.get(keys);
-      return message
-    }))
+    messages = await Promise.all(
+      messageKeys.map(async (keys) => {
+        const message: Database__Message = await store.get(keys);
+        return message;
+      })
+    );
   } else {
     messages = await store.index('conversationId').getAll(conversationId);
   }
 
   await tx.done;
 
-  const formattedMessages = messages.map(message => {
+  const formattedMessages = messages.map((message) => {
     const messageProps = {
       id: message.id,
       author: message.author,
       content: { raw: message.content || '' },
       modelId: message.modelId,
       createdAt: message.createdAt,
-      images: message.images || []
-    }
-    return new Message(messageProps)
-  }) 
+      images: message.images || [],
+    };
+    return new Message(messageProps);
+  });
 
   return formattedMessages;
 }

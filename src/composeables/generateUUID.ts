@@ -1,14 +1,14 @@
-const ALPHABET = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'
-const ID_LENGTH = 8
+const ALPHABET = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
+const ID_LENGTH = 8;
 
 // Generates a random ID of length `ID_LENGTH` using the `ALPHABET` characters
 export const generateUUID = () => {
-  let id = ''
+  let id = '';
   for (let i = 0; i < ID_LENGTH; i++) {
-    id += ALPHABET.charAt(Math.floor(Math.random() * ALPHABET.length))
+    id += ALPHABET.charAt(Math.floor(Math.random() * ALPHABET.length));
   }
-  return id
-}
+  return id;
+};
 
 // export const generateUUID = () => {
 //   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
@@ -18,4 +18,4 @@ export const generateUUID = () => {
 //   });
 // }
 
-export default generateUUID
+export default generateUUID;

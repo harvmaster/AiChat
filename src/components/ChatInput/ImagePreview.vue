@@ -34,16 +34,16 @@
 import useInput from 'src/composeables/useInput';
 
 export type ImagePreviewProps = {
-  src: string
-}
+  src: string;
+};
 
 const props = withDefaults(defineProps<ImagePreviewProps>(), {
-  src: ''
-})
+  src: '',
+});
 
-const { images } = useInput()
+const { images } = useInput();
 
 const deleteImage = () => {
-  images.value = images.value.filter(image => image.src !== props.src)
-}
+  images.value = images.value.filter((image) => image.src !== props.src);
+};
 </script>

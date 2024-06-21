@@ -16,8 +16,8 @@ export default async function saveProviders(providers: Provider[]): Promise<void
       token: (provider as ClosedProvider).token,
       isClosed: provider.isClosed,
       createdAt: Date.now(),
-    }
-    store.put(formatted); 
+    };
+    store.put(formatted);
   }
 
   await tx.done;
