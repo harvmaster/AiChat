@@ -73,7 +73,8 @@ export const useModelFromURL = () => {
           id: model.provider.id,
           name: model.provider.name,
           type: model.provider.type,
-          url: model.provider.url,
+          url: model.provider.url || '',
+          token: '',
           createdAt: model.provider.createdAt || Date.now(),
         },
       };
