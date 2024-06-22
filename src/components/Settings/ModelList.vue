@@ -138,8 +138,8 @@ import generateUUID from 'src/composeables/generateUUID';
 
 import { QPopupEdit } from 'quasar';
 
-import { OllamaModel, OllamaProvider } from 'src/services/models/ollama';
-import { Model } from 'src/services/models';
+import { OpenModel, OpenEngine } from 'src/services/engines';
+import { Model } from 'src/services/engines';
 
 const newProvider = ref('');
 
@@ -149,14 +149,14 @@ type ModelGroups = {
 const groupedModels = computed(() => {
   const grouped: ModelGroups = {};
   app.models.value.forEach((model) => {
-    if (!grouped[model.provider.id]) {
-      grouped[model.provider.id] = [];
+    if (!grouped[model.engine.id]) {
+      grouped[model.engine.id] = [];
     }
-    grouped[model.provider.id].push(model);
+    grouped[model.engine.id].push(model);
   });
   const groupedArray = Object.values(grouped);
   return groupedArray.sort(
-    (a: Model[], b: Model[]) => b[0].provider.createdAt - a[0].provider.createdAt
+    (a: Model[], b: Model[]) => b[0].engine.createdAt - a[0].engine.createdAt
   );
 });
 
@@ -167,23 +167,31 @@ const selectModel = (model: Model) => {
 
 const addProviderPopup = ref<QPopupEdit | null>(null);
 const createProvider = (event: KeyboardEvent) => {
-  if (event.key === 'Enter') {
-    app.models.value.push(
-      new OllamaModel(
-        generateUUID(),
-        new OllamaProvider(generateUUID(), newProvider.value, ''),
-        Date.now(),
-        '{ "temperature": 0.8 }',
-        'Example model'
-      )
-    );
-    addProviderPopup.value?.hide();
-    newProvider.value = '';
+  // if (event.key === 'Enter') {
+  //   app.models.value.push(
+  //     new OllamaModel(
+  //       generateUUID(),
+  //       new OllamaProvider(generateUUID(), newProvider.value, ''),
+  //       Date.now(),
+  //       '{ "temperature": 0.8 }',
+  //       'Example model'
+  //     )
+  //   );
+  //   addProviderPopup.value?.hide();
+  //   newProvider.value = '';
+  // }
+
+  if (event.key === 'enter') {
+    app.engineManager.value.createEngine({
+      type: 'ollama',
+      name: newProvider.value,
+      url: ''
+    })
   }
 };
 
 const addModel = (providerId: string) => {
-  const provider = app.models.value.find((model) => model.provider.id === providerId)?.provider;
+  const provider = app.models.value.find((model) => model.engine.id === providerId)?.engine;
   if (!provider) return;
   if (provider.isClosed) {
     return;

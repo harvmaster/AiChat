@@ -1,4 +1,4 @@
-import { reactive, ref, watch } from 'vue';
+import { computed, reactive, ref, watch } from 'vue';
 
 import { ClosedModel, Model, Engine, ChatGenerationMetrics, EngineManager, PortableModel } from 'src/services/engines';
 import { default as getModelsFromDB } from 'src/utils/Database/Models/getModels'
@@ -6,7 +6,7 @@ import { default as getModelsFromDB } from 'src/utils/Database/Models/getModels'
 import { loadOllamaModels } from 'src/services/models/ollama';
 import { GPT3_5Turbo, GPT4Turbo, GPT4o, initOpenAIProvider } from 'src/services/models/openai';
 
-import { Settings } from 'src/types';
+import { Database__Model, Settings } from 'src/types';
 import Conversation from 'src/utils/App/Conversation';
 import {
   getConversations,
@@ -16,11 +16,15 @@ import {
   saveSettings,
 } from 'src/utils/Database';
 import generateUUID from 'src/composeables/generateUUID';
+import { migrateFromProvider } from 'src/services/engines/utils';
 
 class App {
   readonly conversations = reactive<{ value: Conversation[] }>({ value: [] });
   readonly providers = reactive<{ value: Engine[] }>({ value: [] });
-  readonly models = reactive<{ value: Model[] }>({ value: [] });
+  // readonly models = reactive<{ value: Model[] }>({ value: [] });
+  readonly models = computed<Model[]>(() => {
+    return this.engineManager.value.models
+  })
 
   readonly engineManager = reactive<{ value: EngineManager }>({ value: new EngineManager() });
 
@@ -45,8 +49,15 @@ class App {
 
   async loadFromDatabase() {
     const models: PortableModel[] = await getModelsFromDB();
+    console.log(models)
+    const formattedModels = await  Promise.all(models.map(async (model: (PortableModel | Database__Model)) => {
+      if ((model as Database__Model).providerId != undefined) {
+        return await migrateFromProvider(model as unknown as Database__Model);
+      }
+      return model as PortableModel;
+    }))
 
-    models.forEach(model => this.engineManager.value.importModel(model));
+    formattedModels.forEach(model => this.engineManager.value.importModel(model));
 
 
 
@@ -86,10 +97,10 @@ class App {
         console.error('Failed to save settings:', err)
       );
       if (!this.settings.value.selectedModel) return;
-      if (this.settings.value.selectedModel.provider.isClosed) return;
+      if (this.settings.value.selectedModel.engine.isClosed) return;
 
       // get memory usage metric
-      this.settings.value.selectedModel.provider.getMemoryUsage().then((memoryUsage) => {
+      this.settings.value.selectedModel.engine.getMemoryUsage?.().then((memoryUsage) => {
         this.metrics.value.memory_usage = memoryUsage;
       });
     });

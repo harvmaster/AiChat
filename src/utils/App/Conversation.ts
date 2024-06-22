@@ -1,4 +1,4 @@
-import { ChatHistory, Model } from 'src/services/models';
+import { ChatHistory, Model } from 'src/services/engines';
 import Message from './Message';
 import getMessagesByConversationId, { MessageQueryOptions } from '../Database/Messages/getMessages';
 import {

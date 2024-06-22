@@ -119,6 +119,7 @@ export type OpenEngineProps = BaseEngineProps & {
 export interface OpenEngine extends BaseEngine {
   url: string;
   isClosed: false;
+  getMemoryUsage?: () => Promise<number>;
 }
 
 export type Model = ClosedModel | OpenModel;

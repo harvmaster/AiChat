@@ -41,9 +41,9 @@
         <div class="col-12 col-md row fit-content">
           <div class="row col-12 col-md-auto q-pa-md fit-content">
             <!-- Model Editors based on type of model -->
-            <closed-source-model-editor v-if="selectedModel && selectedModel.provider.isClosed" />
+            <closed-source-model-editor v-if="selectedModel && selectedModel.engine.isClosed" />
             <open-source-model-editor
-              v-else-if="selectedModel && !selectedModel.provider.isClosed"
+              v-else-if="selectedModel && !selectedModel.engine.isClosed"
               @toggleAdvanced="() => (showAdvanced = !showAdvanced)"
             />
           </div>
@@ -104,7 +104,7 @@ const showAdvanced = ref(false);
 watch(
   () => app.settings.value.selectedModel,
   () => {
-    if (app.settings.value.selectedModel?.provider.isClosed) showAdvanced.value = false;
+    if (app.settings.value.selectedModel?.engine.isClosed) showAdvanced.value = false;
   }
 );
 
