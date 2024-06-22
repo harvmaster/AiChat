@@ -27,6 +27,15 @@ export type ChatGenerationResponse = {
   response: Promise<ChatCompletionResponse>;
 };
 
+export type ChatGenerationMetrics = {
+  token_count: number;
+  token_time: number;
+  prompt_count: number;
+  prompt_time: number;
+  tps: number;
+  memory_usage: number;
+};
+
 export type PortableEngine = EngineProps & {
   id: string;
 };

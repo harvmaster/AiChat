@@ -7,17 +7,17 @@ export default async function deleteModel(model: Model): Promise<void> {
 
   if (!model.id) return;
 
-  if (model.provider) {
-    const models = await getModels();
-    if (models.every((m) => m.providerId !== model.provider.id)) {
-      const tx = db.db.transaction('providers', 'readwrite');
-      const store = tx.objectStore('providers');
+  // if (model.provider) {
+  //   const models = await getModels();
+  //   if (models.every((m) => m.providerId !== model.provider.id)) {
+  //     const tx = db.db.transaction('providers', 'readwrite');
+  //     const store = tx.objectStore('providers');
 
-      store.delete(model.provider.id);
+  //     store.delete(model.provider.id);
 
-      await tx.done;
-    }
-  }
+  //     await tx.done;
+  //   }
+  // }
 
   const tx = db.db.transaction('models', 'readwrite');
   const store = tx.objectStore('models');

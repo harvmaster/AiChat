@@ -1,6 +1,8 @@
 import { reactive, ref, watch } from 'vue';
 
-import { ClosedModel, Model, Provider, ChatGenerationMetrics } from 'src/services/models';
+import { ClosedModel, Model, Engine, ChatGenerationMetrics, EngineManager, PortableModel } from 'src/services/engines';
+import { default as getModelsFromDB } from 'src/utils/Database/Models/getModels'
+
 import { loadOllamaModels } from 'src/services/models/ollama';
 import { GPT3_5Turbo, GPT4Turbo, GPT4o, initOpenAIProvider } from 'src/services/models/openai';
 
@@ -17,8 +19,10 @@ import generateUUID from 'src/composeables/generateUUID';
 
 class App {
   readonly conversations = reactive<{ value: Conversation[] }>({ value: [] });
-  readonly providers = reactive<{ value: Provider[] }>({ value: [] });
+  readonly providers = reactive<{ value: Engine[] }>({ value: [] });
   readonly models = reactive<{ value: Model[] }>({ value: [] });
+
+  readonly engineManager = reactive<{ value: EngineManager }>({ value: new EngineManager() });
 
   readonly settings = reactive<{ value: Settings }>({
     value: {
@@ -40,12 +44,20 @@ class App {
   readonly version = ref('1.1.0');
 
   async loadFromDatabase() {
-    const formattedModels = await loadOllamaModels();
+    const models: PortableModel[] = await getModelsFromDB();
 
-    const openaiModels: ClosedModel[] = [GPT3_5Turbo, GPT4Turbo, GPT4o];
-    await initOpenAIProvider();
+    models.forEach(model => this.engineManager.value.importModel(model));
 
-    this.models.value = [...formattedModels, ...openaiModels];
+
+
+
+
+    // const formattedModels = await loadOllamaModels();
+
+    // const openaiModels: ClosedModel[] = [GPT3_5Turbo, GPT4Turbo, GPT4o];
+    // await initOpenAIProvider();
+
+    // this.models.value = [...formattedModels, ...openaiModels];
 
     console.log('getting conversations');
     const conversations = await getConversations({ getMessages: false });

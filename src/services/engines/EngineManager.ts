@@ -44,7 +44,7 @@ export class EngineManager {
   importModel(model: PortableModel) {
     validatePortableModel(model);
 
-    let engine = this.getOrCreateEngine(model);
+    const engine = this.getOrCreateEngine(model);
     if (!engine) {
       throw new Error(`Engine ${model.engine.id} not found`);
     }
@@ -54,5 +54,7 @@ export class EngineManager {
   }
 }
 
-const engineManager = new EngineManager();
-export default engineManager;
+// const engineManager = new EngineManager();
+// export default engineManager;
+
+export default EngineManager
