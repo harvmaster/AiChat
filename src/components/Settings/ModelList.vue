@@ -2,13 +2,13 @@
   <div class="col-12 scroll-area">
     <q-list class="fit">
       <transition-group name="slide-x" tag="div">
-        <div v-for="group of groupedModels" :key="group[0].provider.id">
+        <div v-for="group of groupedModels" :key="group[0].engine.id">
           <div class="text-h6 text-white row">
             <!-- Provider Header -->
             <div class="col-auto self-center q-pr-sm">
-              {{ group[0].provider.name }}
+              {{ group[0].engine.name }}
             </div>
-            <div v-if="!group[0].provider.isClosed" class="col-auto">
+            <div v-if="!group[0].engine.isClosed" class="col-auto">
               <q-btn
                 class="text-bold"
                 outline
@@ -16,7 +16,7 @@
                 flat
                 icon="add"
                 round
-                @click="() => addModel(group[0].provider.id)"
+                @click="() => addModel(group[0].engine.id)"
               >
                 <q-tooltip> Add Model </q-tooltip>
               </q-btn>
@@ -182,28 +182,45 @@ const createProvider = (event: KeyboardEvent) => {
   // }
 
   if (event.key === 'enter') {
-    app.engineManager.value.createEngine({
+    const newEngine = app.engineManager.value.createEngine({
       type: 'ollama',
       name: newProvider.value,
       url: ''
     })
+
+    const newModel = newEngine.createModel({
+      id: generateUUID(),
+      createdAt: Date.now(),
+      // advancedSettings: { 'temperature': 0.8 },
+      name: 'Example model',
+      model: 'Example model'
+    });
+
+    app.engineManager.value.importModel(newModel);
   }
 };
 
-const addModel = (providerId: string) => {
-  const provider = app.models.value.find((model) => model.engine.id === providerId)?.engine;
-  if (!provider) return;
-  if (provider.isClosed) {
+const addModel = (engineId: string) => {
+  const engine = app.models.value.find((model) => model.engine.id === engineId)?.engine;
+  if (!engine) return;
+  if (engine.isClosed) {
     return;
   }
 
-  const model = new OllamaModel(
-    generateUUID(),
-    provider,
-    Date.now(),
-    '{ "temperature": 0.8 }',
-    'Example model'
-  );
+  const model = engine.createModel({
+    id: generateUUID(),
+    createdAt: Date.now(),
+    // advancedSettings: { 'temperature': 0.8 },
+    name: 'Example model',
+    model: 'Example model'
+  });
+  // const model = new OllamaModel(
+  //   generateUUID(),
+  //   provider,
+  //   Date.now(),
+  //   '{ "temperature": 0.8 }',
+  //   'Example model'
+  // );
   app.models.value.push(model);
 
   nextTick(() => selectModel(model));

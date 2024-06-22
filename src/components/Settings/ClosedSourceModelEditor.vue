@@ -1,5 +1,5 @@
 <template>
-  <div v-if="selectedModel && selectedModel.provider.isClosed" class="column align-start">
+  <div v-if="selectedModel && selectedModel.engine.isClosed" class="column align-start">
     <!-- Name -->
     <div class="col-auto text-h6 text-white q-pb-sm">
       {{ selectedModel.name }}
@@ -11,7 +11,7 @@
         <div class="input-container">
           <input
             class="my-input text-white text-h6"
-            v-model="selectedModel.provider.token"
+            v-model="selectedModel.engine.token"
             placeholder="API Token"
           />
         </div>

@@ -52,6 +52,13 @@ export class EngineManager {
     const newModel = engine.createModel(model);
     this.models.push(newModel);
   }
+
+  removeModel(model: Model) {
+    const index = this.models.findIndex((m) => m.id === model.id);
+    if (index !== -1) {
+      this.models.splice(index, 1);
+    }
+  }
 }
 
 // const engineManager = new EngineManager();

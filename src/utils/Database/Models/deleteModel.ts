@@ -1,4 +1,4 @@
-import { Model } from 'src/services/models';
+import { Model } from 'src/services/engines';
 import EasyIDB, { settings } from '../IDB';
 import getModels from './getModels';
 

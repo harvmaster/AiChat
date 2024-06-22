@@ -1,6 +1,6 @@
 <template>
   <div
-    v-if="selectedModel && !selectedModel.provider.isClosed"
+    v-if="selectedModel && !selectedModel.engine.isClosed"
     class="column align-start fit-content"
   >
     <div class="text-white col-auto row q-pb-sm">
@@ -27,7 +27,7 @@
         <div class="input-container">
           <input
             class="my-input text-white text-h6"
-            v-model="selectedModel.provider.url"
+            v-model="selectedModel.engine.url"
             placeholder="URL"
           />
         </div>
@@ -75,7 +75,7 @@ import { app } from 'boot/app';
 import CounterInput from '../Inputs/CounterInput.vue';
 
 import deleteModelFromDatabase from 'src/utils/Database/Models/deleteModel';
-import { OpenModel } from 'src/services/models';
+import { OpenModel } from 'src/services/engines';
 import { Notify, copyToClipboard } from 'quasar';
 
 const selectedModel = computed<OpenModel | undefined>(
@@ -123,7 +123,8 @@ const copyModelLink = () => {
 const deleteModel = () => {
   if (!selectedModel.value) return;
   deleteModelFromDatabase(selectedModel.value);
-  app.models.value = app.models.value.filter((model) => model.id !== selectedModel.value?.id);
+  app.engineManager.value.removeModel(selectedModel.value); 
+  // = app.models.value.filter((model) => model.id !== selectedModel.value?.id);
   app.settings.value.selectedModel = app.models.value[0];
 };
 
