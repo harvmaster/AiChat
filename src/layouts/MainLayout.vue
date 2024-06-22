@@ -78,7 +78,7 @@
 
     <q-footer
       class="bg-secondary text-grey-6 text-weight-medium q-pa-sm"
-      v-if="app.settings.value.showMetrics && !app.settings.value.selectedModel?.provider.isClosed"
+      v-if="app.settings.value.showMetrics && !app.settings.value.selectedModel?.engine.isClosed"
     >
       <div class="row q-col-gutter-md">
         <div class="col-auto">Tokens/s: {{ app.metrics.value.tps.toFixed(2) }}</div>

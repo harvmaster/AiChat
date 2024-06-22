@@ -35,7 +35,13 @@ export const validatePortableModel = (model: PortableModel) => {
 };
 
 export const createPortableModelURL = (portableModel: PortableModel): string => {
-  return `${window.location.origin}/#/?${btoa(JSON.stringify(portableModel))}`;
+  const origin = window.location.origin;
+  const basePath = process.env.BASE_PATH || '';
+
+  const baseURL = `${origin}/${basePath}#/?model=`
+  const encodedModel = btoa(JSON.stringify(portableModel));
+
+  return `${baseURL}${encodedModel}`;
 };
 
 export const migrateFromProvider = async (models: Database__Model): Promise<PortableModel> => {
