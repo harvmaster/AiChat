@@ -1,3 +1,4 @@
+import { reactive } from 'vue';
 import { validatePortableModel } from './utils';
 
 import { ENGINES, EngineType, EngineHandler } from './EngineTypes';
@@ -16,7 +17,7 @@ import {
 
 export class EngineManager {
   selectedModel: Model | null = null;
-  models: Model[] = [];
+  models: Model[] = reactive<Model[]>([]);
 
   selectModel(model: Model) {
     this.selectedModel = model;

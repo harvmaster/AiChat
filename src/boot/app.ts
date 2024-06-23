@@ -23,6 +23,7 @@ class App {
   readonly providers = reactive<{ value: Engine[] }>({ value: [] });
   // readonly models = reactive<{ value: Model[] }>({ value: [] });
   readonly models = computed<Model[]>(() => {
+    console.log('calculating models')
     return this.engineManager.value.models
   })
 
@@ -106,6 +107,7 @@ class App {
     });
 
     watch(this.models, () => {
+      console.log('saving models')
       saveModels(this.models.value).catch((err) => console.error('Failed to save models:', err));
     });
   }
