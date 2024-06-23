@@ -10,6 +10,13 @@ import {
   PortableModel,
 } from './types';
 
+const ENGINES = {
+  openai: (props: EngineProps) => new OpenAI.OpenAIEngine(props as ClosedEngineProps),
+  ollama: (props: EngineProps) => new Ollama.OllamaEngine(props as OpenEngineProps),
+} as const
+
+export type EngineType = keyof typeof ENGINES;
+
 export class EngineManager {
   selectedModel: Model | null = null;
   models: Model[] = [];
@@ -23,14 +30,24 @@ export class EngineManager {
   }
 
   createEngine(engineProps: EngineProps): Engine {
-    switch (engineProps.type) {
-      case 'openai':
-        return new OpenAI.OpenAIEngine(engineProps as ClosedEngineProps);
-      case 'ollama':
-        return new Ollama.OllamaEngine(engineProps as OpenEngineProps);
+    if (this.isValidEngineType(engineProps.type) && ENGINES[engineProps.type]) {
+      const handler = this.getEngineHandler(engineProps.type);
+      return handler(engineProps as EngineProps);
     }
-
+    
     throw new Error(`Engine type ${engineProps.type} is not supported`);
+  }
+
+  getEngineTypes (): EngineType[] {
+    return Object.keys(ENGINES) as EngineType[];
+  }
+
+  getEngineHandler (engineType: EngineType): typeof ENGINES[EngineType] {
+    return ENGINES[engineType];
+  }
+
+  isValidEngineType (engineType: string): engineType is EngineType {
+    return engineType in ENGINES;
   }
 
   getOrCreateEngine(model: PortableModel) {
