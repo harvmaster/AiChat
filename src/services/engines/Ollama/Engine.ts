@@ -48,7 +48,7 @@ export type OllamaAvailableModels = {
 
 export class OllamaEngine implements OllamaEngineI {
   readonly type = 'ollama';
-  readonly isClosed = false;
+  static readonly isClosed = false as const;
 
   id: string;
   name: string;
@@ -60,6 +60,10 @@ export class OllamaEngine implements OllamaEngineI {
     this.name = props.name;
     this.url = props.url;
     this.createdAt = props.createdAt || Date.now();
+  }
+
+  get isClosed() {
+    return OllamaEngine.isClosed;
   }
 
   createModel(model: ModelProps): OllamaModel {
@@ -76,6 +80,7 @@ export class OllamaEngine implements OllamaEngineI {
       id: this.id,
       name: this.name,
       type: this.type,
+      token: '',
       url: this.url,
       createdAt: this.createdAt,
     };

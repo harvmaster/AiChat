@@ -1,21 +1,18 @@
-import { OpenAI, Ollama } from '.';
 import { validatePortableModel } from './utils';
 
+import { ENGINES, EngineType, EngineHandler } from './EngineTypes';
+
 import {
-  ClosedEngineProps,
   Engine,
   EngineProps,
   Model,
-  OpenEngineProps,
   PortableModel,
+  // EngineType
 } from './types';
 
-const ENGINES = {
-  openai: (props: EngineProps) => new OpenAI.OpenAIEngine(props as ClosedEngineProps),
-  ollama: (props: EngineProps) => new Ollama.OllamaEngine(props as OpenEngineProps),
-} as const
+// Define your engines and constructor in .Engines.ts
 
-export type EngineType = keyof typeof ENGINES;
+// I cant figure out the TS wizardy to have this type be an full array of all the keys of the ENGINES object. This is close enough
 
 export class EngineManager {
   selectedModel: Model | null = null;
@@ -32,17 +29,17 @@ export class EngineManager {
   createEngine(engineProps: EngineProps): Engine {
     if (this.isValidEngineType(engineProps.type) && ENGINES[engineProps.type]) {
       const handler = this.getEngineHandler(engineProps.type);
-      return handler(engineProps as EngineProps);
+      return new handler(engineProps);
     }
     
     throw new Error(`Engine type ${engineProps.type} is not supported`);
   }
 
-  getEngineTypes (): EngineType[] {
+  getEngineTypes(): EngineType[] {
     return Object.keys(ENGINES) as EngineType[];
   }
 
-  getEngineHandler (engineType: EngineType): typeof ENGINES[EngineType] {
+  getEngineHandler (engineType: EngineType): EngineHandler {
     return ENGINES[engineType];
   }
 

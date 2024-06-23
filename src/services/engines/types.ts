@@ -1,3 +1,5 @@
+import { EngineType } from "./EngineTypes";
+
 export type ChatMessage = {
   content: string;
   role: 'user' | 'assistant' | 'system';
@@ -83,14 +85,15 @@ export interface BaseModel {
 export type BaseEngineProps = {
   id?: string;
   name: string;
-  type: string;
+  type: EngineType;
   createdAt?: number;
 };
 
 export interface BaseEngine {
   id: string;
   name: string;
-  type: string;
+  // type: string;
+  isClosed: boolean;
   createdAt: number;
   createModel(model: ModelProps): Model;
 }
@@ -124,7 +127,7 @@ export interface OpenEngine extends BaseEngine {
 
 export type Model = ClosedModel | OpenModel;
 export type Engine = ClosedEngine | OpenEngine;
-export type EngineProps = ClosedEngineProps | OpenEngineProps;
+export type EngineProps = ClosedEngineProps & OpenEngineProps;
 
 export type ModelSettings = {
   num_keep: number;

@@ -1,4 +1,4 @@
-import { ClosedEngine, ClosedEngineProps, ModelProps, OpenEngineProps } from '../types';
+import { ClosedEngine, ClosedEngineProps, ModelProps, OpenEngineProps, PortableEngine } from '../types';
 
 import * as Models from './models';
 import OpenAIModel from './models/Model';
@@ -15,7 +15,7 @@ export type OpenAIEngineProps = OpenEngineProps & {
 
 export class OpenAIEngine implements OpenAIEngineI {
   readonly type = 'openai';
-  readonly isClosed = true;
+  static readonly isClosed = true as const;
 
   id: string;
   name: string;
@@ -27,6 +27,10 @@ export class OpenAIEngine implements OpenAIEngineI {
     this.name = props.name;
     this.token = props.token;
     this.createdAt = props.createdAt || Date.now();
+  }
+
+  get isClosed() {
+    return OpenAIEngine.isClosed;
   }
 
   createModel(model: ModelProps): OpenAIModel {
@@ -54,11 +58,12 @@ export class OpenAIEngine implements OpenAIEngineI {
     throw new Error(`Model ${model.model} is not supported by OpenAI`);
   }
 
-  toPortableEngine() {
+  toPortableEngine(): PortableEngine {
     return {
       id: this.id,
       name: this.name,
       type: this.type,
+      url: '',
       token: this.token,
       createdAt: this.createdAt,
     };

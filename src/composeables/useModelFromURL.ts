@@ -2,7 +2,7 @@ import { watch } from 'vue';
 import { useRoute } from 'vue-router';
 
 import { app } from 'boot/app';
-import { PortableModel } from 'src/services/engines';
+import { EngineType, PortableModel } from 'src/services/engines';
 import { validatePortableModel } from 'src/services/engines/utils';
 import { Notify } from 'quasar';
 
@@ -72,7 +72,7 @@ export const useModelFromURL = () => {
         engine: {
           id: model.provider.id,
           name: model.provider.name,
-          type: model.provider.type,
+          type: model.provider.type as EngineType,
           url: model.provider.url || '',
           token: '',
           createdAt: model.provider.createdAt || Date.now(),
