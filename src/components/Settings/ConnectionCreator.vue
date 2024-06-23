@@ -19,7 +19,11 @@
 
     <!-- Name input -->
     <div class="col-auto q-py-sm">
-      <input class="my-input text-white text-h6" placeholder="Connection Name" />
+      <input 
+        class="my-input text-white text-h6"
+        placeholder="Connection Name" 
+        v-model="engineProps.name"
+      />
     </div>  
 
     <div class="col-auto q-pa-sm">
@@ -46,6 +50,11 @@
       </div>
     </div>
 
+    <div class="col-auto">
+      <q-checkbox v-model="shouldRequestModels" label="Add Available Mdoels" color="accent" />
+    </div>
+
+    <!-- Create button -->
     <div class="col-auto row justify-end">
       <q-btn
         outline
@@ -53,7 +62,8 @@
         class="q-mt-md"
         color="blue-4"
         label="Connect"
-        @click="() => app.engineManager.value.connectEngine(engineProps)"
+        :disable="!isValidEngine"
+        @click="createEngine"
       />
     </div>
   </div>
@@ -85,7 +95,8 @@
 import { ref, computed } from 'vue'
 import { app } from 'boot/app'
 
-import { EngineProps, EngineType } from 'src/services/engines';
+import { EngineProps } from 'src/services/engines';
+import { EngineType } from 'src/services/engines/EngineTypes';
 
 const engineProps = ref<EngineProps>({
   type: 'ollama',
@@ -94,13 +105,33 @@ const engineProps = ref<EngineProps>({
   url: ''
 })
 
+const shouldRequestModels = ref(false)
+
 const selectedModel = computed(() => app.settings.value.selectedModel)
 const engineTypes = computed<EngineType[]>(() => app.engineManager.value.getEngineTypes())
 const engineAccessType = computed<boolean>(() => app.engineManager.value.getEngineHandler(engineProps.value.type).isClosed)
 
+const isValidEngine = computed(() => validateEngineProps(engineProps.value) === '')
+
 const selectEngineType = (engineType: EngineType) => {
-  engineProps.value.type = engineType
+  engineProps.value.type = engineType.toLowerCase() as EngineType
 }
 
+const createEngine = async () => {
+  const engine = app.engineManager.value.createEngine(engineProps.value)
+  if (shouldRequestModels.value) {
+    const availableModels = await engine.getAvailableModels()
+    availableModels.forEach(model => engine.createModel({ name: model, model }))
+  }
+}
 
+const validateEngineProps = (props: EngineProps) => {
+  if (!props.name) {
+    return 'Connection name is required'
+  }
+  if (!engineAccessType.value && !props.url) {
+    return 'Host URL is required'
+  }
+  return ''
+}
 </script>

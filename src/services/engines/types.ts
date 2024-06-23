@@ -96,6 +96,7 @@ export interface BaseEngine {
   isClosed: boolean;
   createdAt: number;
   createModel(model: ModelProps): Model;
+  getAvailableModels(): Promise<string[]>;
 }
 
 export interface ClosedModel extends BaseModel {

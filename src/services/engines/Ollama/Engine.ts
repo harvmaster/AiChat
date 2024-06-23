@@ -86,11 +86,17 @@ export class OllamaEngine implements OllamaEngineI {
     };
   }
 
-  async getAvailableModels(): Promise<OllamaAvailableModel> {
+  async fetchAvailableModels(): Promise<OllamaAvailableModels> {
     const response = await fetch(`${this.url}/api/tags`);
     const data = await response.json();
 
     return data;
+  }
+
+  async getAvailableModels(): Promise<string[]> {
+    const models = await this.fetchAvailableModels();
+
+    return models.models.map((model) => model.name);
   }
 
   async getRunningModels(): Promise<OllamaRunningModels> {

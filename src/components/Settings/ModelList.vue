@@ -44,7 +44,7 @@
         </div>
 
         <!-- Add Provider -->
-        <div class="q-pa-md text-white text-bold row cursor-pointer" key="add-provider">
+        <!-- <div class="q-pa-md text-white text-bold row cursor-pointer" key="add-provider">
           <div class="col-auto self-center">Add Provider</div>
           <div class="col-auto self-center text-h6 q-px-md">+</div>
 
@@ -62,7 +62,7 @@
               @keydown.enter="createProvider"
             />
           </q-popup-edit>
-        </div>
+        </div> -->
       </transition-group>
     </q-list>
   </div>

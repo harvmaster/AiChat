@@ -1,4 +1,4 @@
-import { ClosedEngine, ClosedEngineProps, ModelProps, OpenEngineProps, PortableEngine } from '../types';
+import { ClosedEngine, ClosedEngineProps, Model, ModelProps, OpenEngineProps, PortableEngine } from '../types';
 
 import * as Models from './models';
 import OpenAIModel from './models/Model';
@@ -56,6 +56,10 @@ export class OpenAIEngine implements OpenAIEngineI {
     }
 
     throw new Error(`Model ${model.model} is not supported by OpenAI`);
+  }
+
+  getAvailableModels(): Promise<string[]> {
+    return Promise.resolve(['gpt-3.5-turbo', 'gpt-4-turbo', 'gpt-4o']);
   }
 
   toPortableEngine(): PortableEngine {
