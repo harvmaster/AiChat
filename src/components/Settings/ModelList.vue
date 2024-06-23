@@ -185,7 +185,8 @@ const createProvider = (event: KeyboardEvent) => {
     const newEngine = app.engineManager.value.createEngine({
       type: 'ollama',
       name: newProvider.value,
-      url: ''
+      url: '',
+      token: ''
     })
 
     const newModel = newEngine.createModel({
@@ -193,8 +194,8 @@ const createProvider = (event: KeyboardEvent) => {
       createdAt: Date.now(),
       // advancedSettings: { 'temperature': 0.8 },
       name: 'Example model',
-      model: 'Example model'
-    });
+      model: 'Example model',
+    }).toPortableModel();
 
     app.engineManager.value.importModel(newModel);
   }

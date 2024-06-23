@@ -41,11 +41,12 @@
         <div class="col-12 col-md row fit-content">
           <div class="row col-12 col-md-auto q-pa-md fit-content">
             <!-- Model Editors based on type of model -->
-            <closed-source-model-editor v-if="selectedModel && selectedModel.engine.isClosed" />
+            <connection-creator />
+            <!-- <closed-source-model-editor v-if="selectedModel && selectedModel.engine.isClosed" />
             <open-source-model-editor
               v-else-if="selectedModel && !selectedModel.engine.isClosed"
               @toggleAdvanced="() => (showAdvanced = !showAdvanced)"
-            />
+            /> -->
           </div>
         </div>
       </div>
@@ -92,6 +93,7 @@ import ModelList from './ModelList.vue';
 import ClosedSourceModelEditor from './ClosedSourceModelEditor.vue';
 import OpenSourceModelEditor from './OpenSourceModelEditor.vue';
 import FixedOptionsEditor from './FixedOptionsEditor.vue';
+import ConnectionCreator from './ConnectionCreator.vue';
 
 const show = ref(false);
 const toggleVisible = () => {
