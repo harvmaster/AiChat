@@ -17,7 +17,8 @@ import {
 
 export class EngineManager {
   selectedModel: Model | null = null;
-  models: Model[] = reactive<Model[]>([]);
+  // models: Model[] = reactive<Model[]>([]);
+  models: Model[] = []
 
   selectModel(model: Model) {
     this.selectedModel = model;

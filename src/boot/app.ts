@@ -24,6 +24,7 @@ class App {
   // readonly models = reactive<{ value: Model[] }>({ value: [] });
   readonly models = computed<Model[]>(() => {
     console.log('calculating models')
+    const length = app.engineManager.value.models.length
     return this.engineManager.value.models
   })
 
@@ -106,7 +107,7 @@ class App {
       });
     });
 
-    watch(this.models, () => {
+    watch(this.engineManager, () => {
       console.log('saving models')
       saveModels(this.models.value).catch((err) => console.error('Failed to save models:', err));
     });

@@ -2,6 +2,7 @@ import { ClosedModel, Model, OpenModel } from 'src/services/engines';
 import EasyIDB, { settings } from '../IDB';
 import saveProviders from '../Providers/saveProviders';
 import { PortableModel } from 'src/services/engines';
+import simplifyProxyObject from '../simplifyProxyObject';
 
 // export default async function saveModels(models: Model[] | PortableModel[]) {
 //   const db = await EasyIDB.getDB(settings.dbName, settings.dbVersion);
@@ -70,7 +71,7 @@ export default async function saveModels (models: PortableModel[] | Model[]) {
   const formattedModels = models.map((model) => {
     if ((model as Model).toPortableModel == undefined) return model as PortableModel
     return (model as Model).toPortableModel()
-  })
+  }).map(model => simplifyProxyObject(model) as PortableModel)
 
   const db = await EasyIDB.getDB(settings.dbName, settings.dbVersion);
 
@@ -78,6 +79,7 @@ export default async function saveModels (models: PortableModel[] | Model[]) {
   const store = tx.objectStore('models');
 
   for (const model of formattedModels) {
+    console.log(model)
     store.put(model);
   }
 
