@@ -21,6 +21,19 @@
                 <q-tooltip> Add Model </q-tooltip>
               </q-btn>
             </div>
+            <div class="col-auto">
+              <q-btn
+                class="text-bold"
+                outline
+                color="green-4"
+                icon="bolt"
+                flat
+                round
+                @click="() => refreshModels(group[0].engine)"
+              >
+                <q-tooltip> Auto Add </q-tooltip>
+              </q-btn>
+            </div>
           </div>
 
           <!-- Models of a provider -->
@@ -138,7 +151,7 @@ import generateUUID from 'src/composeables/generateUUID';
 
 import { QPopupEdit } from 'quasar';
 
-import { OpenModel, OpenEngine } from 'src/services/engines';
+import { OpenModel, OpenEngine, Engine } from 'src/services/engines';
 import { Model } from 'src/services/engines';
 
 const newProvider = ref('');
@@ -225,5 +238,25 @@ const addModel = (engineId: string) => {
   app.models.value.push(model);
 
   nextTick(() => selectModel(model));
+};
+
+const refreshModels = async (engine: Engine) => {
+  console.log('refreshing models')
+  const models = await engine.getAvailableModels();
+
+  const existing = app.models.value.filter((model) => model.engine.id === engine.id);
+  console.log('existing', existing)
+
+  const toAdd = models.filter((model) => !existing.find((m) => m.model === model));
+
+  console.log('toAdd', toAdd)
+  
+  const newModels = toAdd.map((model) => engine.createModel({
+    createdAt: Date.now(),
+    name: model,
+    model: model
+  }).toPortableModel());
+
+  newModels.forEach((model) => app.engineManager.value.importModel(model));
 };
 </script>

@@ -96,7 +96,7 @@ export class OllamaEngine implements OllamaEngineI {
   async getAvailableModels(): Promise<string[]> {
     const models = await this.fetchAvailableModels();
 
-    return models.models.map((model) => model.name);
+    return models.models.map((model) => model.name.endsWith(':latest') ? model.name.split(':')[0] : model.name);
   }
 
   async getRunningModels(): Promise<OllamaRunningModels> {
