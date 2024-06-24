@@ -1,6 +1,7 @@
 import { computed, reactive, ref, watch } from 'vue';
 
 import { ClosedModel, Model, Engine, ChatGenerationMetrics, EngineManager, PortableModel } from 'src/services/engines';
+import DefaultModels from 'src/services/engines/DefaultModels';
 import { default as getModelsFromDB } from 'src/utils/Database/Models/getModels'
 
 import { loadOllamaModels } from 'src/services/models/ollama';
@@ -60,6 +61,10 @@ class App {
     }))
 
     formattedModels.forEach(model => this.engineManager.value.importModel(model));
+    if (this.engineManager.value.models.length === 0) {
+      console.log('no models found, loading defaults')
+      DefaultModels.forEach(model => this.engineManager.value.importModel(model));
+    }
 
 
 
