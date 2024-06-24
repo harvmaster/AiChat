@@ -1,7 +1,6 @@
-import { ClosedEngine, ClosedEngineProps, Model, ModelProps, OpenEngineProps, PortableEngine } from '../types';
+import { ClosedEngine, ClosedEngineProps, PortableEngine } from '../types';
 
-import * as Models from './models';
-import GroqModel from './models/Model';
+import { GroqModel, GroqModelProps, MODELS } from './models';
 
 import generateUUID from 'src/composeables/generateUUID';
 
@@ -34,40 +33,19 @@ export class GroqEngine implements GroqEngineI {
     return GroqEngine.isClosed;
   }
 
-  createModel(model: ModelProps): GroqModel {
-    if (model.model === 'llama3-8b') {
-      return new Models.Llama3_8b({
-        ...model,
-        engine: this,
-      });
+  createModel(model: GroqModelProps): GroqModel {
+    if (MODELS[model.model] === undefined) {
+      throw new Error(`Model ${model.model} is not supported by Groq`);
     }
 
-    if (model.model === 'llama3-70b') {
-      return new Models.Llama3_70b({
-        ...model,
-        engine: this,
-      });
-    }
-
-    if (model.model === 'gemma-7b') {
-      return new Models.Gemma_7b({
-        ...model,
-        engine: this,
-      });
-    }
-
-    if (model.model === 'mixtral-8x7b') {
-      return new Models.Mixtral_8x7b({
-        ...model,
-        engine: this,
-      });
-    }
-
-    throw new Error(`Model ${model.model} is not supported by OpenAI`);
+    return new GroqModel({
+      ...model,
+      engine: this,
+    });
   }
 
-  getAvailableModels(): Promise<string[]> {
-    return Promise.resolve(['llama3-8b', 'llama3-70b', 'gemma-7b', 'mixtral-8x7b']);
+  getAvailableModels(): Promise<(keyof typeof MODELS)[]> {
+    return Promise.resolve(Object.keys(MODELS) as (keyof typeof MODELS)[]);
   }
 
   toPortableEngine(): PortableEngine {

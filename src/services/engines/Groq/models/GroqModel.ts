@@ -1,28 +1,38 @@
-import { GroqEngine } from '../Engine';
-import GroqModel, { GroqModelProps } from './Model';
+import { 
+  Capabilities, 
+  ChatCompletionRequestOptions, 
+  ChatCompletionResponse, 
+  ChatGenerationResponse, 
+  ChatHistory, 
+  ClosedModel, 
+  ModelProps, 
+  ModelSettings, 
+  PortableModel, 
+  SupportLevel, 
+  TextGenerationRequest 
+} from "../../types";
+import GroqEngine from "../Engine";
+import { ChatCompletionChunk } from "openai/resources";
 
-import {
-  Capabilities,
-  ChatCompletionRequestOptions,
-  ChatCompletionResponse,
-  ChatGenerationResponse,
-  ChatHistory,
-  ModelSettings,
-  PortableModel,
-  SupportLevel,
-  TextGenerationRequest,
-} from '../../types';
+import { createPortableModelURL } from "../../utils";
+import generateUUID from "src/composeables/generateUUID";
 
-import generateUUID from 'src/composeables/generateUUID';
-import { createPortableModelURL } from '../../utils';
-import { ChatCompletionChunk } from 'openai/resources/chat/completions';
+import MODELS from "./models";
 
-export interface Gemma_7bI extends GroqModel {
-  model: 'gemma-7b';
+export type GroqModelProps = ModelProps & {
+  engine: GroqEngine;
+  model: keyof typeof MODELS;
+};
+
+export interface GroqModelI extends ClosedModel {
+  engine: GroqEngine;
+  model: keyof typeof MODELS;
+  external_name: typeof MODELS[keyof typeof MODELS]['external_name'];
 }
 
-export class Gemma_7b implements Gemma_7bI {
-  readonly model = 'gemma-7b';
+export class GroqModel implements GroqModelI {
+  readonly model: keyof typeof MODELS;
+  readonly external_name: typeof MODELS[keyof typeof MODELS]['external_name'];
 
   id: string;
   name: string;
@@ -34,13 +44,16 @@ export class Gemma_7b implements Gemma_7bI {
   };
   capabilities: Capabilities = {
     text: SupportLevel.SUPPORTED,
-    image: SupportLevel.SUPPORTED,
+    image: SupportLevel.UNSUPPORTED,
   };
 
   constructor(props: GroqModelProps) {
     this.id = props.id || generateUUID();
     this.name = props.name;
     this.engine = props.engine;
+    this.model = props.model;
+
+    this.external_name = MODELS[props.model].external_name;
 
     this.createdAt = props.createdAt || Date.now();
     this.advancedSettings = props.advancedSettings || this.advancedSettings;
@@ -64,7 +77,7 @@ export class Gemma_7b implements Gemma_7bI {
     const response = fetch(`${this.engine.api}/chat/completions`, {
       method: 'POST',
       body: JSON.stringify({
-        model: 'gemma-7b-lt',
+        model: this.external_name,
         messages: request.messages,
         stream: true,
         temperature: options?.temperature || this.advancedSettings.temperature
@@ -167,4 +180,4 @@ export class Gemma_7b implements Gemma_7bI {
   }
 }
 
-export default Gemma_7b;
+export default GroqModel;
