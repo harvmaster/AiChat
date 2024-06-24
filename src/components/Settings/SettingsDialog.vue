@@ -35,7 +35,7 @@
               round
               @click="() => (showEngineCreator = !showEngineCreator)"
             >
-              <q-tooltip> Add Provider </q-tooltip>
+              <q-tooltip> Add Connection </q-tooltip>
             </q-btn>  
   
             <!-- Metrics checkbox -->
