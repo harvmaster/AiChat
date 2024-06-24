@@ -19,9 +19,7 @@ import { migrateFromProvider } from 'src/services/engines/utils';
 class App {
   readonly conversations = reactive<{ value: Conversation[] }>({ value: [] });
   readonly providers = reactive<{ value: Engine[] }>({ value: [] });
-  // readonly models = reactive<{ value: Model[] }>({ value: [] });
   readonly models = computed<Model[]>(() => {
-    console.log('calculating models')
     const length = app.engineManager.value.models.length
     return this.engineManager.value.models
   })
@@ -62,22 +60,11 @@ class App {
       console.log('no models found, loading defaults')
       DefaultModels.forEach(model => this.engineManager.value.importModel(model));
     }
+    console.log(`Loaded ${this.engineManager.value.models.length} models`, this.engineManager.value.models)
 
-
-
-
-
-    // const formattedModels = await loadOllamaModels();
-
-    // const openaiModels: ClosedModel[] = [GPT3_5Turbo, GPT4Turbo, GPT4o];
-    // await initOpenAIProvider();
-
-    // this.models.value = [...formattedModels, ...openaiModels];
-
-    console.log('getting conversations');
     const conversations = await getConversations({ getMessages: false });
     this.conversations.value = conversations;
-    console.log('got conversations');
+    console.log(`Loaded ${this.conversations.value.length} conversations`, this.conversations.value);
 
     const databaseSettings = await getSettings();
     const formattedSettings = {
