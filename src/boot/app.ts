@@ -1,11 +1,8 @@
 import { computed, reactive, ref, watch } from 'vue';
 
-import { ClosedModel, Model, Engine, ChatGenerationMetrics, EngineManager, PortableModel } from 'src/services/engines';
+import { Model, Engine, ChatGenerationMetrics, EngineManager, PortableModel } from 'src/services/engines';
 import DefaultModels from 'src/services/engines/DefaultModels';
 import { default as getModelsFromDB } from 'src/utils/Database/Models/getModels'
-
-import { loadOllamaModels } from 'src/services/models/ollama';
-import { GPT3_5Turbo, GPT4Turbo, GPT4o, initOpenAIProvider } from 'src/services/models/openai';
 
 import { Database__Model, Settings } from 'src/types';
 import Conversation from 'src/utils/App/Conversation';
