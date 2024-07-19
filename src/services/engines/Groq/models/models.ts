@@ -3,8 +3,12 @@ export const MODELS = {
     model: 'Gemma-7b',
     external_name: 'gemma-7b-lt'
   },
+  'gemma2-9b': {
+    model: 'Gemma2-9b',
+    external_name: 'gemma2-9b-it'
+  },
   'llama3-8b': {
-    model: 'llama3-8b',
+    model: 'Llama3-8b',
     external_name: 'llama3-8b-8192'
   },
   'llama3-70b': {

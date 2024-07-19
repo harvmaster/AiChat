@@ -24,12 +24,12 @@ import {
 import generateUUID from 'src/composeables/generateUUID';
 import { createPortableModelURL } from '../../utils';
 
-export interface GPT4TurboI extends OpenAIModel {
-  model: 'gpt-4o';
+export interface GPT4_Omni_MiniI extends OpenAIModel {
+  model: 'gpt-4o-mini';
 }
 
-export class GPT4Turbo implements GPT4TurboI {
-  readonly model = 'gpt-4o';
+export class GPT4_Omni_Mini implements GPT4_Omni_MiniI {
+  readonly model = 'gpt-4o-mini';
 
   id: string;
   name: string;
@@ -62,7 +62,7 @@ export class GPT4Turbo implements GPT4TurboI {
 
     const messages = this.formatChatHistory(request.messages);
     const stream = openai.chat.completions.create({
-      model: 'gpt-4o',
+      model: 'gpt-4o-mini',
       messages,
       stream: true,
       ...options,
@@ -81,7 +81,7 @@ export class GPT4Turbo implements GPT4TurboI {
   ): ChatGenerationResponse {
     const openai = new OpenAI({ apiKey: this.engine.token, dangerouslyAllowBrowser: true });
     const stream = openai.chat.completions.create({
-      model: 'gpt-4o',
+      model: 'gpt-4o-mini',
       messages: [{ content: request.prompt, role: 'user' }],
       stream: true,
       ...options,
@@ -164,4 +164,4 @@ export class GPT4Turbo implements GPT4TurboI {
   }
 }
 
-export default GPT4Turbo;
+export default GPT4_Omni_Mini;

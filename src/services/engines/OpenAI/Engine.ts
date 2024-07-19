@@ -55,11 +55,18 @@ export class OpenAIEngine implements OpenAIEngineI {
       });
     }
 
+    if (model.model === 'gpt-4o-mini') {
+      return new Models.GPT4OmniMini({
+        ...model,
+        engine: this,
+      });
+    }
+
     throw new Error(`Model ${model.model} is not supported by OpenAI`);
   }
 
   getAvailableModels(): Promise<string[]> {
-    return Promise.resolve(['gpt-3.5-turbo', 'gpt-4-turbo', 'gpt-4o']);
+    return Promise.resolve(['gpt-3.5-turbo', 'gpt-4-turbo', 'gpt-4o', 'gpt-4o-mini']);
   }
 
   toPortableEngine(): PortableEngine {
