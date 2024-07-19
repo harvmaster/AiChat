@@ -23,11 +23,28 @@
         <!-- List of models -->
         <div class="col-12 col-md-auto">
           <model-list />
-          <q-checkbox
-            v-model="app.settings.value.showMetrics"
-            label="Show Metrics"
-            class="text-white text-weight-medium"
-          />
+
+          <div class="row">
+            <!-- Provider Creator Button -->
+            <q-btn
+              class="text-bold"
+              outline
+              color="white"
+              flat
+              icon="add"
+              round
+              @click="() => (showEngineCreator = !showEngineCreator)"
+            >
+              <q-tooltip> Add Connection </q-tooltip>
+            </q-btn>  
+  
+            <!-- Metrics checkbox -->
+            <q-checkbox
+              v-model="app.settings.value.showMetrics"
+              label="Show Metrics"
+              class="text-white text-weight-medium"
+            />
+          </div>
         </div>
 
         <q-separator
@@ -41,9 +58,14 @@
         <div class="col-12 col-md row fit-content">
           <div class="row col-12 col-md-auto q-pa-md fit-content">
             <!-- Model Editors based on type of model -->
-            <closed-source-model-editor v-if="selectedModel && selectedModel.provider.isClosed" />
+            <connection-creator v-if="showEngineCreator" />
+
+            <closed-source-model-editor 
+              v-else-if="selectedModel && selectedModel.engine.isClosed"
+            />
+
             <open-source-model-editor
-              v-else-if="selectedModel && !selectedModel.provider.isClosed"
+              v-else-if="selectedModel && !selectedModel.engine.isClosed"
               @toggleAdvanced="() => (showAdvanced = !showAdvanced)"
             />
           </div>
@@ -92,11 +114,13 @@ import ModelList from './ModelList.vue';
 import ClosedSourceModelEditor from './ClosedSourceModelEditor.vue';
 import OpenSourceModelEditor from './OpenSourceModelEditor.vue';
 import FixedOptionsEditor from './FixedOptionsEditor.vue';
+import ConnectionCreator from './ConnectionCreator.vue';
 
 const show = ref(false);
 const toggleVisible = () => {
   show.value = !show.value;
 };
+const showEngineCreator = ref(false);
 
 const selectedModel = computed(() => app.settings.value.selectedModel);
 
@@ -104,7 +128,8 @@ const showAdvanced = ref(false);
 watch(
   () => app.settings.value.selectedModel,
   () => {
-    if (app.settings.value.selectedModel?.provider.isClosed) showAdvanced.value = false;
+    showEngineCreator.value = false;
+    if (app.settings.value.selectedModel?.engine.isClosed) showAdvanced.value = false;
   }
 );
 

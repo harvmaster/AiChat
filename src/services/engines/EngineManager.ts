@@ -1,18 +1,24 @@
-import { OpenAI, Ollama } from '.';
+import { reactive } from 'vue';
 import { validatePortableModel } from './utils';
 
+import { ENGINES, EngineType, EngineHandler } from './EngineTypes';
+
 import {
-  ClosedEngineProps,
   Engine,
   EngineProps,
   Model,
-  OpenEngineProps,
   PortableModel,
+  // EngineType
 } from './types';
+
+// Define your engines and constructor in .Engines.ts
+
+// I cant figure out the TS wizardy to have this type be an full array of all the keys of the ENGINES object. This is close enough
 
 export class EngineManager {
   selectedModel: Model | null = null;
-  models: Model[] = [];
+  // models: Model[] = reactive<Model[]>([]);
+  models: Model[] = []
 
   selectModel(model: Model) {
     this.selectedModel = model;
@@ -23,14 +29,24 @@ export class EngineManager {
   }
 
   createEngine(engineProps: EngineProps): Engine {
-    switch (engineProps.type) {
-      case 'openai':
-        return new OpenAI.OpenAIEngine(engineProps as ClosedEngineProps);
-      case 'ollama':
-        return new Ollama.OllamaEngine(engineProps as OpenEngineProps);
+    if (this.isValidEngineType(engineProps.type) && ENGINES[engineProps.type]) {
+      const handler = this.getEngineHandler(engineProps.type);
+      return new handler(engineProps);
     }
-
+    
     throw new Error(`Engine type ${engineProps.type} is not supported`);
+  }
+
+  getEngineTypes(): EngineType[] {
+    return Object.keys(ENGINES) as EngineType[];
+  }
+
+  getEngineHandler (engineType: EngineType): EngineHandler {
+    return ENGINES[engineType];
+  }
+
+  isValidEngineType (engineType: string): engineType is EngineType {
+    return engineType in ENGINES;
   }
 
   getOrCreateEngine(model: PortableModel) {
@@ -44,7 +60,7 @@ export class EngineManager {
   importModel(model: PortableModel) {
     validatePortableModel(model);
 
-    let engine = this.getOrCreateEngine(model);
+    const engine = this.getOrCreateEngine(model);
     if (!engine) {
       throw new Error(`Engine ${model.engine.id} not found`);
     }
@@ -52,7 +68,16 @@ export class EngineManager {
     const newModel = engine.createModel(model);
     this.models.push(newModel);
   }
+
+  removeModel(model: Model) {
+    const index = this.models.findIndex((m) => m.id === model.id);
+    if (index !== -1) {
+      this.models.splice(index, 1);
+    }
+  }
 }
 
-const engineManager = new EngineManager();
-export default engineManager;
+// const engineManager = new EngineManager();
+// export default engineManager;
+
+export default EngineManager

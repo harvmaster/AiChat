@@ -92,7 +92,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch, nextTick } from 'vue';
 import { app } from 'boot/app';
-import { Model } from 'src/services/models';
+import { Model } from 'src/services/engines';
 
 const selectedModel = computed<Model | undefined>(() => app.settings.value.selectedModel);
 const advancedSettingsBuffer = ref<string>('');

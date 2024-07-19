@@ -19,10 +19,10 @@
           <div
             class="row pill model-settings-button cursor-pointer"
             @click="toggleSettings"
-            :class="app.settings.value.selectedModel?.provider.isClosed ? 'q-pa-md' : 'q-pa-sm'"
+            :class="app.settings.value.selectedModel?.engine.isClosed ? 'q-pa-md' : 'q-pa-sm'"
           >
             <div class="col-auto text-blue-2 text-h6 text-center">
-              {{ app.settings.value.selectedModel?.provider.name }}
+              {{ app.settings.value.selectedModel?.engine.name }}
               ({{ app.settings.value.selectedModel?.model }})
             </div>
             <div class="col-auto text-blue-2 text-h6 q-px-sm">

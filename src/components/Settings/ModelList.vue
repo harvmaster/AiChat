@@ -2,13 +2,13 @@
   <div class="col-12 scroll-area">
     <q-list class="fit">
       <transition-group name="slide-x" tag="div">
-        <div v-for="group of groupedModels" :key="group[0].provider.id">
+        <div v-for="group of groupedModels" :key="group[0].engine.id">
           <div class="text-h6 text-white row">
             <!-- Provider Header -->
             <div class="col-auto self-center q-pr-sm">
-              {{ group[0].provider.name }}
+              {{ group[0].engine.name }}
             </div>
-            <div v-if="!group[0].provider.isClosed" class="col-auto">
+            <div v-if="!group[0].engine.isClosed" class="col-auto">
               <q-btn
                 class="text-bold"
                 outline
@@ -16,9 +16,22 @@
                 flat
                 icon="add"
                 round
-                @click="() => addModel(group[0].provider.id)"
+                @click="() => addModel(group[0].engine.id)"
               >
                 <q-tooltip> Add Model </q-tooltip>
+              </q-btn>
+            </div>
+            <div class="col-auto">
+              <q-btn
+                class="text-bold"
+                outline
+                color="green-4"
+                icon="bolt"
+                flat
+                round
+                @click="() => refreshModels(group[0].engine)"
+              >
+                <q-tooltip> Auto Add </q-tooltip>
               </q-btn>
             </div>
           </div>
@@ -44,7 +57,7 @@
         </div>
 
         <!-- Add Provider -->
-        <div class="q-pa-md text-white text-bold row cursor-pointer" key="add-provider">
+        <!-- <div class="q-pa-md text-white text-bold row cursor-pointer" key="add-provider">
           <div class="col-auto self-center">Add Provider</div>
           <div class="col-auto self-center text-h6 q-px-md">+</div>
 
@@ -62,7 +75,7 @@
               @keydown.enter="createProvider"
             />
           </q-popup-edit>
-        </div>
+        </div> -->
       </transition-group>
     </q-list>
   </div>
@@ -138,8 +151,8 @@ import generateUUID from 'src/composeables/generateUUID';
 
 import { QPopupEdit } from 'quasar';
 
-import { OllamaModel, OllamaProvider } from 'src/services/models/ollama';
-import { Model } from 'src/services/models';
+import { OpenModel, OpenEngine, Engine } from 'src/services/engines';
+import { Model } from 'src/services/engines';
 
 const newProvider = ref('');
 
@@ -149,14 +162,14 @@ type ModelGroups = {
 const groupedModels = computed(() => {
   const grouped: ModelGroups = {};
   app.models.value.forEach((model) => {
-    if (!grouped[model.provider.id]) {
-      grouped[model.provider.id] = [];
+    if (!grouped[model.engine.id]) {
+      grouped[model.engine.id] = [];
     }
-    grouped[model.provider.id].push(model);
+    grouped[model.engine.id].push(model);
   });
   const groupedArray = Object.values(grouped);
   return groupedArray.sort(
-    (a: Model[], b: Model[]) => b[0].provider.createdAt - a[0].provider.createdAt
+    (a: Model[], b: Model[]) => b[0].engine.createdAt - a[0].engine.createdAt
   );
 });
 
@@ -167,37 +180,83 @@ const selectModel = (model: Model) => {
 
 const addProviderPopup = ref<QPopupEdit | null>(null);
 const createProvider = (event: KeyboardEvent) => {
-  if (event.key === 'Enter') {
-    app.models.value.push(
-      new OllamaModel(
-        generateUUID(),
-        new OllamaProvider(generateUUID(), newProvider.value, ''),
-        Date.now(),
-        '{ "temperature": 0.8 }',
-        'Example model'
-      )
-    );
-    addProviderPopup.value?.hide();
-    newProvider.value = '';
+  // if (event.key === 'Enter') {
+  //   app.models.value.push(
+  //     new OllamaModel(
+  //       generateUUID(),
+  //       new OllamaProvider(generateUUID(), newProvider.value, ''),
+  //       Date.now(),
+  //       '{ "temperature": 0.8 }',
+  //       'Example model'
+  //     )
+  //   );
+  //   addProviderPopup.value?.hide();
+  //   newProvider.value = '';
+  // }
+
+  if (event.key === 'enter') {
+    const newEngine = app.engineManager.value.createEngine({
+      type: 'ollama',
+      name: newProvider.value,
+      url: '',
+      token: ''
+    })
+
+    const newModel = newEngine.createModel({
+      id: generateUUID(),
+      createdAt: Date.now(),
+      // advancedSettings: { 'temperature': 0.8 },
+      name: 'Example model',
+      model: 'Example model',
+    }).toPortableModel();
+
+    app.engineManager.value.importModel(newModel);
   }
 };
 
-const addModel = (providerId: string) => {
-  const provider = app.models.value.find((model) => model.provider.id === providerId)?.provider;
-  if (!provider) return;
-  if (provider.isClosed) {
+const addModel = (engineId: string) => {
+  const engine = app.models.value.find((model) => model.engine.id === engineId)?.engine;
+  if (!engine) return;
+  if (engine.isClosed) {
     return;
   }
 
-  const model = new OllamaModel(
-    generateUUID(),
-    provider,
-    Date.now(),
-    '{ "temperature": 0.8 }',
-    'Example model'
-  );
+  const model = engine.createModel({
+    id: generateUUID(),
+    createdAt: Date.now(),
+    // advancedSettings: { 'temperature': 0.8 },
+    name: 'Example model',
+    model: 'Example model'
+  });
+  // const model = new OllamaModel(
+  //   generateUUID(),
+  //   provider,
+  //   Date.now(),
+  //   '{ "temperature": 0.8 }',
+  //   'Example model'
+  // );
   app.models.value.push(model);
 
   nextTick(() => selectModel(model));
+};
+
+const refreshModels = async (engine: Engine) => {
+  console.log('refreshing models')
+  const models = await engine.getAvailableModels();
+
+  const existing = app.models.value.filter((model) => model.engine.id === engine.id);
+  console.log('existing', existing)
+
+  const toAdd = models.filter((model) => !existing.find((m) => m.model === model));
+
+  console.log('toAdd', toAdd)
+  
+  const newModels = toAdd.map((model) => engine.createModel({
+    createdAt: Date.now(),
+    name: model,
+    model: model
+  }).toPortableModel());
+
+  newModels.forEach((model) => app.engineManager.value.importModel(model));
 };
 </script>

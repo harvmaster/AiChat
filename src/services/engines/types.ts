@@ -1,3 +1,5 @@
+import { EngineType } from "./EngineTypes";
+
 export type ChatMessage = {
   content: string;
   role: 'user' | 'assistant' | 'system';
@@ -25,6 +27,15 @@ export type TextGenerationRequest = {
 export type ChatGenerationResponse = {
   abort: () => void;
   response: Promise<ChatCompletionResponse>;
+};
+
+export type ChatGenerationMetrics = {
+  token_count: number;
+  token_time: number;
+  prompt_count: number;
+  prompt_time: number;
+  tps: number;
+  memory_usage: number;
 };
 
 export type PortableEngine = EngineProps & {
@@ -74,16 +85,18 @@ export interface BaseModel {
 export type BaseEngineProps = {
   id?: string;
   name: string;
-  type: string;
+  type: EngineType;
   createdAt?: number;
 };
 
 export interface BaseEngine {
   id: string;
   name: string;
-  type: string;
+  // type: string;
+  isClosed: boolean;
   createdAt: number;
   createModel(model: ModelProps): Model;
+  getAvailableModels(): Promise<string[]>;
 }
 
 export interface ClosedModel extends BaseModel {
@@ -110,11 +123,12 @@ export type OpenEngineProps = BaseEngineProps & {
 export interface OpenEngine extends BaseEngine {
   url: string;
   isClosed: false;
+  getMemoryUsage?: () => Promise<number>;
 }
 
 export type Model = ClosedModel | OpenModel;
 export type Engine = ClosedEngine | OpenEngine;
-export type EngineProps = ClosedEngineProps | OpenEngineProps;
+export type EngineProps = ClosedEngineProps & OpenEngineProps;
 
 export type ModelSettings = {
   num_keep: number;
@@ -151,12 +165,6 @@ export type ModelSettings = {
   image_detail: 'auto' | 'low' | 'high';
 };
 
-// export type SupportLevel = {
-//   'UNSUPPORTED': 0
-//   'SUPPORTED': 1
-//   'UNKNOWN': 2
-// }
-
 export const SupportLevelEnum = {
   0: 'UNSUPPORTED',
   1: 'SUPPORTED',
@@ -170,10 +178,6 @@ export const SupportLevel = {
 } as const;
 
 export type SupportLevel = (typeof SupportLevel)[keyof typeof SupportLevel];
-
-// export type SupportLevel = keyof typeof SupportLevel;
-
-// export type SupportLevel = typeof SupportLevelEnum[keyof typeof SupportLevelEnum];
 
 export type Capabilities = {
   text: SupportLevel;

@@ -1,8 +1,18 @@
 <template>
-  <div v-if="selectedModel && selectedModel.provider.isClosed" class="column align-start">
+  <div v-if="selectedModel && selectedModel.engine.isClosed" class="column align-start">
     <!-- Name -->
-    <div class="col-auto text-h6 text-white q-pb-sm">
+    <div class="col-auto text-h6 text-white q-pb-sm row justify-between">
       {{ selectedModel.name }}
+
+
+      <div class="col-auto row">
+        <div class="col-auto">
+          <q-btn flat round dense icon="content_copy" color="blue-4" @click="copyModelLink" />
+        </div>
+        <div class="col-auto">
+          <q-btn flat round dense icon="delete" color="red-4" @click="deleteModel" />
+        </div>
+      </div>
     </div>
 
     <!-- API token -->
@@ -11,7 +21,7 @@
         <div class="input-container">
           <input
             class="my-input text-white text-h6"
-            v-model="selectedModel.provider.token"
+            v-model="selectedModel.engine.token"
             placeholder="API Token"
           />
         </div>
@@ -51,6 +61,9 @@ import { app } from 'boot/app';
 
 import CounterInput from '../Inputs/CounterInput.vue';
 
+import deleteModelFromDatabase from 'src/utils/Database/Models/deleteModel';
+import { Notify, copyToClipboard } from 'quasar';
+
 const selectedModel = computed(() => app.settings.value.selectedModel);
 
 const clampTemperature = () => {
@@ -70,5 +83,26 @@ const clampTemperature = () => {
   if (temperature > 2) temperature = 2;
   if (temperature < 0) temperature = 0;
   selectedModel.value.advancedSettings.temperature = temperature;
+};
+
+const deleteModel = () => {
+  if (!selectedModel.value) return;
+  deleteModelFromDatabase(selectedModel.value);
+  app.engineManager.value.removeModel(selectedModel.value); 
+  // = app.models.value.filter((model) => model.id !== selectedModel.value?.id);
+  app.settings.value.selectedModel = app.models.value[0];
+};
+
+const copyModelLink = () => {
+  if (!selectedModel.value) return;
+  if (!selectedModel.value.createShareableURL) return;
+
+  copyToClipboard(selectedModel.value.createShareableURL());
+  Notify.create({
+    message: 'Model link copied to clipboard',
+    color: 'green-4',
+    position: 'bottom',
+    timeout: 2000,
+  });
 };
 </script>

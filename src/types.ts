@@ -1,4 +1,4 @@
-import { Model } from './services/models';
+import { Model } from './services/engines';
 import Message from './utils/App/Message';
 import { ChatMessage } from './services/models';
 

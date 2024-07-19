@@ -1,6 +1,6 @@
 import { watch, reactive, ref, Ref } from 'vue';
 import getHighlightedChunks from '../HighlightMessage';
-import { ChatMessage, Model } from 'src/services/models';
+import { ChatMessage, Model } from 'src/services/engines';
 import { MessageProps, MessageContent, Database__Message } from 'src/types';
 
 import MessageImage from './MessageImage';

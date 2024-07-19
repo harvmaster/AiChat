@@ -1,4 +1,7 @@
 import { PortableModel } from './types';
+import { Model } from '../models'
+import { getProviders } from 'src/utils/Database';
+import { Database__Model } from 'src/types';
 
 export const validatePortableModel = (model: PortableModel) => {
   if (!model.id) {
@@ -32,5 +35,35 @@ export const validatePortableModel = (model: PortableModel) => {
 };
 
 export const createPortableModelURL = (portableModel: PortableModel): string => {
-  return `${window.location.origin}/#/?${btoa(JSON.stringify(portableModel))}`;
+  const origin = window.location.origin;
+  const basePath = process.env.BASE_PATH || '';
+
+  const baseURL = `${origin}/${basePath}#/?model=`
+  const encodedModel = btoa(JSON.stringify(portableModel));
+
+  return `${baseURL}${encodedModel}`;
 };
+
+export const migrateFromProvider = async (models: Database__Model): Promise<PortableModel> => {
+  const providers = await getProviders();
+  const provider = providers.find((provider) => provider.id === models.providerId);
+
+  if (!provider) {
+    throw new Error('Provider not found');
+  }
+
+  return {
+    id: models.id,
+    name: models.name,
+    model: models.model,
+    advancedSettings: JSON.parse(models.advancedSettings || ''),
+    engine: {
+      id: provider.id,
+      name: provider.name,
+      url: provider.url || '',
+      token: provider.token || '',
+      type: provider.type,
+      createdAt: provider.createdAt,
+    },
+  };
+}

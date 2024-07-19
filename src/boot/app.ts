@@ -1,10 +1,10 @@
-import { reactive, ref, watch } from 'vue';
+import { computed, reactive, ref, watch } from 'vue';
 
-import { ClosedModel, Model, Provider, ChatGenerationMetrics } from 'src/services/models';
-import { loadOllamaModels } from 'src/services/models/ollama';
-import { GPT3_5Turbo, GPT4Turbo, GPT4o, initOpenAIProvider } from 'src/services/models/openai';
+import { Model, Engine, ChatGenerationMetrics, EngineManager, PortableModel } from 'src/services/engines';
+import DefaultModels from 'src/services/engines/DefaultModels';
+import { default as getModelsFromDB } from 'src/utils/Database/Models/getModels'
 
-import { Settings } from 'src/types';
+import { Database__Model, Settings } from 'src/types';
 import Conversation from 'src/utils/App/Conversation';
 import {
   getConversations,
@@ -14,11 +14,17 @@ import {
   saveSettings,
 } from 'src/utils/Database';
 import generateUUID from 'src/composeables/generateUUID';
+import { migrateFromProvider } from 'src/services/engines/utils';
 
 class App {
   readonly conversations = reactive<{ value: Conversation[] }>({ value: [] });
-  readonly providers = reactive<{ value: Provider[] }>({ value: [] });
-  readonly models = reactive<{ value: Model[] }>({ value: [] });
+  readonly providers = reactive<{ value: Engine[] }>({ value: [] });
+  readonly models = computed<Model[]>(() => {
+    const length = app.engineManager.value.models.length
+    return this.engineManager.value.models
+  })
+
+  readonly engineManager = reactive<{ value: EngineManager }>({ value: new EngineManager() });
 
   readonly settings = reactive<{ value: Settings }>({
     value: {
@@ -40,17 +46,25 @@ class App {
   readonly version = ref('1.1.0');
 
   async loadFromDatabase() {
-    const formattedModels = await loadOllamaModels();
+    const models: PortableModel[] = await getModelsFromDB();
+    console.log(models)
+    const formattedModels = await  Promise.all(models.map(async (model: (PortableModel | Database__Model)) => {
+      if ((model as Database__Model).providerId != undefined) {
+        return await migrateFromProvider(model as unknown as Database__Model);
+      }
+      return model as PortableModel;
+    }))
 
-    const openaiModels: ClosedModel[] = [GPT3_5Turbo, GPT4Turbo, GPT4o];
-    await initOpenAIProvider();
+    formattedModels.forEach(model => this.engineManager.value.importModel(model));
+    if (this.engineManager.value.models.length === 0) {
+      console.log('no models found, loading defaults')
+      DefaultModels.forEach(model => this.engineManager.value.importModel(model));
+    }
+    console.log(`Loaded ${this.engineManager.value.models.length} models`, this.engineManager.value.models)
 
-    this.models.value = [...formattedModels, ...openaiModels];
-
-    console.log('getting conversations');
     const conversations = await getConversations({ getMessages: false });
     this.conversations.value = conversations;
-    console.log('got conversations');
+    console.log(`Loaded ${this.conversations.value.length} conversations`, this.conversations.value);
 
     const databaseSettings = await getSettings();
     const formattedSettings = {
@@ -74,15 +88,16 @@ class App {
         console.error('Failed to save settings:', err)
       );
       if (!this.settings.value.selectedModel) return;
-      if (this.settings.value.selectedModel.provider.isClosed) return;
+      if (this.settings.value.selectedModel.engine.isClosed) return;
 
       // get memory usage metric
-      this.settings.value.selectedModel.provider.getMemoryUsage().then((memoryUsage) => {
+      this.settings.value.selectedModel.engine.getMemoryUsage?.().then((memoryUsage) => {
         this.metrics.value.memory_usage = memoryUsage;
       });
     });
 
-    watch(this.models, () => {
+    watch(this.engineManager, () => {
+      console.log('saving models')
       saveModels(this.models.value).catch((err) => console.error('Failed to save models:', err));
     });
   }
