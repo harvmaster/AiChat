@@ -1,4 +1,5 @@
 import { computed, reactive, ref, watch } from 'vue';
+import { Notify } from 'quasar';
 
 import { Model, Engine, ChatGenerationMetrics, EngineManager, PortableModel } from 'src/services/engines';
 import DefaultModels from 'src/services/engines/DefaultModels';
@@ -55,7 +56,21 @@ class App {
       return model as PortableModel;
     }))
 
-    formattedModels.forEach(model => this.engineManager.value.importModel(model));
+    // add models to the engine manager. If the model is not found, load the default models
+    formattedModels.forEach(model => {
+      try {
+        // Try to load the model
+        this.engineManager.value.importModel(model)
+      } catch (err) {
+        // If the model fails to load, log the error and notify the user
+        console.error('Failed to load model:', model, err);
+        Notify.create({
+          message: `Failed to load model: ${model.name}. Check the console for more information.`,
+          color: 'negative',
+        });
+      }
+    });
+
     if (this.engineManager.value.models.length === 0) {
       console.log('no models found, loading defaults')
       DefaultModels.forEach(model => this.engineManager.value.importModel(model));
