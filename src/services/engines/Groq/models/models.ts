@@ -15,6 +15,18 @@ export const MODELS = {
     model: 'Llama3-70b',
     external_name: 'llama3-70b-8192'
   },
+  'llama3.1-8b': {
+    model: 'llama-3.1-8b',
+    external_name: 'llama3.1-8b-instant'
+  },
+  'llama3.1-70b': {
+    model: 'llama-3.1-70b',
+    external_name: 'llama-3.1-70b-versatile'
+  },
+  // 'llama3.1-405b': {
+  //   model: 'llama-3.1-405b',
+  //   external_name: 'llama-3.1-405b-reasoning'
+  // },
   'mixtral-8x7b': {
     model: 'Mixtral-8x7b',
     external_name: 'mixtral-8x7b-32768'
