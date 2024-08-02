@@ -95,7 +95,7 @@
 import { ref, computed } from 'vue'
 import { app } from 'boot/app'
 
-import { EngineProps } from 'src/services/engines';
+import { EngineProps, PortableModel } from 'src/services/engines';
 import { EngineType } from 'src/services/engines/EngineTypes';
 import { Notify } from 'quasar';
 
@@ -119,7 +119,12 @@ const selectEngineType = (engineType: EngineType) => {
 }
 
 const createEngine = async () => {
+  // Create engine
   const engine = app.engineManager.value.createEngine(engineProps.value)
+
+  let models: PortableModel[] = [engine.createModel({ name: 'Example Model', model: 'example' }).toPortableModel()]
+  
+  // Get the available models from the server if that option is selected
   if (shouldRequestModels.value) {
     let availableModels: string[] = []
 
@@ -130,11 +135,11 @@ const createEngine = async () => {
     } catch (error) {
 
       // Set default error message
-      let errorMessage = 'Failed to get available models from the server'
+      let errorMessage = 'Could not get available models, Please check your Host URL.'
 
       // Handle Brave Browser Shield error
       if ((navigator as any).brave && (error as Error).message.includes('Failed to fetch')) {
-        errorMessage = 'Brave Browser Shield is blocking the request. Please disable it and try again.'
+        errorMessage = 'Could not get available models, Please check your Host URL. Brave Browser Shield may be blocking the request. Please disable it and try again.'
       }
 
       // Handle other errors
@@ -145,13 +150,12 @@ const createEngine = async () => {
       })
     }
 
-    // Import available models
-    const models = availableModels.map(model => engine.createModel({ name: model, model }).toPortableModel())
-    models.forEach(model => app.engineManager.value.importModel(model))
-  } else {
-    const exampleModel = engine.createModel({ name: 'Example Model', model: 'example' }).toPortableModel()
-    app.engineManager.value.importModel(exampleModel)
+    // Set models to the available models
+    models = availableModels.map(model => engine.createModel({ name: model, model }).toPortableModel())
   }
+
+  // Import models
+  models.forEach(model => app.engineManager.value.importModel(model))
 }
 
 const validateEngineProps = (props: EngineProps) => {
