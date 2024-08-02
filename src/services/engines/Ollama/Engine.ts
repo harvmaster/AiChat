@@ -1,6 +1,7 @@
 import generateUUID from 'src/composeables/generateUUID';
 import { OpenEngine, ModelProps, OpenEngineProps, PortableEngine } from '../types';
 import OllamaModel from './Model';
+import { Notify } from 'quasar';
 
 export interface OllamaEngineI extends OpenEngine {
   type: 'ollama';
@@ -87,10 +88,32 @@ export class OllamaEngine implements OllamaEngineI {
   }
 
   async fetchAvailableModels(): Promise<OllamaAvailableModels> {
-    const response = await fetch(`${this.url}/api/tags`);
-    const data = await response.json();
+    try {
 
-    return data;
+      const response = await fetch(`${this.url}/api/tags`);
+      const data = await response.json();
+      
+      return data;
+    } catch (err) {
+      // Set default error message
+      let errorMessage = 'Could not get available models, Please check your Host URL.'
+
+      // Handle Brave Browser Shield error
+      if ((navigator as any).brave && (err as Error).message.includes('Failed to fetch')) {
+        errorMessage = 'Could not get available models, Please check your Host URL. Brave Browser Shield may be blocking the request. Please disable it and try again.'
+      }
+
+      // // Handle other errors
+      // Notify.create({
+      //   message: errorMessage,
+      //   color: 'red',
+      //   position: 'top-right'
+      // })
+
+      // Throw error
+      console.error(err);
+      throw errorMessage
+    }
   }
 
   async getAvailableModels(): Promise<string[]> {

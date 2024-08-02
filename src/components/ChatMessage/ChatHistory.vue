@@ -47,6 +47,7 @@ import { watch, ref, nextTick } from 'vue';
 import Message from 'src/utils/App/Message';
 import ChatMessage from './ChatMessage.vue';
 import useCurrentConversation from 'src/composeables/useCurrentConversation';
+import { Notify } from 'quasar';
 
 export type ChatHistoryProps = {
   messages: Message[];
@@ -109,9 +110,25 @@ const handleScroll = (event: Event) => {
 };
 
 const currentConversation = useCurrentConversation();
-const regenerateResponse = () => {
+const regenerateResponse = async () => {
   if (currentConversation.value && app.settings.value.selectedModel) {
-    currentConversation.value.addAssistantMessage(app.settings.value.selectedModel);
+    try {
+      // Regenerate Response
+      await currentConversation.value.addAssistantMessage(app.settings.value.selectedModel);
+    } catch (err) {
+      // Notify the user of the error
+      console.error(err);
+      Notify.create({
+        message: (err as Error).message,
+        color: 'negative',
+        position: 'top-right',
+      });
+
+      // Cleanup message generation status
+      currentConversation.value.messages.forEach((message) => {
+        if (message.generating) message.generating = false;
+      });
+    }
   }
 };
 

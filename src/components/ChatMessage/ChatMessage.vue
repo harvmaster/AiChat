@@ -201,13 +201,28 @@ const stopGeneration = () => {
   props.message.abort();
 };
 
-const regenerateMessage = () => {
+const regenerateMessage = async () => {
   if (!currentConveration.value || !app.settings.value.selectedModel) return;
   props.message.setContent('');
-  props.message.generateAssistantResponse(
-    app.settings.value.selectedModel,
-    currentConveration.value.getChatHistory()
-  );
+  try {
+    console.log('Regenerating message');
+    // Regenerate the message
+    await props.message.generateAssistantResponse(
+      app.settings.value.selectedModel,
+      currentConveration.value.getChatHistory()
+    );
+  } catch (err) {
+    // Notify the user of the error
+    console.error(err);
+    Notify.create({
+      message: (err as Error).message,
+      color: 'negative',
+      position: 'top-right',
+    });
+
+    // Cleanup message generation status
+    props.message.setGenerating(false);
+  }
 };
 
 const copyRaw = async () => {

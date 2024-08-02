@@ -126,31 +126,22 @@ const createEngine = async () => {
   
   // Get the available models from the server if that option is selected
   if (shouldRequestModels.value) {
-    let availableModels: string[] = []
-
-    // Try to fetch available models
+    let availableModels: string[] 
+    
     try {
-      const availableModelsResponse = await engine.getAvailableModels()
-      availableModels = availableModelsResponse
+      // Fetch available models
+      availableModels= await engine.getAvailableModels()
     } catch (error) {
-
-      // Set default error message
-      let errorMessage = 'Could not get available models, Please check your Host URL.'
-
-      // Handle Brave Browser Shield error
-      if ((navigator as any).brave && (error as Error).message.includes('Failed to fetch')) {
-        errorMessage = 'Could not get available models, Please check your Host URL. Brave Browser Shield may be blocking the request. Please disable it and try again.'
-      }
-
-      // Handle other errors
+      // Notify the user of the error
       Notify.create({
-        message: errorMessage,
-        color: 'red',
+        message: (error as Error).message,
+        color: 'negative',
         position: 'top-right'
       })
+      return
     }
-
-    // Set models to the available models
+      
+    // Create portable models from the available models
     models = availableModels.map(model => engine.createModel({ name: model, model }).toPortableModel())
   }
 

@@ -144,8 +144,13 @@ const handleMessage = async (message: UserMessageInput): Promise<void> => {
     if (error instanceof Error && error.message == 'No model selected') {
       createErrorMessage('No model selected');
     } else {
-      createErrorMessage('An error occurred');
+      createErrorMessage((error as Error).message);
     }
+
+    // Cleanup message generation status
+    conversation.messages.forEach((message) => {
+      if (message.generating) message.generating = false;
+    });
   }
 };
 

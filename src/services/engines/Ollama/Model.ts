@@ -14,6 +14,7 @@ import {
 } from '../types';
 import OllamaEngine from './Engine';
 import { createPortableModelURL } from '../utils';
+import { Notify } from 'quasar';
 
 export interface OllamaModelI extends OpenModel {
   engine: OllamaEngine;
@@ -103,7 +104,27 @@ export class OllamaModel implements OllamaModelI {
     // TS gave me an error when err was defined as 'any', response requires a response property. So i did this. I dont know how error handling works in TS
     const handleError = (err: Error & { response: Response & ChatCompletionResponse }) => {
       if (err.name == 'AbortError') return err.response;
-      throw err;
+
+      // Other Errors
+
+      // Set default error message
+      let errorMessage = 'Could not generate response, Please check your Host URL and ensure the Ollama API is enabled.'
+
+      // Handle Brave Browser Shield error
+      if ((navigator as any).brave && (err as Error).message.includes('Failed to fetch')) {
+        errorMessage += 'Brave Browser Shield may be blocking the request. Please disable it and try again.'
+      }
+
+      // // Handle other errors
+      // Notify.create({
+      //   message: errorMessage,
+      //   color: 'red',
+      //   position: 'top-right'
+      // })
+
+      // Throw error
+      console.error(err);
+      throw new Error(errorMessage);
     };
 
     return {
@@ -118,6 +139,8 @@ export class OllamaModel implements OllamaModelI {
     options?: Partial<ModelSettings>
   ): ChatGenerationResponse {
     const controller = new AbortController();
+
+    // Create Request
     const response = fetch(`${this.engine.url}/api/generate`, {
       method: 'POST',
       body: JSON.stringify({
@@ -131,7 +154,24 @@ export class OllamaModel implements OllamaModelI {
 
     const handleError = (err: Error & { response: Response & ChatCompletionResponse }) => {
       if (err.name == 'AbortError') return err.response;
-      throw err;
+
+      // Set default error message
+      let errorMessage = 'Could not generate response, Please check your Host URL and ensure the Ollama API is enabled.'
+
+      // Handle Brave Browser Shield error
+      if ((navigator as any).brave && (err as Error).message.includes('Failed to fetch')) {
+        errorMessage += 'Brave Browser Shield may be blocking the request. Please disable it and try again.'
+      }
+
+      // Handle other errors
+      Notify.create({
+        message: errorMessage,
+        color: 'red',
+        position: 'top-right'
+      })
+
+      // Throw error
+      throw err
     };
 
     return {
