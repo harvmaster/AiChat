@@ -112,7 +112,7 @@ export class OllamaEngine implements OllamaEngineI {
 
       // Throw error
       console.error(err);
-      throw errorMessage
+      throw new Error(errorMessage);
     }
   }
 
