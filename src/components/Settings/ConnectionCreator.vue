@@ -97,6 +97,7 @@ import { app } from 'boot/app'
 
 import { EngineProps } from 'src/services/engines';
 import { EngineType } from 'src/services/engines/EngineTypes';
+import { Notify } from 'quasar';
 
 const engineProps = ref<EngineProps>({
   type: 'ollama',
@@ -120,7 +121,31 @@ const selectEngineType = (engineType: EngineType) => {
 const createEngine = async () => {
   const engine = app.engineManager.value.createEngine(engineProps.value)
   if (shouldRequestModels.value) {
-    const availableModels = await engine.getAvailableModels()
+    let availableModels: string[] = []
+
+    // Try to fetch available models
+    try {
+      const availableModelsResponse = await engine.getAvailableModels()
+      availableModels = availableModelsResponse
+    } catch (error) {
+
+      // Set default error message
+      let errorMessage = 'Failed to get available models from the server'
+
+      // Handle Brave Browser Shield error
+      if ((navigator as any).brave && (error as Error).message.includes('Failed to fetch')) {
+        errorMessage = 'Brave Browser Shield is blocking the request. Please disable it and try again.'
+      }
+
+      // Handle other errors
+      Notify.create({
+        message: errorMessage,
+        color: 'red',
+        position: 'top-right'
+      })
+    }
+
+    // Import available models
     const models = availableModels.map(model => engine.createModel({ name: model, model }).toPortableModel())
     models.forEach(model => app.engineManager.value.importModel(model))
   } else {
