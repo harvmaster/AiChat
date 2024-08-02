@@ -123,6 +123,9 @@ const createEngine = async () => {
     const availableModels = await engine.getAvailableModels()
     const models = availableModels.map(model => engine.createModel({ name: model, model }).toPortableModel())
     models.forEach(model => app.engineManager.value.importModel(model))
+  } else {
+    const exampleModel = engine.createModel({ name: 'Example Model', model: 'example' }).toPortableModel()
+    app.engineManager.value.importModel(exampleModel)
   }
 }
 
