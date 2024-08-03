@@ -122,7 +122,14 @@ const createEngine = async () => {
   // Create engine
   const engine = app.engineManager.value.createEngine(engineProps.value)
 
-  let models: PortableModel[] = [engine.createModel({ name: 'Example Model', model: 'example' }).toPortableModel()]
+  let models: PortableModel[] = []
+  if (engine.name == 'ollama') {
+    // Set an example model for Ollama
+    models = [engine.createModel({ name: 'Example Model', model: 'example' }).toPortableModel()]
+  } else {
+    // Get the first available model for when the engine is not Ollama
+    models = [await engine.getAvailableModels().then(models => engine.createModel({ name: models[0], model: models[0] }).toPortableModel())]
+  }
   
   // Get the available models from the server if that option is selected
   if (shouldRequestModels.value) {

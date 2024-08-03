@@ -1,7 +1,7 @@
 export const MODELS = {
   'gemma-7b': {
     model: 'Gemma-7b',
-    external_name: 'gemma-7b-lt'
+    external_name: 'gemma-7b-it'
   },
   'gemma2-9b': {
     model: 'Gemma2-9b',

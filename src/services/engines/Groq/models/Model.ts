@@ -74,7 +74,7 @@ export class GroqModel implements GroqModelI {
       };
     });
 
-    const response = fetch(`${this.engine.api}/chat/completions`, {
+    const response = fetch(`${this.engine.api}chat/completions`, {
       method: 'POST',
       body: JSON.stringify({
         model: this.external_name,
