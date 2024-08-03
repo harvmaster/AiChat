@@ -92,7 +92,7 @@ export type BaseEngineProps = {
 export interface BaseEngine {
   id: string;
   name: string;
-  // type: string;
+  type: string;
   isClosed: boolean;
   createdAt: number;
   createModel(model: ModelProps): Model;

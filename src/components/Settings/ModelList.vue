@@ -149,9 +149,9 @@ import { ref, computed, nextTick } from 'vue';
 import { app } from 'boot/app';
 import generateUUID from 'src/composeables/generateUUID';
 
-import { QPopupEdit } from 'quasar';
+import { Notify, QPopupEdit } from 'quasar';
 
-import { OpenModel, OpenEngine, Engine } from 'src/services/engines';
+import { OpenModel, OpenEngine, Engine, PortableModel } from 'src/services/engines';
 import { Model } from 'src/services/engines';
 
 const newProvider = ref('');
@@ -180,20 +180,6 @@ const selectModel = (model: Model) => {
 
 const addProviderPopup = ref<QPopupEdit | null>(null);
 const createProvider = (event: KeyboardEvent) => {
-  // if (event.key === 'Enter') {
-  //   app.models.value.push(
-  //     new OllamaModel(
-  //       generateUUID(),
-  //       new OllamaProvider(generateUUID(), newProvider.value, ''),
-  //       Date.now(),
-  //       '{ "temperature": 0.8 }',
-  //       'Example model'
-  //     )
-  //   );
-  //   addProviderPopup.value?.hide();
-  //   newProvider.value = '';
-  // }
-
   if (event.key === 'enter') {
     const newEngine = app.engineManager.value.createEngine({
       type: 'ollama',
@@ -205,7 +191,6 @@ const createProvider = (event: KeyboardEvent) => {
     const newModel = newEngine.createModel({
       id: generateUUID(),
       createdAt: Date.now(),
-      // advancedSettings: { 'temperature': 0.8 },
       name: 'Example model',
       model: 'Example model',
     }).toPortableModel();
@@ -224,32 +209,30 @@ const addModel = (engineId: string) => {
   const model = engine.createModel({
     id: generateUUID(),
     createdAt: Date.now(),
-    // advancedSettings: { 'temperature': 0.8 },
     name: 'Example model',
     model: 'Example model'
   });
-  // const model = new OllamaModel(
-  //   generateUUID(),
-  //   provider,
-  //   Date.now(),
-  //   '{ "temperature": 0.8 }',
-  //   'Example model'
-  // );
   app.models.value.push(model);
 
   nextTick(() => selectModel(model));
 };
 
 const refreshModels = async (engine: Engine) => {
-  console.log('refreshing models')
-  const models = await engine.getAvailableModels();
+  let models: string[] = [];
+  try {
+    models = await engine.getAvailableModels();
+  } catch (error) {
+    Notify.create({
+      message: (error as Error).message,
+      color: 'negative',
+      position: 'top-right'
+    });
+
+    return
+  }
 
   const existing = app.models.value.filter((model) => model.engine.id === engine.id);
-  console.log('existing', existing)
-
   const toAdd = models.filter((model) => !existing.find((m) => m.model === model));
-
-  console.log('toAdd', toAdd)
   
   const newModels = toAdd.map((model) => engine.createModel({
     createdAt: Date.now(),

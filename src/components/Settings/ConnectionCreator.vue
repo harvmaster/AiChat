@@ -123,7 +123,7 @@ const createEngine = async () => {
   const engine = app.engineManager.value.createEngine(engineProps.value)
 
   let models: PortableModel[] = []
-  if (engine.name == 'ollama') {
+  if (engine.type == 'ollama') {
     // Set an example model for Ollama
     models = [engine.createModel({ name: 'Example Model', model: 'example' }).toPortableModel()]
   } else {
