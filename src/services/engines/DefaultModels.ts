@@ -21,7 +21,7 @@ export const DefaultModels: PortableModel[] = [
     name: 'GPT-3.5 Turbo',
     engine: {
       id: 'openai',
-      name: 'GPT-3.5 Turbo',
+      name: 'OpenAI',
       type: 'openai',
       token: '',
       url: '',
@@ -36,7 +36,7 @@ export const DefaultModels: PortableModel[] = [
     name: 'GPT-4 Turbo',
     engine: {
       id: 'openai',
-      name: 'GPT-4 Turbo',
+      name: 'OpenAI',
       type: 'openai',
       token: '',
       url: '',
@@ -51,7 +51,7 @@ export const DefaultModels: PortableModel[] = [
     name: 'GPT-4o',
     engine: {
       id: 'openai',
-      name: 'GPT-4o',
+      name: 'OpenAI',
       type: 'openai',
       token: '',
       url: '',
