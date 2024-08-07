@@ -47,7 +47,7 @@ class App {
   //   },
   // });
 
-  readonly version = ref('1.2.0');
+  readonly version = ref('1.3.0');
 
   async loadFromDatabase() {
     const models: PortableModel[] = await getModelsFromDB();
