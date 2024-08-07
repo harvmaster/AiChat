@@ -16,6 +16,7 @@ import {
 } from 'src/utils/Database';
 import generateUUID from 'src/composeables/generateUUID';
 import { migrateFromProvider } from 'src/services/engines/utils';
+import MetricCollector from 'src/services/metric-collector/metric-collector';
 
 class App {
   readonly conversations = reactive<{ value: Conversation[] }>({ value: [] });
@@ -25,7 +26,9 @@ class App {
     return this.engineManager.value.models
   })
 
-  readonly engineManager = reactive<{ value: EngineManager }>({ value: new EngineManager() });
+  readonly metrics = reactive<{ value: MetricCollector }>({ value: new MetricCollector() });
+
+  readonly engineManager = reactive<{ value: EngineManager }>({ value: new EngineManager(this.metrics.value) });
 
   readonly settings = reactive<{ value: Settings }>({
     value: {
@@ -33,16 +36,16 @@ class App {
       showMetrics: false,
     },
   });
-  readonly metrics = reactive<{ value: ChatGenerationMetrics }>({
-    value: {
-      token_count: 0,
-      token_time: 0,
-      prompt_count: 0,
-      prompt_time: 0,
-      tps: 0,
-      memory_usage: 0,
-    },
-  });
+  // readonly metrics = reactive<{ value: ChatGenerationMetrics }>({
+  //   value: {
+  //     token_count: 0,
+  //     token_time: 0,
+  //     prompt_count: 0,
+  //     prompt_time: 0,
+  //     tps: 0,
+  //     memory_usage: 0,
+  //   },
+  // });
 
   readonly version = ref('1.2.0');
 

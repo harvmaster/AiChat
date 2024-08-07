@@ -10,11 +10,18 @@ import {
   PortableModel,
   SupportLevel,
   TextGenerationRequest,
-  ChatGenerationMetrics
 } from '../types';
 import OllamaEngine from './Engine';
 import { createPortableModelURL } from '../utils';
-import { Notify } from 'quasar';
+
+import { Metric } from '../metric-collector/types';
+
+export type OllamaMetrics = {
+  tokens_per_second: Metric;
+  eval_tokens_per_second: Metric;
+  token_count: Metric;
+  memory_usage: Metric;
+}
 
 export interface OllamaModelI extends OpenModel {
   engine: OllamaEngine;
@@ -105,8 +112,7 @@ export class OllamaModel implements OllamaModelI {
     const handleError = (err: Error & { response: Response & ChatCompletionResponse }) => {
       if (err.name == 'AbortError') return err.response;
 
-      // Other Errors
-
+      // Handler for other Errors
       // Set default error message
       let errorMessage = 'Could not generate response, Please check your Host URL and ensure the Ollama API is enabled.'
 
@@ -114,13 +120,6 @@ export class OllamaModel implements OllamaModelI {
       if ((navigator as any).brave && (err as Error).message.includes('Failed to fetch')) {
         errorMessage += 'Brave Browser Shield may be blocking the request. Please disable it and try again.'
       }
-
-      // // Handle other errors
-      // Notify.create({
-      //   message: errorMessage,
-      //   color: 'red',
-      //   position: 'top-right'
-      // })
 
       // Throw error
       console.error(err);
@@ -155,6 +154,7 @@ export class OllamaModel implements OllamaModelI {
     const handleError = (err: Error & { response: Response & ChatCompletionResponse }) => {
       if (err.name == 'AbortError') return err.response;
 
+      // Handler for other Errors
       // Set default error message
       let errorMessage = 'Could not generate response, Please check your Host URL and ensure the Ollama API is enabled.'
 
@@ -163,15 +163,9 @@ export class OllamaModel implements OllamaModelI {
         errorMessage += 'Brave Browser Shield may be blocking the request. Please disable it and try again.'
       }
 
-      // Handle other errors
-      Notify.create({
-        message: errorMessage,
-        color: 'red',
-        position: 'top-right'
-      })
-
       // Throw error
-      throw err
+      console.error(err);
+      throw new Error(errorMessage);
     };
 
     return {
@@ -223,6 +217,10 @@ export class OllamaModel implements OllamaModelI {
 
     // Collect metrics
 
+    // compile chunks
+    const responseSummary = responseChunks.at(-1);
+    this.engine.metricsCollector.updateMetrics(await this.parseMetrics(responseSummary));
+
 
     return {
       message: {
@@ -249,17 +247,27 @@ export class OllamaModel implements OllamaModelI {
     };
   }
 
-  async parseMetrics(metrics: OllamaResponseFinalChunk): Promise<ChatGenerationMetrics> {
+  async parseMetrics(metrics: OllamaResponseFinalChunk): Promise<OllamaMetrics> {
     const memUsage = await this.engine.getMemoryUsage();
 
     return {
-      token_count: metrics.eval_count,
-      token_time: metrics.eval_duration,
-      prompt_count: metrics.prompt_eval_count,
-      prompt_time: metrics.prompt_eval_duration,
-      tps: metrics.eval_count / metrics.eval_duration,
-      memory_usage: memUsage,
-    }
+      tokens_per_second: {
+        key: "Tokens/s",
+        value: ((metrics.eval_count / metrics.eval_duration) * 10 ** 9).toFixed(2)
+      },
+      eval_tokens_per_second: {
+        key: "Evaluation Tokens/s",
+        value: ((metrics.prompt_eval_count / metrics.prompt_eval_duration) * 10 ** 9).toFixed(2)
+      },
+      token_count: {
+        key: "Token Count",
+        value: metrics.eval_count
+      },
+      memory_usage: {
+        key: "Memory Usage",
+        value: `${(memUsage / 1024 / 1024 / 1024).toFixed(2)} GB`
+      }
+    };
   }
 }
 

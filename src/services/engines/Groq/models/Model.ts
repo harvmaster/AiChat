@@ -19,6 +19,30 @@ import generateUUID from "src/composeables/generateUUID";
 
 import MODELS from "./models";
 
+// Metric Engine types
+import { Metric } from "src/services/metric-collector/types";
+
+export type GroqMetrics = {
+  tokens_per_second: Metric;
+  queue_time: Metric;
+  token_count: Metric;
+}
+
+export type GroqResponseFinalChunk = {
+  x_groq: {
+    id: string
+    usage: {
+      completion_time: number;
+      completion_tokens: number;
+      prompt_time: number;
+      prompt_tokens: number;
+      queue_time: number;
+      total_time: number;
+      total_tokens: number;
+    }
+  }
+}
+
 export type GroqModelProps = ModelProps & {
   engine: GroqEngine;
   model: keyof typeof MODELS;
@@ -146,13 +170,17 @@ export class GroqModel implements GroqModelI {
         responseChunks.push(chunk);
 
         if (chunk.choices[0].delta.content) {
-          if (callback)
+          if (callback) {
             await callback({ message: { finished: !!chunk.choices[0].finish_reason, content: chunk.choices[0].delta.content } });
+          }
           result += chunk.choices[0].delta.content;
         }
       }
     }
 
+    // Collect metrics
+    const responseSummary = responseChunks.at(-1);
+    this.engine.metricsCollector.updateMetrics(await this.parseMetrics(responseSummary));
 
     return {
       message: {
@@ -178,6 +206,24 @@ export class GroqModel implements GroqModelI {
       createdAt: this.createdAt,
     };
   }
+
+  parseMetrics(metrics: GroqResponseFinalChunk): GroqMetrics {
+    return {
+      tokens_per_second: {
+        key: "Tokens/s",
+        value: ((metrics.x_groq.usage.completion_tokens / metrics.x_groq.usage.completion_time)).toFixed(2)
+      },
+      queue_time: {
+        key: "Queue Time",
+        value: `${(metrics.x_groq.usage.queue_time).toFixed(2)}s`
+      },
+      token_count: {
+        key: "Token Count",
+        value: metrics.x_groq.usage.total_tokens.toString()
+      },
+    };
+  }
+
 }
 
 export default GroqModel;

@@ -17,7 +17,7 @@ export const MODELS = {
   },
   'llama3.1-8b': {
     model: 'llama-3.1-8b',
-    external_name: 'llama3.1-8b-instant'
+    external_name: 'llama-3.1-8b-instant'
   },
   'llama3.1-70b': {
     model: 'llama-3.1-70b',

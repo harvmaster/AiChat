@@ -4,6 +4,7 @@ import {
   ChatCompletionContentPart,
   ChatCompletionContentPartImage,
   ChatCompletionMessageParam,
+  ChatCompletionChunk
 } from 'openai/resources';
 
 import { OpenAIEngine } from '../Engine';
@@ -23,6 +24,26 @@ import {
 
 import generateUUID from 'src/composeables/generateUUID';
 import { createPortableModelURL } from '../../utils';
+
+import { Metric } from 'src/services/metric-collector/types';
+
+export type GPT4OmniMiniMetrics = {
+  estimated_tokens_per_second: Metric;
+  token_count: Metric;
+}
+
+export type GPT4OmniMiniResponseFinalChunk = {
+  usage: {
+    completion_tokens: number;
+    prompt_tokens: number;
+    total_tokens: number;
+  }
+}
+
+export type GPT4OmniMiniResponseMetrics = GPT4OmniMiniResponseFinalChunk & {
+  firstToken: number;
+  lastToken: number;
+}
 
 export interface GPT4_Omni_MiniI extends OpenAIModel {
   model: 'gpt-4o-mini';
@@ -65,6 +86,9 @@ export class GPT4_Omni_Mini implements GPT4_Omni_MiniI {
       model: 'gpt-4o-mini',
       messages,
       stream: true,
+      stream_options: {
+        include_usage: true
+      },
       ...options,
     });
 
@@ -98,13 +122,35 @@ export class GPT4_Omni_Mini implements GPT4_Omni_MiniI {
     callback?: (res: ChatCompletionResponse) => void
   ): Promise<ChatCompletionResponse> {
     let result = '';
+    let firstToken;
+
+    const responseChunks: ChatCompletionChunk[] = []
+
     for await (const chunk of stream) {
+      if (firstToken === undefined) {
+        firstToken = Date.now()
+      }
+
+      responseChunks.push(chunk);
+
       if (chunk.choices[0]?.delta?.content) {
         if (callback)
           callback({ message: { finished: false, content: chunk.choices[0].delta.content } });
         result += chunk.choices[0].delta.content;
       }
     }
+
+    // Collect metrics
+    const lastToken = Date.now()
+    const responseSummary = responseChunks.at(-1);
+    console.log(responseSummary)
+
+    this.engine.metricsCollector.updateMetrics(await this.parseMetrics({
+      firstToken,
+      lastToken,
+      usage: responseSummary.usage
+    }));
+
     return {
       message: {
         finished: true,
@@ -160,6 +206,21 @@ export class GPT4_Omni_Mini implements GPT4_Omni_MiniI {
       engine: this.engine.toPortableEngine(),
       advancedSettings: this.advancedSettings,
       createdAt: this.createdAt,
+    };
+  }
+
+  parseMetrics(metrics: GPT4OmniMiniResponseMetrics): GPT4OmniMiniMetrics {
+    const timeDiff = metrics.lastToken - metrics.firstToken
+
+    return {
+      estimated_tokens_per_second: {
+        key: "Estimated Tokens/s",
+        value: (metrics.usage.completion_tokens / timeDiff * 1000).toFixed(2)
+      },
+      token_count: {
+        key: "Token Count",
+        value: metrics.usage.total_tokens.toString()
+      },
     };
   }
 }

@@ -1,5 +1,6 @@
 import OpenAI from 'openai';
 import { Stream } from 'openai/streaming';
+import { ChatCompletionChunk } from 'openai/resources';
 
 import { OpenAIEngine } from '../Engine';
 import OpenAIModel, { OpenAIModelProps } from './Model';
@@ -9,7 +10,6 @@ import {
   ChatCompletionRequestOptions,
   ChatCompletionResponse,
   ChatGenerationResponse,
-  ChatHistory,
   ModelSettings,
   PortableModel,
   SupportLevel,
@@ -18,6 +18,26 @@ import {
 
 import generateUUID from 'src/composeables/generateUUID';
 import { createPortableModelURL } from '../../utils';
+
+import { Metric } from 'src/services/metric-collector/types';
+
+export type GPT3_5TurboMetrics = {
+  estimated_tokens_per_second: Metric;
+  token_count: Metric;
+}
+
+export type GPT3_5TurboResponseFinalChunk = {
+  usage: {
+    completion_tokens: number;
+    prompt_tokens: number;
+    total_tokens: number;
+  }
+} 
+
+export type GPT3_5TurboResponseMetrics = GPT3_5TurboResponseFinalChunk & {
+  firstToken: number;
+  lastToken: number;
+}
 
 export interface GPT3_5TurboI extends OpenAIModel {
   model: 'gpt-3.5-turbo';
@@ -77,6 +97,9 @@ export class GPT3_5Turbo implements GPT3_5TurboI {
       model: 'gpt-3.5-turbo',
       messages: [{ content: request.prompt, role: 'user' }],
       stream: true,
+      stream_options: {
+        include_usage: true
+      },
       ...options,
     });
 
@@ -91,13 +114,34 @@ export class GPT3_5Turbo implements GPT3_5TurboI {
     callback?: (res: ChatCompletionResponse) => void
   ): Promise<ChatCompletionResponse> {
     let result = '';
+    let firstToken;
+
+    const responseChunks: ChatCompletionChunk[] = []
+
     for await (const chunk of stream) {
+      if (firstToken === undefined) {
+        firstToken = Date.now()
+      }
+
+      responseChunks.push(chunk);
+
       if (chunk.choices[0]?.delta?.content) {
         if (callback)
           callback({ message: { finished: false, content: chunk.choices[0].delta.content } });
         result += chunk.choices[0].delta.content;
       }
     }
+
+    // Collect metrics
+    const lastToken = Date.now()
+    const responseSummary = responseChunks.at(-1);
+
+    this.engine.metricsCollector.updateMetrics(await this.parseMetrics({
+      firstToken,
+      lastToken,
+      usage: responseSummary.usage
+    }));
+
     return {
       message: {
         finished: true,
@@ -120,6 +164,21 @@ export class GPT3_5Turbo implements GPT3_5TurboI {
       engine: this.engine.toPortableEngine(),
       advancedSettings: this.advancedSettings,
       createdAt: this.createdAt,
+    };
+  }
+
+  parseMetrics(metrics: GPT3_5TurboResponseMetrics): GPT3_5TurboMetrics {
+    const timeDiff = metrics.lastToken - metrics.firstToken
+
+    return {
+      estimated_tokens_per_second: {
+        key: "Estimated Tokens/s",
+        value: (metrics.usage.completion_tokens / timeDiff * 1000).toFixed(2)
+      },
+      token_count: {
+        key: "Token Count",
+        value: metrics.usage.total_tokens.toString()
+      },
     };
   }
 }

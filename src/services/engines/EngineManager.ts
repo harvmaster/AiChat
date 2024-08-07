@@ -1,4 +1,3 @@
-import { reactive } from 'vue';
 import { validatePortableModel } from './utils';
 
 import { ENGINES, EngineType, EngineHandler } from './EngineTypes';
@@ -8,17 +7,18 @@ import {
   EngineProps,
   Model,
   PortableModel,
-  // EngineType
 } from './types';
-
-// Define your engines and constructor in .Engines.ts
-
-// I cant figure out the TS wizardy to have this type be an full array of all the keys of the ENGINES object. This is close enough
+import MetricCollector from '../metric-collector/metric-collector';
 
 export class EngineManager {
   selectedModel: Model | null = null;
-  // models: Model[] = reactive<Model[]>([]);
   models: Model[] = []
+
+  MetricsCollector: MetricCollector;
+
+  constructor(MetricsCollector: MetricCollector) {
+    this.MetricsCollector = MetricsCollector;
+  }
 
   selectModel(model: Model) {
     this.selectedModel = model;
@@ -31,7 +31,7 @@ export class EngineManager {
   createEngine(engineProps: EngineProps): Engine {
     if (this.isValidEngineType(engineProps.type) && ENGINES[engineProps.type]) {
       const handler = this.getEngineHandler(engineProps.type);
-      return new handler(engineProps);
+      return new handler(engineProps, this.MetricsCollector);
     }
     
     throw new Error(`Engine type ${engineProps.type} is not supported`);
@@ -76,8 +76,5 @@ export class EngineManager {
     }
   }
 }
-
-// const engineManager = new EngineManager();
-// export default engineManager;
 
 export default EngineManager

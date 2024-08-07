@@ -1,3 +1,4 @@
+import MetricCollector from 'src/services/metric-collector/metric-collector';
 import { ClosedEngine, ClosedEngineProps, PortableEngine } from '../types';
 
 import { GroqModel, GroqModelProps, MODELS } from './models';
@@ -22,11 +23,16 @@ export class GroqEngine implements GroqEngineI {
   token: string;
   createdAt: number;
 
-  constructor(props: ClosedEngineProps) {
+  readonly hasMetrics = true;
+  metricsCollector: MetricCollector;
+
+  constructor(props: ClosedEngineProps, metricsCollector: MetricCollector) {
     this.id = props.id || generateUUID();
     this.name = props.name;
     this.token = props.token;
     this.createdAt = props.createdAt || Date.now();
+
+    this.metricsCollector = metricsCollector;
   }
 
   get isClosed() {

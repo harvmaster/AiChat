@@ -95,6 +95,7 @@ export interface BaseEngine {
   type: string;
   isClosed: boolean;
   createdAt: number;
+  hasMetrics: boolean;
   createModel(model: ModelProps): Model;
   getAvailableModels(): Promise<string[]>;
 }
