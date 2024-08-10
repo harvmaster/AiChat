@@ -37,7 +37,7 @@ class App {
     },
   });
 
-  readonly version = ref('1.3.0');
+  readonly version = ref('1.3.1');
 
   async loadFromDatabase() {
     const models: PortableModel[] = await getModelsFromDB();
@@ -95,8 +95,8 @@ class App {
       saveSettings(this.settings.value).catch((err) =>
         console.error('Failed to save settings:', err)
       );
-      if (!this.settings.value.selectedModel) return;
-      if (this.settings.value.selectedModel.engine.isClosed) return;
+      // if (!this.settings.value.selectedModel) return;
+      // if (this.settings.value.selectedModel.engine.isClosed) return;
 
       // get memory usage metric
       // this.settings.value.selectedModel.engine.getMemoryUsage?.().then((memoryUsage) => {

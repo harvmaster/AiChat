@@ -81,8 +81,8 @@
       v-if="app.settings.value.showMetrics && app.settings.value.selectedModel?.engine.hasMetrics && Object.keys(app.metrics.value.metrics).length > 0"
     >
       <div class="row q-col-gutter-md">
-        <!-- Iterate over the metrics object and display each metric -->
-        <div class="col-auto" v-for="metric of Object.values(app.metrics.value.metrics)" :key="metric.key">
+        <!-- Iterate over the metrics array and display each metric -->
+        <div class="col-auto" v-for="metric of app.metrics.value.metrics" :key="metric.key">
           {{ metric.key }}: {{ metric.value }}
         </div>
       </div>

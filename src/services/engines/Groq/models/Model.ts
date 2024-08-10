@@ -20,13 +20,22 @@ import generateUUID from "src/composeables/generateUUID";
 import MODELS from "./models";
 
 // Metric Engine types
-import { Metric } from "src/services/metric-collector/types";
+import { Metrics } from "src/services/metric-collector/types";
 
-export type GroqMetrics = {
-  tokens_per_second: Metric;
-  queue_time: Metric;
-  token_count: Metric;
-}
+export type GroqMetrics = Metrics<[
+  {
+    key: 'Tokens/s',
+    value: string
+  },
+  {
+    key: 'Queue Time',
+    value: string
+  },
+  {
+    key: 'Token Count',
+    value: string
+  }
+]>
 
 export type GroqResponseFinalChunk = {
   x_groq: {
@@ -42,6 +51,8 @@ export type GroqResponseFinalChunk = {
     }
   }
 }
+
+export type GroqResponseChunk = ChatCompletionChunk | GroqResponseFinalChunk;
 
 export type GroqModelProps = ModelProps & {
   engine: GroqEngine;
@@ -147,7 +158,7 @@ export class GroqModel implements GroqModelI {
     const reader = response.body.getReader();
 
     // This is used to get the metrics
-    const responseChunks: ChatCompletionChunk[] = []
+    const responseChunks: GroqResponseChunk[] = []
 
     while (true) {
       const { done, value } = await reader.read();
@@ -179,8 +190,10 @@ export class GroqModel implements GroqModelI {
     }
 
     // Collect metrics
-    const responseSummary = responseChunks.at(-1);
-    this.engine.metricsCollector.updateMetrics(await this.parseMetrics(responseSummary));
+    const responseSummary = responseChunks.at(-1) as GroqResponseFinalChunk;
+    if (responseSummary) {
+      this.engine.metricsCollector.updateMetrics(await this.parseMetrics(responseSummary));
+    }
 
     return {
       message: {
@@ -208,20 +221,20 @@ export class GroqModel implements GroqModelI {
   }
 
   parseMetrics(metrics: GroqResponseFinalChunk): GroqMetrics {
-    return {
-      tokens_per_second: {
-        key: "Tokens/s",
+    return [
+      {
+        key: 'Tokens/s',
         value: ((metrics.x_groq.usage.completion_tokens / metrics.x_groq.usage.completion_time)).toFixed(2)
       },
-      queue_time: {
-        key: "Queue Time",
+      {
+        key: 'Queue Time',
         value: `${(metrics.x_groq.usage.queue_time).toFixed(2)}s`
       },
-      token_count: {
-        key: "Token Count",
+      {
+        key: 'Token Count',
         value: metrics.x_groq.usage.total_tokens.toString()
       },
-    };
+    ];
   }
 
 }

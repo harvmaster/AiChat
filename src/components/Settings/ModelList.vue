@@ -151,8 +151,7 @@ import generateUUID from 'src/composeables/generateUUID';
 
 import { Notify, QPopupEdit } from 'quasar';
 
-import { OpenModel, OpenEngine, Engine, PortableModel } from 'src/services/engines';
-import { Model } from 'src/services/engines';
+import { Model, Engine } from 'src/services/engines';
 
 const newProvider = ref('');
 
@@ -176,6 +175,7 @@ const groupedModels = computed(() => {
 const selectedModel = computed(() => app.settings.value.selectedModel);
 const selectModel = (model: Model) => {
   app.settings.value.selectedModel = model;
+  console.log('Selected model:', model);
 };
 
 const addProviderPopup = ref<QPopupEdit | null>(null);

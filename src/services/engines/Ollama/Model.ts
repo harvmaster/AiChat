@@ -14,14 +14,26 @@ import {
 import OllamaEngine from './Engine';
 import { createPortableModelURL } from '../utils';
 
-import { Metric } from '../metric-collector/types';
+import { Metrics } from 'src/services/metric-collector/types';
 
-export type OllamaMetrics = {
-  tokens_per_second: Metric;
-  eval_tokens_per_second: Metric;
-  token_count: Metric;
-  memory_usage: Metric;
-}
+export type OllamaMetrics = Metrics<[
+  {
+    key: 'Tokens/s',
+    value: string
+  },
+  {
+    key: 'Evaluation Tokens/s',
+    value: string
+  },
+  {
+    key: 'Token Count',
+    value: string
+  },
+  {
+    key: 'Memory Usage',
+    value: string
+  }
+]>
 
 export interface OllamaModelI extends OpenModel {
   engine: OllamaEngine;
@@ -218,8 +230,10 @@ export class OllamaModel implements OllamaModelI {
     // Collect metrics
 
     // compile chunks
-    const responseSummary = responseChunks.at(-1);
-    this.engine.metricsCollector.updateMetrics(await this.parseMetrics(responseSummary));
+    const responseSummary = responseChunks.at(-1) as OllamaResponseFinalChunk;
+    if (responseSummary) {
+      this.engine.metricsCollector.updateMetrics(await this.parseMetrics(responseSummary));
+    }
 
 
     return {
@@ -250,24 +264,26 @@ export class OllamaModel implements OllamaModelI {
   async parseMetrics(metrics: OllamaResponseFinalChunk): Promise<OllamaMetrics> {
     const memUsage = await this.engine.getMemoryUsage();
 
-    return {
-      tokens_per_second: {
-        key: "Tokens/s",
+    const formattedMetrics: OllamaMetrics = [
+      {
+        key: 'Tokens/s',
         value: ((metrics.eval_count / metrics.eval_duration) * 10 ** 9).toFixed(2)
       },
-      eval_tokens_per_second: {
-        key: "Evaluation Tokens/s",
+      {
+        key: 'Evaluation Tokens/s',
         value: ((metrics.prompt_eval_count / metrics.prompt_eval_duration) * 10 ** 9).toFixed(2)
       },
-      token_count: {
-        key: "Token Count",
-        value: metrics.eval_count
+      {
+        key: 'Token Count',
+        value: metrics.eval_count.toString()
       },
-      memory_usage: {
-        key: "Memory Usage",
+      {
+        key: 'Memory Usage',
         value: `${(memUsage / 1024 / 1024 / 1024).toFixed(2)} GB`
       }
-    };
+    ]
+
+    return formattedMetrics;
   }
 }
 

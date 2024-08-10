@@ -1,17 +1,17 @@
 import { Metric } from "./types";
 
 class MetricCollector {
-  metrics: unknown;
+  metrics: Metric[];
 
   constructor() {
-    this.metrics = {}
+    this.metrics = []
   }
 
-  updateMetrics(metrics: unknown) {
+  updateMetrics(metrics: Metric[]) {
     this.metrics = metrics;
   }
 
-  getMetrics(): unknown {
+  getMetrics(): Metric[] {
     return this.metrics;
   }
 }

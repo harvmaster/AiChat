@@ -8,13 +8,19 @@ import { OpenAIEngine } from '../Engine';
 import { MODELS } from './models';
 
 import generateUUID from 'src/composeables/generateUUID';
-import { Metric } from 'src/services/metric-collector/types';
+import { Metrics } from 'src/services/metric-collector/types';
 import { createPortableModelURL } from '../../utils';
 
-export type OpenAIMetrics = {
-  estimated_tokens_per_second: Metric;
-  token_count: Metric;
-}
+export type OpenAIMetrics = Metrics<[
+  {
+    key: 'Estimated Tokens/s',
+    value: string
+  },
+  {
+    key: 'Token Count',
+    value: string
+  }
+]>
 
 export type OpenAIResponseFinalChunk = {
   usage: {
@@ -235,16 +241,18 @@ export class OpenAIModel implements OpenAIModelI {
   parseMetrics(metrics: OpenAIResponseMetrics): OpenAIMetrics { 
     const timeDiff = metrics.lastToken - metrics.firstToken
 
-    return {
-      estimated_tokens_per_second: {
-        key: "Estimated Tokens/s",
+    const formattedMetrics: OpenAIMetrics = [
+      {
+        key: 'Estimated Tokens/s',
         value: (metrics.usage.completion_tokens / timeDiff * 1000).toFixed(2)
       },
-      token_count: {
-        key: "Token Count",
+      {
+        key: 'Token Count',
         value: metrics.usage.total_tokens.toString()
-      },
-    };
+      }
+    ]
+
+    return formattedMetrics;
   }
 }
 
