@@ -1,8 +1,7 @@
 import MetricCollector from 'src/services/metric-collector/metric-collector';
-import { ClosedEngine, ClosedEngineProps, Model, ModelProps, OpenEngineProps, PortableEngine } from '../types';
+import { ClosedEngine, ClosedEngineProps, OpenEngineProps, PortableEngine } from '../types';
 
-import * as Models from './models';
-import OpenAIModel from './models/Model';
+import { OpenAIModel, OpenAIModelProps, MODELS } from './models';
 
 import generateUUID from 'src/composeables/generateUUID';
 
@@ -38,41 +37,20 @@ export class OpenAIEngine implements OpenAIEngineI {
   get isClosed() {
     return OpenAIEngine.isClosed;
   }
-
-  createModel(model: ModelProps): OpenAIModel {
-    if (model.model === 'gpt-3.5-turbo') {
-      return new Models.GPT3_5Turbo({
-        ...model,
-        engine: this,
-      });
+  
+  createModel(model: OpenAIModelProps): OpenAIModel {
+    if (MODELS[model.model] === undefined) {
+      throw new Error(`Model ${model.model} is not supported by OpenAI`);
     }
 
-    if (model.model === 'gpt-4-turbo') {
-      return new Models.GPT4Turbo({
-        ...model,
-        engine: this,
-      });
-    }
-
-    if (model.model === 'gpt-4o') {
-      return new Models.GPT4Omni({
-        ...model,
-        engine: this,
-      });
-    }
-
-    if (model.model === 'gpt-4o-mini') {
-      return new Models.GPT4OmniMini({
-        ...model,
-        engine: this,
-      });
-    }
-
-    throw new Error(`Model ${model.model} is not supported by OpenAI`);
+    return new OpenAIModel({
+      ...model,
+      engine: this,
+    });
   }
 
-  getAvailableModels(): Promise<string[]> {
-    return Promise.resolve(['gpt-3.5-turbo', 'gpt-4-turbo', 'gpt-4o', 'gpt-4o-mini']);
+  getAvailableModels(): Promise<(keyof typeof MODELS)[]> {
+    return Promise.resolve(Object.keys(MODELS)) as Promise<(keyof typeof MODELS)[]>;
   }
 
   toPortableEngine(): PortableEngine {

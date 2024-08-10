@@ -1,7 +1,7 @@
 import { computed, reactive, ref, watch } from 'vue';
 import { Notify } from 'quasar';
 
-import { Model, Engine, ChatGenerationMetrics, EngineManager, PortableModel } from 'src/services/engines';
+import { Model, Engine, EngineManager, PortableModel } from 'src/services/engines';
 import DefaultModels from 'src/services/engines/DefaultModels';
 import { default as getModelsFromDB } from 'src/utils/Database/Models/getModels'
 
@@ -36,16 +36,6 @@ class App {
       showMetrics: false,
     },
   });
-  // readonly metrics = reactive<{ value: ChatGenerationMetrics }>({
-  //   value: {
-  //     token_count: 0,
-  //     token_time: 0,
-  //     prompt_count: 0,
-  //     prompt_time: 0,
-  //     tps: 0,
-  //     memory_usage: 0,
-  //   },
-  // });
 
   readonly version = ref('1.3.0');
 
@@ -109,9 +99,9 @@ class App {
       if (this.settings.value.selectedModel.engine.isClosed) return;
 
       // get memory usage metric
-      this.settings.value.selectedModel.engine.getMemoryUsage?.().then((memoryUsage) => {
-        this.metrics.value.memory_usage = memoryUsage;
-      });
+      // this.settings.value.selectedModel.engine.getMemoryUsage?.().then((memoryUsage) => {
+      //   this.metrics.value.memoryUsage = memoryUsage;
+      // });
     });
 
     watch(this.engineManager, () => {
