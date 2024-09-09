@@ -8,7 +8,7 @@ pages:
     - npm run build
     - rm -rf public
     - mkdir public
-    - cp -r dist/spa/* public
+    - cp -r dist/pwa/* public
     - echo "/* /index.html 200" >> _redirect
   artifacts:
     paths:
