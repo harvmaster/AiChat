@@ -1,11 +1,11 @@
 export const MODELS = {
   '3.5-sonnet': {
     model: 'Claude-3.5-Sonnet',
-    external_name: 'claude-3-5-sonnet-20240620',
+    external_name: 'claude-3-5-sonnet-latest',
   },
   '3-opus': {
     model: 'Claude-3-Opus',
-    external_name: 'claude-3-opus-20240229',
+    external_name: 'claude-3-opus-latest',
   },
   '3-sonnet': {
     model: 'Claude-3-Sonnet',

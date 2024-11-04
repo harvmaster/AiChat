@@ -107,11 +107,13 @@ export class ClaudeModel implements ClaudeModelI {
         model: this.external_name,
         messages: request.messages,
         stream: true,
+        max_tokens: 8192,
       }),
       headers: {
         'x-api-key': `${this.engine.token}`,
-        'anhropic-version': '2023-06-01',
+        'anthropic-version': '2023-06-01',
         'content-type': 'application/json',
+        'anthropic-dangerous-direct-browser-access': 'true',
       },
       signal: controller.signal,
     });
@@ -175,7 +177,7 @@ export class ClaudeModel implements ClaudeModelI {
         responseChunks.push(chunk);
         if (!chunk.type.startsWith('content_block')) continue;
 
-        if (chunk.delta.text) {
+        if (chunk.delta?.text) {
           if (callback) {
             await callback({
               message: {
