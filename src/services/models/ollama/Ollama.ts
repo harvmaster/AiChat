@@ -20,7 +20,7 @@ export const defaultOptions: Partial<OllamaOptions> = {
   // tfs_z: 0.5,
   // typical_p: 0.7,
   // repeat_last_n: 33,
-  temperature: 0.8,
+  // temperature: 0.8,
   // repeat_penalty: 1.2,
   // presence_penalty: 1.5,
   // frequency_penalty: 1.0,

@@ -77,9 +77,8 @@ export class OllamaModel implements OllamaModelI {
   createdAt: number;
   engine: OllamaEngine;
 
-  advancedSettings: Partial<ModelSettings> = {
-    temperature: 0.8,
-  };
+  advancedSettings: Partial<ModelSettings> = {};
+  
   capabilities: Capabilities = {
     text: SupportLevel.SUPPORTED,
     image: SupportLevel.UNKNOWN,

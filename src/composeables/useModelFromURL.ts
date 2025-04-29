@@ -68,7 +68,7 @@ export const useModelFromURL = () => {
         id: model.id,
         name: model.name || model.model,
         model: model.model,
-        advancedSettings: model.advancedSettings || { temperature: 0.8 },
+        advancedSettings: model.advancedSettings || {},
         engine: {
           id: model.provider.id,
           name: model.provider.name,

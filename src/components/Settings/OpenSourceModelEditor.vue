@@ -35,9 +35,9 @@
     </div>
 
     <!-- Temperature -->
-    <div class="col-auto row">
+    <!-- <div class="col-auto row">
       <div class="row fit-content q-py-sm">
-        <div class="col-12 text-white">Temperature</div>
+        <div class="col-12 text-white"></div>
         <counter-input
           class="col-auto"
           v-model="selectedModel.advancedSettings.temperature!"
@@ -45,7 +45,7 @@
           @update:model-value="clampTemperature"
         />
       </div>
-    </div>
+    </div> -->
 
     <!-- Advanced settings Dialog Toggle -->
     <div class="col-auto row q-py-sm">
@@ -128,12 +128,12 @@ const deleteModel = () => {
   app.settings.value.selectedModel = app.models.value[0];
 };
 
-watch(
-  () => app.settings.value.selectedModel?.advancedSettings.temperature,
-  () => {
-    clampTemperature();
-  }
-);
+// watch(
+// () => app.settings.value.selectedModel?.advancedSettings.temperature,
+//   () => {
+// clampTemperature();
+//   }
+// );
 
 const toggleAdvanced = () => {
   emits('toggleAdvanced');

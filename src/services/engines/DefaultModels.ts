@@ -12,8 +12,8 @@ export const DefaultModels: PortableModel[] = [
       url: 'https://ai.ollama.mc.hzuccon.com',
       createdAt: Date.now(),
     },
-    model: 'phi3',
-    advancedSettings: { temperature: 0.8 },
+    model: 'qwen3:30b',
+    advancedSettings: {},
     createdAt: Date.now(),
   },
   {
