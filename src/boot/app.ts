@@ -51,9 +51,11 @@ class App {
       if (model.id === 'default_llama_phi3') {
         return {
           ...model,
+          id: 'default_llama_qwen3_30b',
+          name: 'Qwen3-30B-A3B-Q4_K_M',
           engine: {
             ...(model as PortableModel).engine,
-            url: 'https://ai.ollama.mc.hzuccon.com',
+            url: 'https://ai.llama.mc.hzuccon.com',
           },
         } as PortableModel;
       }
