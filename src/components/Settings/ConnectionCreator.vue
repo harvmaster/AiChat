@@ -88,7 +88,6 @@
   background-color: $blue-3;
   color: $accent;
 }
-
 </style>
 
 <script setup lang="ts">
@@ -100,7 +99,7 @@ import { EngineType } from 'src/services/engines/EngineTypes';
 import { Notify } from 'quasar';
 
 const engineProps = ref<EngineProps>({
-  type: 'ollama',
+  type: 'llama',
   name: '',
   token: '',
   url: ''
@@ -126,6 +125,9 @@ const createEngine = async () => {
   if (engine.type == 'ollama') {
     // Set an example model for Ollama
     models = [engine.createModel({ name: 'Example Model', model: 'example' }).toPortableModel()]
+  } else if (engine.type == 'llama') {
+    // Set an example model for Llama
+    models = [engine.createModel({ name: 'Example Model', model: 'example' }).toPortableModel()]
   } else {
     // Get the first available model for when the engine is not Ollama
     models = [await engine.getAvailableModels().then(models => engine.createModel({ name: models[0], model: models[0] }).toPortableModel())]
@@ -138,6 +140,7 @@ const createEngine = async () => {
     try {
       // Fetch available models
       availableModels= await engine.getAvailableModels()
+      console.log(availableModels)
     } catch (error) {
       // Notify the user of the error
       Notify.create({

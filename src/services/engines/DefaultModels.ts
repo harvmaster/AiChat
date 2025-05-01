@@ -2,17 +2,17 @@ import { PortableModel } from "./types"
 
 export const DefaultModels: PortableModel[] = [
   {
-    id: 'default_ollama_phi3',
-    name: 'AI Chat',
+    id: 'default_llama_qwen3_30b',
+    name: 'Qwen3-30B-A3B-Q4_K_M',
     engine: {
-      id: 'ollama',
+      id: 'llama',
       name: 'AI Chat',
-      type: 'ollama',
+      type: 'llama',
       token: '',
       url: 'https://ai.ollama.mc.hzuccon.com',
       createdAt: Date.now(),
     },
-    model: 'qwen3:30b',
+    model: 'Qwen3-30B-A3B-Q4_K_M.gguf',
     advancedSettings: {},
     createdAt: Date.now(),
   },
@@ -60,7 +60,23 @@ export const DefaultModels: PortableModel[] = [
     model: 'gpt-4o',
     advancedSettings: { temperature: 0.8 },
     createdAt: Date.now(),
-  }
+  },
+  {
+    id: 'default_openai_gpto4mini',
+    name: 'GPT-o4 Mini',
+    engine: {
+      id: 'openai',
+      name: 'OpenAI',
+      type: 'openai',
+      token: '',
+      url: '',
+      createdAt: Date.now(),
+    },
+    model: 'gpt-o4-mini',
+    advancedSettings: { temperature: 0.8 },
+    createdAt: Date.now(),
+  },
+
 ]
 
 export default DefaultModels

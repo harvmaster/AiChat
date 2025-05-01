@@ -78,17 +78,21 @@ export class Conversation implements ConversationI {
     const summaryPrompt: ChatHistory = [
       {
         role: 'system',
-        content: 'Summarise this conversation into 5 words or less',
+        content: 'Summarise this conversation into 5 words or less /no_think',
       },
       {
         role: 'user',
-        content: formattedMessages.map((m) => m.content).join(' '),
+        content: `
+          ${formattedMessages.map((m) => `${m.role}: ${m.content}`).join('\n')}
+          /no_think
+        `,
       },
     ];
 
     const response = await model.sendChat({ messages: summaryPrompt }).response;
-    this.summary = response.message.content;
 
+    // Remove any think tags from the response
+    this.summary = response.message.content.replace(/<think>([\s\S]*?)<\/think>/g, '');
     return this.summary;
   }
 }

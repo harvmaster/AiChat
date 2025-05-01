@@ -1,6 +1,14 @@
 import { SupportLevel } from "../../types"
 
 export const MODELS = {
+  'gpt-o4-mini': {
+    model: 'GPT-o4-mini',
+    external_name: 'o4-mini',
+    capabilities: {
+      text: SupportLevel.SUPPORTED,
+      image: SupportLevel.SUPPORTED
+    }
+  },
   'gpt-o1-preview': {
     model: 'GPT-o1-Preview',
     external_name: 'o1-preview',

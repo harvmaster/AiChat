@@ -46,6 +46,17 @@ class App {
       if ((model as Database__Model).providerId != undefined) {
         return await migrateFromProvider(model as unknown as Database__Model);
       }
+
+      // This is garbage code for garbage people 😔
+      if (model.id === 'default_llama_phi3') {
+        return {
+          ...model,
+          engine: {
+            ...(model as PortableModel).engine,
+            url: 'https://ai.ollama.mc.hzuccon.com',
+          },
+        } as PortableModel;
+      }
       return model as PortableModel;
     }))
 
